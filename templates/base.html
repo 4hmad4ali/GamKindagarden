@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}GAAM Kindergarten{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-gray-100 font-vazir">
+    {% if messages %}
+    {% for message in messages %}
+    <div class="m-4 p-4 bg-blue-100 rounded-lg">{{ message }}</div>
+    {% endfor %}
+    {% endif %}
+    
+    {% block content %}{% endblock %}
+</body>
+</html>

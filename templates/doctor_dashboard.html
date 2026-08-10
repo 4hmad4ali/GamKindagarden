@@ -1,0 +1,846 @@
+{% extends 'base.html' %}
+{% block title %}داشبورد داکتر - GAAM{% endblock %}
+
+{% block content %}
+<style>
+/* ══════════════════════════════════════════
+   DOCTOR DASHBOARD - GAAM KINDERGARTEN
+   ══════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;600;700;900&display=swap');
+
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f4ff;--card:#fff;--text:#1e293b;--text2:#64748b;
+  --pri:#4f46e5;--pri2:#312e81;--border:#e2e8f0;
+  --shadow:0 4px 24px rgba(79,70,229,.09);
+  --sidebar:#1e1b4b;--sidebar-text:#c7d2fe;
+  --sb-w:260px;
+}
+.dark{
+  --bg:#0f172a;--card:#1e293b;--text:#f1f5f9;--text2:#94a3b8;
+  --border:#334155;--shadow:0 4px 24px rgba(0,0,0,.4);
+}
+body{font-family:'Vazirmatn',sans-serif;background:var(--bg);color:var(--text);
+  direction:rtl;min-height:100vh;transition:background .3s,color .3s}
+
+/* ══ LAYOUT ══ */
+.doc-layout{display:flex;min-height:100vh}
+
+/* ══ SIDEBAR ══ */
+.doc-sidebar{
+  width:var(--sb-w);min-height:100vh;background:var(--sidebar);
+  position:fixed;right:0;top:0;z-index:100;
+  display:flex;flex-direction:column;
+  transition:transform .3s;
+}
+.doc-sidebar.collapsed{transform:translateX(100%)}
+.sb-logo{padding:24px 20px;border-bottom:1px solid rgba(255,255,255,.1)}
+.sb-logo h3{color:#fff;font-size:16px;font-weight:900}
+.sb-logo p{color:#a5b4fc;font-size:11px;margin-top:2px}
+
+/* Profile in sidebar */
+.sb-profile{padding:20px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:12px}
+.sb-avatar{width:46px;height:46px;border-radius:50%;object-fit:cover;border:2px solid #4f46e5}
+.sb-avatar-ph{width:46px;height:46px;border-radius:50%;background:#4f46e5;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:900}
+.sb-uname{color:#fff;font-size:13px;font-weight:700}
+.sb-urole{color:#a5b4fc;font-size:11px}
+
+.sb-menu{padding:12px 0;flex:1;overflow-y:auto}
+.sb-section{padding:6px 16px 4px;color:#6366f1;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.sb-link{display:flex;align-items:center;gap:10px;padding:11px 20px;
+  color:var(--sidebar-text);text-decoration:none;font-size:13px;font-weight:600;
+  transition:.2s;border-right:3px solid transparent;cursor:pointer;background:none;border-top:none;border-bottom:none;border-left:none;width:100%}
+.sb-link:hover,.sb-link.active{background:rgba(99,102,241,.2);color:#fff;border-right-color:#6366f1}
+.sb-link span:first-child{font-size:16px;width:22px;text-align:center}
+
+.sb-logout{padding:16px;border-top:1px solid rgba(255,255,255,.1)}
+.btn-logout{width:100%;padding:11px;background:#dc2626;color:#fff;border:none;
+  border-radius:9px;font-family:'Vazirmatn',sans-serif;font-size:13px;font-weight:700;
+  cursor:pointer;transition:.2s}
+.btn-logout:hover{background:#b91c1c}
+
+/* ══ TOPBAR ══ */
+.doc-topbar{
+  position:fixed;top:0;left:0;
+  right:var(--sb-w);
+  height:62px;background:var(--card);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;z-index:90;transition:right .3s;
+}
+.doc-topbar.full{right:0}
+.tb-left{display:flex;align-items:center;gap:14px}
+.tb-right{display:flex;align-items:center;gap:12px}
+.btn-toggle{background:none;border:none;font-size:20px;cursor:pointer;
+  color:var(--text);padding:6px;border-radius:7px;transition:.2s}
+.btn-toggle:hover{background:var(--border)}
+.btn-dark{background:none;border:none;font-size:18px;cursor:pointer;
+  color:var(--text);padding:6px;border-radius:7px;transition:.2s}
+.clock-box{font-size:13px;font-weight:700;color:var(--pri);
+  background:rgba(79,70,229,.08);padding:6px 14px;border-radius:20px}
+.page-title{font-size:15px;font-weight:800;color:var(--text)}
+
+/* ══ MAIN CONTENT ══ */
+.doc-main{
+  margin-right:var(--sb-w);padding:82px 24px 30px;
+  min-height:100vh;transition:margin-right .3s;
+}
+.doc-main.full{margin-right:0}
+
+/* ══ WELCOME CARD ══ */
+.welcome-card{
+  background:linear-gradient(135deg,#312e81 0%,#4f46e5 60%,#7c3aed 100%);
+  border-radius:16px;padding:28px 32px;margin-bottom:24px;
+  display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;
+  color:#fff;
+}
+.wc-title{font-size:22px;font-weight:900}
+.wc-sub{font-size:13px;opacity:.8;margin-top:4px}
+.wc-time{text-align:left;direction:ltr}
+.wc-date{font-size:13px;opacity:.8}
+.wc-clock{font-size:30px;font-weight:900;letter-spacing:2px;margin-top:4px}
+.wc-tz{font-size:11px;opacity:.7}
+
+/* ══ STATS ROW ══ */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.stat-card{background:var(--card);border-radius:14px;padding:20px;
+  box-shadow:var(--shadow);border:1px solid var(--border);
+  display:flex;align-items:center;gap:16px}
+.stat-icon{width:52px;height:52px;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.si-blue{background:#dbeafe}.si-green{background:#dcfce7}
+.si-yellow{background:#fef3c7}.si-red{background:#fee2e2}
+.stat-num{font-size:26px;font-weight:900;color:var(--text)}
+.stat-lbl{font-size:12px;color:var(--text2);margin-top:2px}
+
+/* ══ SECTION CARDS ══ */
+.section-card{background:var(--card);border-radius:14px;padding:24px;
+  box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:20px}
+.section-title{font-size:15px;font-weight:900;color:var(--text);
+  margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.btn-add{padding:9px 18px;background:linear-gradient(135deg,#312e81,#4f46e5);
+  color:#fff;border:none;border-radius:9px;font-size:13px;font-weight:700;
+  cursor:pointer;font-family:'Vazirmatn',sans-serif;transition:.2s;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn-add:hover{opacity:.9;transform:translateY(-1px)}
+.btn-back{padding:8px 16px;background:var(--border);color:var(--text);
+  border:none;border-radius:9px;font-size:13px;font-weight:700;
+  cursor:pointer;text-decoration:none;font-family:'Vazirmatn',sans-serif;
+  display:inline-flex;align-items:center;gap:6px;transition:.2s}
+.btn-back:hover{background:#94a3b8;color:#fff}
+
+/* ══ TABLE ══ */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+thead tr{background:linear-gradient(135deg,#312e81,#4f46e5);color:#fff}
+th{padding:12px 14px;text-align:right;font-size:13px;font-weight:700;white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--border);transition:.2s}
+tbody tr:hover{background:rgba(79,70,229,.04)}
+td{padding:12px 14px;font-size:13px;color:var(--text)}
+.badge{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700}
+.b-excellent{background:#dcfce7;color:#166534}
+.b-good{background:#dbeafe;color:#1e40af}
+.b-normal{background:#fef3c7;color:#92400e}
+.b-care{background:#fee2e2;color:#991b1b}
+.b-present{background:#dcfce7;color:#166534}
+.b-absent{background:#fee2e2;color:#991b1b}
+.b-late{background:#fef3c7;color:#92400e}
+
+/* ══ ACTION BUTTONS ══ */
+.act-btns{display:flex;gap:6px;justify-content:center}
+.btn-edit{padding:5px 11px;background:#3b82f6;color:#fff;border:none;
+  border-radius:6px;font-size:12px;cursor:pointer;font-family:'Vazirmatn',sans-serif;transition:.2s}
+.btn-edit:hover{background:#2563eb}
+.btn-del{padding:5px 11px;background:#ef4444;color:#fff;border:none;
+  border-radius:6px;font-size:12px;cursor:pointer;font-family:'Vazirmatn',sans-serif;transition:.2s}
+.btn-del:hover{background:#dc2626}
+
+/* ══ NUM-FIELD ══ */
+.num-field{
+  width:100%;padding:11px 14px;
+  border:1.5px solid var(--border);border-radius:9px;
+  font-size:14px;font-family:'Vazirmatn',sans-serif;
+  background:var(--bg);color:var(--text);transition:.2s;
+  direction:ltr;text-align:left;letter-spacing:1px;
+}
+.num-field:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(79,70,229,.1);outline:none}
+.num-field::placeholder{direction:rtl;text-align:right;color:#aaa;font-size:12px;letter-spacing:0}
+.dark .num-field{background:#0f172a!important;color:var(--text)!important}
+
+/* ══ FORM STYLES ══ */
+.form-card{background:var(--card);border-radius:14px;padding:28px;
+  box-shadow:var(--shadow);border:1px solid var(--border);max-width:720px}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;margin-bottom:6px;color:var(--text2);
+  font-weight:700;font-size:12px;text-align:right}
+.form-group input,.form-group select,.form-group textarea{
+  width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:9px;
+  font-size:13px;transition:.2s;direction:rtl;font-family:'Vazirmatn',sans-serif;
+  background:var(--bg);color:var(--text)}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{
+  border-color:var(--pri);box-shadow:0 0 0 3px rgba(79,70,229,.1);outline:none}
+.form-group textarea{min-height:80px;resize:vertical}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-actions{display:flex;gap:12px;margin-top:20px}
+.btn-submit{flex:1;padding:12px;background:linear-gradient(135deg,#312e81,#4f46e5);
+  color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:700;
+  cursor:pointer;font-family:'Vazirmatn',sans-serif;transition:.2s}
+.btn-submit:hover{opacity:.9;transform:translateY(-1px)}
+
+/* ══ PROFILE CARD ══ */
+.profile-card{background:var(--card);border-radius:14px;padding:28px;
+  box-shadow:var(--shadow);border:1px solid var(--border);max-width:600px}
+.prof-avatar-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:24px}
+.prof-avatar{width:100px;height:100px;border-radius:50%;object-fit:cover;
+  border:3px solid var(--pri);margin-bottom:10px}
+.prof-avatar-ph{width:100px;height:100px;border-radius:50%;background:var(--pri);
+  display:flex;align-items:center;justify-content:center;color:#fff;font-size:36px;font-weight:900;margin-bottom:10px}
+.btn-pic{padding:7px 16px;background:var(--border);color:var(--text);border:none;
+  border-radius:8px;font-size:12px;cursor:pointer;font-family:'Vazirmatn',sans-serif}
+
+/* ══ MODAL ══ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);
+  z-index:200;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--card);border-radius:14px;padding:28px;
+  max-width:420px;width:90%;text-align:center}
+.modal h3{font-size:16px;font-weight:900;color:var(--text);margin-bottom:10px}
+.modal p{font-size:13px;color:var(--text2);margin-bottom:20px}
+.modal-btns{display:flex;gap:10px;justify-content:center}
+.btn-confirm{padding:10px 24px;background:#ef4444;color:#fff;border:none;
+  border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Vazirmatn',sans-serif}
+.btn-cancel-m{padding:10px 24px;background:var(--border);color:var(--text);border:none;
+  border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Vazirmatn',sans-serif}
+
+/* ══ TABS / SECTIONS (single page app style) ══ */
+.doc-section{display:none}
+.doc-section.active{display:block}
+
+/* ══ MESSAGES ══ */
+.msg-box{padding:10px 14px;border-radius:8px;margin-bottom:14px;font-size:13px;font-weight:600}
+.msg-ok{background:#dcfce7;color:#166534}
+.msg-err{background:#fee2e2;color:#991b1b}
+
+@media(max-width:900px){
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+  .doc-sidebar{transform:translateX(100%)}
+  .doc-sidebar.mobile-open{transform:none}
+  .doc-topbar,.doc-main{right:0!important;margin-right:0!important}
+  .form-row{grid-template-columns:1fr}
+}
+@media(max-width:600px){.stats-row{grid-template-columns:1fr}}
+</style>
+
+<!-- ══ SIDEBAR ══ -->
+<div class="doc-sidebar" id="sidebar">
+  <div class="sb-logo">
+    <h3>🏥 GAAM Kindergarten</h3>
+    <p>سیستم مدیریت داکتر</p>
+  </div>
+  <div class="sb-profile">
+    {% if profile_picture %}
+    <img src="{{ profile_picture }}" class="sb-avatar" alt="profile">
+    {% else %}
+    <div class="sb-avatar-ph">{{ username|first|upper }}</div>
+    {% endif %}
+    <div>
+      <div class="sb-uname">{{ username }}</div>
+      <div class="sb-urole">⚕️ داکتر</div>
+    </div>
+  </div>
+  <nav class="sb-menu">
+    <div class="sb-section">منو اصلی</div>
+    <button class="sb-link active" onclick="showSection('dashboard')">🏠 داشبورد</button>
+    <div class="sb-section">پزشکی</div>
+    <button class="sb-link" onclick="showSection('health_list')">👨‍🎓 معلومات صحی شاگردان</button>
+    <button class="sb-link" onclick="showSection('add_report')">➕ اضافه کردن گزارش</button>
+    <div class="sb-section">حضور</div>
+    <button class="sb-link" onclick="showSection('presence')">✅ حضور داکتر</button>
+    <button class="sb-link" onclick="showSection('add_presence')">➕ ثبت حضور</button>
+    <div class="sb-section">تنظیمات</div>
+    <button class="sb-link" onclick="showSection('profile')">👤 پروفایل</button>
+  </nav>
+  <div class="sb-logout">
+    <a href="{% url 'logout_chat' %}" class="btn-logout" style="display:block;text-align:center;text-decoration:none">🚪 خروج</a>
+  </div>
+</div>
+
+<!-- ══ TOPBAR ══ -->
+<div class="doc-topbar" id="topbar">
+  <div class="tb-left">
+    <button class="btn-toggle" onclick="toggleSidebar()" title="منو">☰</button>
+    <span class="page-title" id="pageTitle">داشبورد داکتر</span>
+  </div>
+  <div class="tb-right">
+    <div class="clock-box">⏰ <span id="afgClock">--:--:--</span> <span style="font-size:10px;opacity:.7">کابل</span></div>
+    <button class="btn-dark" onclick="toggleDark()" title="دارک مود" id="darkBtn">🌙</button>
+    <span style="font-size:13px;font-weight:700;color:var(--text);cursor:pointer" onclick="showSection('profile')">{{ username }}</span>
+    {% if profile_picture %}
+    <img src="{{ profile_picture }}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--pri);cursor:pointer;flex-shrink:0" onclick="showSection('profile')" title="پروفایل">
+    {% else %}
+    <div onclick="showSection('profile')" style="width:36px;height:36px;border-radius:50%;background:var(--pri);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:900;cursor:pointer;flex-shrink:0" title="پروفایل">{{ username|first|upper }}</div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<main class="doc-main" id="mainArea">
+
+  <!-- ════ 1. DASHBOARD ════ -->
+  <div class="doc-section active" id="sec-dashboard">
+    <!-- Welcome -->
+    <div class="welcome-card">
+      <div>
+        <div class="wc-title">خوش آمدید، عبدالرب 👨‍⚕️</div>
+        <div class="wc-sub">سیستم مدیریت صحی شاگردان - GAAM Kindergarten</div>
+      </div>
+      <div class="wc-time">
+        <div class="wc-date" id="afgDate">--/--/----</div>
+        <div class="wc-clock" id="afgClockBig">--:--:--</div>
+        <div class="wc-tz">🇦🇫 تایم افغانستان (UTC+4:30)</div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-icon si-blue">👨‍🎓</div>
+        <div><div class="stat-num">{{ total_students }}</div><div class="stat-lbl">مجموع شاگردان</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon si-green">✅</div>
+        <div><div class="stat-num">{{ total_examined }}</div><div class="stat-lbl">معاینه شده</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon si-yellow">⚠️</div>
+        <div><div class="stat-num">{{ needs_care }}</div><div class="stat-lbl">نیاز به مراقبت</div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon si-red">📋</div>
+        <div><div class="stat-num">{{ total_records }}</div><div class="stat-lbl">گزارش‌های امروز</div></div>
+      </div>
+    </div>
+
+    <!-- Recent Health Records -->
+    <div class="section-card">
+      <div class="section-title">
+        <span>📋 آخرین معاینات</span>
+        <button class="btn-add" onclick="showSection('add_report')">➕ گزارش جدید</button>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>شاگرد</th>
+              <th>تاریخ</th>
+              <th>قد (cm)</th>
+              <th>وزن (kg)</th>
+              <th>فشار خون</th>
+              <th>دما (°C)</th>
+              <th>وضعیت</th>
+              <th>عملیات</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in recent_records %}
+            <tr>
+              <td>{{ r.student.first_name }} {{ r.student.last_name }}</td>
+              <td>{{ r.checkup_date|date:"Y-m-d" }}</td>
+              <td>{{ r.height|default:"-" }}</td>
+              <td>{{ r.weight|default:"-" }}</td>
+              <td>{{ r.blood_pressure|default:"-" }}</td>
+              <td>{{ r.temperature|default:"-" }}</td>
+              <td>
+                {% if r.health_status == 'excellent' %}<span class="badge b-excellent">✅ عالی</span>
+                {% elif r.health_status == 'good' %}<span class="badge b-good">👍 خوب</span>
+                {% elif r.health_status == 'normal' %}<span class="badge b-normal">😐 معمولی</span>
+                {% elif r.health_status == 'needs_care' %}<span class="badge b-care">⚠️ مراقبت</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="act-btns">
+                  <button class="btn-edit" onclick="editRecord({{ r.id }},'{{ r.student.id }}','{{ r.checkup_date|date:"Y-m-d" }}','{{ r.height|default:"" }}','{{ r.weight|default:"" }}','{{ r.blood_pressure|default:"" }}','{{ r.temperature|default:"" }}','{{ r.health_status }}','{{ r.diagnosis|escapejs }}','{{ r.recommendations|escapejs }}')">✏️</button>
+                  <button class="btn-del" onclick="confirmDelete({{ r.id }}, '{{ r.student.first_name }}')">🗑️</button>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="8" style="text-align:center;padding:30px;color:var(--text2)">هیچ رکورد پزشکی ثبت نشده</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ 2. HEALTH LIST ════ -->
+  <div class="doc-section" id="sec-health_list">
+    <div class="section-card">
+      <div class="section-title">
+        <span>👨‍🎓 معلومات صحی تمام شاگردان</span>
+        <div style="display:flex;gap:8px">
+          <button class="btn-back" onclick="showSection('dashboard')">← بازگشت</button>
+          <button class="btn-add" onclick="showSection('add_report')">➕ گزارش جدید</button>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th><th>شاگرد</th><th>تاریخ</th>
+              <th>قد</th><th>وزن</th><th>فشار خون</th><th>دما</th>
+              <th>تشخیص</th><th>وضعیت</th><th>عملیات</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in all_records %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ r.student.first_name }} {{ r.student.last_name }}</td>
+              <td>{{ r.checkup_date|date:"Y-m-d" }}</td>
+              <td>{{ r.height|default:"-" }}</td>
+              <td>{{ r.weight|default:"-" }}</td>
+              <td>{{ r.blood_pressure|default:"-" }}</td>
+              <td>{{ r.temperature|default:"-" }}</td>
+              <td>{{ r.diagnosis|truncatechars:30|default:"-" }}</td>
+              <td>
+                {% if r.health_status == 'excellent' %}<span class="badge b-excellent">✅ عالی</span>
+                {% elif r.health_status == 'good' %}<span class="badge b-good">👍 خوب</span>
+                {% elif r.health_status == 'normal' %}<span class="badge b-normal">😐 معمولی</span>
+                {% elif r.health_status == 'needs_care' %}<span class="badge b-care">⚠️ مراقبت</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="act-btns">
+                  <button class="btn-edit" onclick="editRecord({{ r.id }},'{{ r.student.id }}','{{ r.checkup_date|date:"Y-m-d" }}','{{ r.height|default:"" }}','{{ r.weight|default:"" }}','{{ r.blood_pressure|default:"" }}','{{ r.temperature|default:"" }}','{{ r.health_status }}','{{ r.diagnosis|escapejs }}','{{ r.recommendations|escapejs }}')">✏️</button>
+                  <button class="btn-del" onclick="confirmDelete({{ r.id }}, '{{ r.student.first_name }}')">🗑️</button>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="10" style="text-align:center;padding:30px;color:var(--text2)">هیچ رکورد پزشکی ثبت نشده</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ 3. ADD / EDIT HEALTH REPORT ════ -->
+  <div class="doc-section" id="sec-add_report">
+    <div class="form-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border)">
+        <h2 style="font-size:16px;font-weight:900;color:var(--text)" id="reportFormTitle">➕ گزارش صحی جدید</h2>
+        <button class="btn-back" onclick="showSection('health_list')">← بازگشت</button>
+      </div>
+
+      {% if messages %}{% for m in messages %}
+      <div class="msg-box {% if '❌' in m.message %}msg-err{% else %}msg-ok{% endif %}">{{ m }}</div>
+      {% endfor %}{% endif %}
+
+      <form method="POST" action="{% url 'doctor_dashboard' %}" id="reportForm">
+        {% csrf_token %}
+        <input type="hidden" name="action" id="reportAction" value="add_report">
+        <input type="hidden" name="record_id" id="reportRecordId" value="">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>👨‍🎓 شاگرد *</label>
+            <select name="student" id="rf_student" required>
+              <option value="">-- شاگرد را انتخاب کنید --</option>
+              {% for s in students %}
+              <option value="{{ s.id }}">{{ s.first_name }} {{ s.last_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>📅 تاریخ معاینه *</label>
+            <input type="date" name="checkup_date" id="rf_date" required>
+          </div>
+        </div>
+
+        <!-- قد و وزن — num-field -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>📏 قد (سانتی‌متر)</label>
+            <input type="text" class="num-field" name="height" id="rf_height" placeholder="مثال: 120" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label>⚖️ وزن (کیلوگرم)</label>
+            <input type="text" class="num-field" name="weight" id="rf_weight" placeholder="مثال: 25" autocomplete="off">
+          </div>
+        </div>
+
+        <!-- فشار و دما -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>🩺 فشار خون</label>
+            <input type="text" name="blood_pressure" id="rf_bp" placeholder="مثال: 120/80">
+          </div>
+          <div class="form-group">
+            <label>🌡️ دما (°C)</label>
+            <input type="text" class="num-field" name="temperature" id="rf_temp" placeholder="مثال: 36.5" autocomplete="off">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>❤️ وضعیت سلامتی *</label>
+          <select name="health_status" id="rf_status" required>
+            <option value="excellent">✅ عالی</option>
+            <option value="good">👍 خوب</option>
+            <option value="normal">😐 معمولی</option>
+            <option value="needs_care">⚠️ نیاز به مراقبت</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>📋 تشخیص</label>
+            <textarea name="diagnosis" id="rf_diagnosis" placeholder="تشخیص پزشکی..."></textarea>
+          </div>
+          <div class="form-group">
+            <label>💊 توصیه‌ها</label>
+            <textarea name="recommendations" id="rf_recommend" placeholder="توصیه‌های پزشکی..."></textarea>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-submit" id="reportSubmitBtn">💾 ذخیره گزارش</button>
+          <button type="button" class="btn-back" onclick="resetReportForm()">🔄 پاک کردن</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ════ 4. PRESENCE LIST ════ -->
+  <div class="doc-section" id="sec-presence">
+    <div class="section-card">
+      <div class="section-title">
+        <span>✅ حضور داکتر</span>
+        <div style="display:flex;gap:8px">
+          <button class="btn-back" onclick="showSection('dashboard')">← بازگشت</button>
+          <button class="btn-add" onclick="showSection('add_presence')">➕ ثبت حضور</button>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr><th>#</th><th>تاریخ</th><th>وضعیت</th><th>یادداشت</th><th>عملیات</th></tr>
+          </thead>
+          <tbody>
+            {% for p in presence_list %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ p.date|date:"Y-m-d" }}</td>
+              <td>
+                {% if p.status == 'present' %}<span class="badge b-present">✅ حاضر</span>
+                {% elif p.status == 'absent' %}<span class="badge b-absent">❌ غایب</span>
+                {% else %}<span class="badge b-late">⏰ دیر</span>{% endif %}
+              </td>
+              <td>{{ p.note|default:"-" }}</td>
+              <td>
+                <div class="act-btns">
+                  <button class="btn-del" onclick="confirmDeletePresence({{ p.id }}, '{{ p.date|date:"Y-m-d" }}')">🗑️</button>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text2)">هیچ رکورد حضور ثبت نشده</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════ 5. ADD PRESENCE ════ -->
+  <div class="doc-section" id="sec-add_presence">
+    <div class="form-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border)">
+        <h2 style="font-size:16px;font-weight:900;color:var(--text)">✅ ثبت حضور داکتر</h2>
+        <button class="btn-back" onclick="showSection('presence')">← بازگشت</button>
+      </div>
+      <form method="POST" action="{% url 'doctor_dashboard' %}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="add_presence">
+        <div class="form-row">
+          <div class="form-group">
+            <label>📅 تاریخ *</label>
+            <input type="date" name="date" required>
+          </div>
+          <div class="form-group">
+            <label>📊 وضعیت *</label>
+            <select name="status" required>
+              <option value="present">✅ حاضر</option>
+              <option value="absent">❌ غایب</option>
+              <option value="late">⏰ دیر</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>📝 یادداشت</label>
+          <textarea name="note" placeholder="یادداشت اختیاری..."></textarea>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-submit">💾 ثبت حضور</button>
+          <button type="button" class="btn-back" onclick="showSection('presence')">← لغو</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ════ 6. PROFILE ════ -->
+  <div class="doc-section" id="sec-profile">
+    <div class="profile-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:14px;border-bottom:1px solid var(--border)">
+        <h2 style="font-size:16px;font-weight:900;color:var(--text)">👤 پروفایل داکتر</h2>
+        <button class="btn-back" onclick="showSection('dashboard')">← بازگشت</button>
+      </div>
+
+      <!-- عکس پروفایل -->
+      <div class="prof-avatar-wrap">
+        {% if profile_picture %}
+        <img src="{{ profile_picture }}" class="prof-avatar" alt="profile" id="profImg">
+        {% else %}
+        <div class="prof-avatar-ph" id="profPh">{{ username|first|upper }}</div>
+        {% endif %}
+        <form method="POST" action="{% url 'doctor_profile_picture' %}" enctype="multipart/form-data" id="picForm">
+          {% csrf_token %}
+          <input type="file" name="picture" id="picInput" accept="image/*" style="display:none" onchange="document.getElementById('picForm').submit()">
+          <button type="button" class="btn-pic" onclick="document.getElementById('picInput').click()">📷 تغییر عکس</button>
+        </form>
+      </div>
+
+      <!-- اطلاعات پروفایل -->
+      <form method="POST" action="{% url 'doctor_profile_update' %}">
+        {% csrf_token %}
+        <div class="form-row">
+          <div class="form-group">
+            <label>👤 نام *</label>
+            <input type="text" name="first_name" value="{{ request.user.first_name }}" required>
+          </div>
+          <div class="form-group">
+            <label>👤 نام خانوادگی</label>
+            <input type="text" name="last_name" value="{{ request.user.last_name }}">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>📧 ایمیل</label>
+          <input type="email" name="email" value="{{ request.user.email }}">
+        </div>
+        <div class="form-group">
+          <label>📱 شماره تماس</label>
+          <input type="text" name="phone" value="{{ profile_phone|default:'' }}" placeholder="مثال: 0700000000">
+        </div>
+        <div class="form-group">
+          <label>📝 بایو</label>
+          <textarea name="bio" placeholder="درباره خودتان بنویسید...">{{ profile_bio|default:'' }}</textarea>
+        </div>
+        <button type="submit" class="btn-submit" style="width:100%;margin-bottom:14px">💾 بروزرسانی پروفایل</button>
+      </form>
+
+      <!-- تغییر پسورد -->
+      <div style="border-top:1px solid var(--border);padding-top:20px;margin-top:6px">
+        <h3 style="font-size:14px;font-weight:800;color:var(--text);margin-bottom:14px">🔒 تغییر رمز عبور</h3>
+        <form method="POST" action="{% url 'doctor_profile_update' %}">
+          {% csrf_token %}
+          <input type="hidden" name="change_password" value="1">
+          <div class="form-row">
+            <div class="form-group">
+              <label>🔑 رمز عبور جدید</label>
+              <input type="password" name="new_password" placeholder="رمز عبور جدید" required>
+            </div>
+            <div class="form-group">
+              <label>🔑 تکرار رمز عبور</label>
+              <input type="password" name="confirm_password" placeholder="تکرار رمز عبور" required>
+            </div>
+          </div>
+          <button type="submit" class="btn-submit" style="width:100%;background:linear-gradient(135deg,#b91c1c,#ef4444)">🔒 تغییر رمز عبور</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ════ DELETE CONFIRM MODAL ════ -->
+<div class="modal-overlay" id="deleteModal">
+  <div class="modal">
+    <h3>🗑️ تأیید حذف</h3>
+    <p id="deleteModalText">آیا مطمئن هستید؟</p>
+    <form method="POST" id="deleteForm" action="">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="delete_record">
+      <div class="modal-btns">
+        <button type="submit" class="btn-confirm">✅ بله، حذف شود</button>
+        <button type="button" class="btn-cancel-m" onclick="closeDeleteModal()">❌ انصراف</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="deletePresenceModal">
+  <div class="modal">
+    <h3>🗑️ تأیید حذف</h3>
+    <p id="deletePresenceText">آیا مطمئن هستید؟</p>
+    <form method="POST" id="deletePresenceForm" action="">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="delete_presence">
+      <div class="modal-btns">
+        <button type="submit" class="btn-confirm">✅ بله، حذف شود</button>
+        <button type="button" class="btn-cancel-m" onclick="document.getElementById('deletePresenceModal').classList.remove('open')">❌ انصراف</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+/* ══ URL SECTION ROUTING ══ */
+var _urlSection = '';
+try { _urlSection = new URLSearchParams(window.location.search).get('section') || ''; } catch(e){}
+
+/* ══ DARK MODE ══ */
+(function(){
+  if(localStorage.getItem('doc_dark')==='1'){
+    document.documentElement.classList.add('dark');
+    var b=document.getElementById('darkBtn');
+    if(b) b.textContent='☀️';
+  }
+})();
+function toggleDark(){
+  var d=document.documentElement.classList.toggle('dark');
+  localStorage.setItem('doc_dark',d?'1':'0');
+  document.getElementById('darkBtn').textContent=d?'☀️':'🌙';
+}
+
+/* ══ SIDEBAR TOGGLE ══ */
+var sbOpen = true;
+function toggleSidebar(){
+  sbOpen=!sbOpen;
+  var sb=document.getElementById('sidebar');
+  var tb=document.getElementById('topbar');
+  var ma=document.getElementById('mainArea');
+  if(window.innerWidth<=900){
+    sb.classList.toggle('mobile-open',sbOpen);
+  } else {
+    sb.classList.toggle('collapsed',!sbOpen);
+    tb.classList.toggle('full',!sbOpen);
+    ma.classList.toggle('full',!sbOpen);
+  }
+}
+
+/* ══ SECTION SWITCHER ══ */
+var sectionTitles = {
+  'dashboard':   'داشبورد داکتر',
+  'health_list': 'معلومات صحی شاگردان',
+  'add_report':  'گزارش صحی جدید',
+  'presence':    'حضور داکتر',
+  'add_presence':'ثبت حضور',
+  'profile':     'پروفایل'
+};
+function showSection(id){
+  document.querySelectorAll('.doc-section').forEach(function(s){s.classList.remove('active')});
+  var sec=document.getElementById('sec-'+id);
+  if(sec) sec.classList.add('active');
+  document.getElementById('pageTitle').textContent = sectionTitles[id]||'';
+  document.querySelectorAll('.sb-link').forEach(function(l){
+    l.classList.toggle('active', l.getAttribute('onclick')==="showSection('"+id+"')");
+  });
+  if(id==='add_report'){
+    var td = new Date().toISOString().split('T')[0];
+    var rfdate = document.getElementById('rf_date');
+    if(rfdate && !rfdate.value) rfdate.value = td;
+  }
+  if(id==='add_presence'){
+    var td2 = new Date().toISOString().split('T')[0];
+    var dp = document.querySelector('#sec-add_presence input[name="date"]');
+    if(dp && !dp.value) dp.value = td2;
+  }
+}
+
+/* ══ AFGHANISTAN CLOCK ══ */
+function afgTime(){
+  var now=new Date();
+  var utc=now.getTime()+now.getTimezoneOffset()*60000;
+  var afg=new Date(utc+4.5*3600000);
+  var hh=String(afg.getHours()).padStart(2,'0');
+  var mm=String(afg.getMinutes()).padStart(2,'0');
+  var ss=String(afg.getSeconds()).padStart(2,'0');
+  var t=hh+':'+mm+':'+ss;
+  var dt=afg.getFullYear()+'/'+String(afg.getMonth()+1).padStart(2,'0')+'/'+String(afg.getDate()).padStart(2,'0');
+  var ce=document.getElementById('afgClock'); if(ce) ce.textContent=t;
+  var cb=document.getElementById('afgClockBig'); if(cb) cb.textContent=t;
+  var de=document.getElementById('afgDate'); if(de) de.textContent=dt;
+}
+setInterval(afgTime,1000); afgTime();
+
+/* ══ DELETE MODAL ══ */
+function confirmDelete(id, name){
+  document.getElementById('deleteModalText').textContent='حذف رکورد صحی: '+name+' ؟';
+  document.getElementById('deleteForm').action='/core/doctor/record/'+id+'/delete/';
+  document.getElementById('deleteModal').classList.add('open');
+}
+function closeDeleteModal(){
+  document.getElementById('deleteModal').classList.remove('open');
+}
+function confirmDeletePresence(id, date){
+  document.getElementById('deletePresenceText').textContent='حذف حضور: '+date+' ؟';
+  document.getElementById('deletePresenceForm').action='/core/doctor/presence/'+id+'/delete/';
+  document.getElementById('deletePresenceModal').classList.add('open');
+}
+document.querySelectorAll('.modal-overlay').forEach(function(el){
+  el.addEventListener('click',function(e){if(e.target===el)el.classList.remove('open')});
+});
+
+/* ══ EDIT RECORD ══ */
+function editRecord(id,student,date,height,weight,bp,temp,status,diagnosis,recommend){
+  document.getElementById('reportFormTitle').textContent='✏️ ویرایش گزارش صحی';
+  document.getElementById('reportAction').value='edit_report';
+  document.getElementById('reportRecordId').value=id;
+  document.getElementById('reportSubmitBtn').textContent='💾 بروزرسانی گزارش';
+  document.getElementById('rf_student').value=student;
+  document.getElementById('rf_date').value=date;
+  document.getElementById('rf_height').value=height;
+  document.getElementById('rf_weight').value=weight;
+  document.getElementById('rf_bp').value=bp;
+  document.getElementById('rf_temp').value=temp;
+  document.getElementById('rf_status').value=status;
+  document.getElementById('rf_diagnosis').value=diagnosis;
+  document.getElementById('rf_recommend').value=recommend;
+  showSection('add_report');
+}
+function resetReportForm(){
+  document.getElementById('reportFormTitle').textContent='➕ گزارش صحی جدید';
+  document.getElementById('reportAction').value='add_report';
+  document.getElementById('reportRecordId').value='';
+  document.getElementById('reportSubmitBtn').textContent='💾 ذخیره گزارش';
+  document.getElementById('reportForm').reset();
+  document.getElementById('rf_date').value=new Date().toISOString().split('T')[0];
+}
+
+/* ══ NUMERIC INPUTS ══ */
+document.addEventListener('DOMContentLoaded',function(){
+  // ── امروز را روی همه date inputها set کن
+  var _today = new Date().toISOString().split('T')[0];
+  var _rfDate = document.getElementById('rf_date');
+  if(_rfDate && !_rfDate.value) _rfDate.value = _today;
+  var _presDate = document.querySelector('#sec-add_presence input[name="date"]');
+  if(_presDate && !_presDate.value) _presDate.value = _today;
+
+  // ── Auto open section from URL
+  if(_urlSection){ showSection(_urlSection); }
+
+  document.querySelectorAll('.num-field').forEach(function(inp){
+    inp.addEventListener('keydown',function(e){
+      if([8,9,27,13,46,37,38,39,40,35,36].indexOf(e.keyCode)!==-1) return;
+      if((e.ctrlKey||e.metaKey)&&[65,67,86,88].indexOf(e.keyCode)!==-1) return;
+      if(e.keyCode>=48&&e.keyCode<=57) return;
+      if(e.keyCode>=96&&e.keyCode<=105) return;
+      if(e.keyCode===190||e.keyCode===110) return;
+      e.preventDefault();
+    });
+    inp.addEventListener('paste',function(){
+      setTimeout(function(){inp.value=inp.value.replace(/[^0-9.]/g,'');},0);
+    });
+  });
+});
+</script>
+{% endblock %}

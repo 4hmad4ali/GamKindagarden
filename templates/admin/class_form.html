@@ -1,0 +1,145 @@
+{% extends 'admin_base.html' %}
+{% block title %}{% if edit_mode %}ویرایش{% else %}افزودن{% endif %} کلاس - GAAM{% endblock %}
+{% block page_title %}{% if edit_mode %}ویرایش کلاس{% else %}افزودن کلاس جدید{% endif %}{% endblock %}
+{% block sb_role %}ادمین{% endblock %}
+
+{% block content %}
+<style>
+/* ══ NUM-FIELD ══ */
+.num-field{
+  width:100%;padding:12px 15px;
+  border:1.5px solid var(--border);border-radius:9px;
+  font-size:14px;font-family:'Vazirmatn',sans-serif;
+  background:var(--bg);color:var(--text);transition:.2s;
+  direction:ltr;text-align:left;letter-spacing:1px;
+}
+.num-field:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(79,70,229,.1);outline:none}
+.num-field::placeholder{direction:rtl;text-align:right;color:#aaa;font-size:12px;letter-spacing:0}
+.dark .num-field{background:#0f172a!important;color:var(--text)!important;border-color:var(--border)!important}
+
+/* ══ FORM ══ */
+.form-container{max-width:650px;margin:0 auto;background:var(--card);
+  border-radius:14px;padding:30px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.form-header{display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px}
+.form-header h2{font-size:18px;font-weight:900;color:var(--text);margin:0}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;margin-bottom:6px;color:var(--text2);
+  font-weight:700;font-size:12px;text-align:right}
+.form-group input,.form-group select{
+  width:100%;padding:12px 15px;border:1.5px solid var(--border);border-radius:9px;
+  font-size:13px;transition:.2s;direction:rtl;font-family:'Vazirmatn',sans-serif;
+  background:var(--bg);color:var(--text)}
+.form-group input:focus,.form-group select:focus{
+  border-color:var(--pri);box-shadow:0 0 0 3px rgba(79,70,229,.1);outline:none}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-actions{display:flex;gap:12px;margin-top:24px}
+.btn-submit{flex:1;padding:13px;background:linear-gradient(135deg,#312e81,#4f46e5);
+  color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:700;
+  cursor:pointer;font-family:'Vazirmatn',sans-serif;transition:.2s}
+.btn-submit:hover{opacity:.9;transform:translateY(-1px)}
+.btn-cancel{padding:13px 24px;background:var(--border);color:var(--text);border:none;
+  border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;
+  font-family:'Vazirmatn',sans-serif;display:inline-flex;align-items:center;gap:6px;transition:.2s}
+.btn-cancel:hover{background:#94a3b8;color:#fff}
+@media(max-width:768px){.form-row{grid-template-columns:1fr}.form-actions{flex-direction:column}}
+</style>
+
+<div class="form-container">
+  <div class="form-header">
+    <h2>{% if edit_mode %}✏️ ویرایش کلاس{% else %}🏫 افزودن کلاس جدید{% endif %}</h2>
+    <a href="{% url 'classes_list' %}" class="btn-cancel">← بازگشت</a>
+  </div>
+
+  {% if messages %}
+  {% for m in messages %}
+  <div style="padding:10px 14px;border-radius:8px;margin-bottom:14px;font-size:13px;font-weight:600;
+    {% if '❌' in m.message or 'خطا' in m.message %}background:#fee2e2;color:#991b1b{% else %}background:#dcfce7;color:#166534{% endif %}">
+    {{ m }}</div>
+  {% endfor %}
+  {% endif %}
+
+  <form method="POST">{% csrf_token %}
+
+    <!-- نام کلاس -->
+    <div class="form-group">
+      <label>🏫 نام کلاس *</label>
+      <input type="text" name="class_name"
+        value="{% if class %}{{ class.class_name }}{% endif %}"
+        placeholder="مثال: صنف اول" required>
+    </div>
+
+    <!-- معلم -->
+    <div class="form-group">
+      <label>👨‍🏫 معلم مسئول</label>
+      <select name="teacher">
+        <option value="">-- انتخاب معلم --</option>
+        {% for t in teachers %}
+        <option value="{{ t.id }}" {% if class.teacher.id == t.id %}selected{% endif %}>
+          {{ t.user.first_name }} {{ t.user.last_name }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- اتاق و ظرفیت — num-field -->
+    <div class="form-row">
+      <div class="form-group">
+        <label>🚪 شماره اتاق *</label>
+        <input type="text" class="num-field" name="room_number"
+          value="{% if class %}{{ class.room_number }}{% endif %}"
+          placeholder="مثال: 101" autocomplete="off" required>
+      </div>
+      <div class="form-group">
+        <label>👥 ظرفیت *</label>
+        <input type="text" class="num-field" name="capacity"
+          value="{% if class %}{{ class.capacity }}{% endif %}"
+          placeholder="مثال: 30" autocomplete="off" required>
+      </div>
+    </div>
+
+    <!-- سطح -->
+    <div class="form-group">
+      <label>📚 سطح / Grade *</label>
+      <select name="level" required>
+        <option value="">-- انتخاب سطح --</option>
+        <option value="اول"    {% if class.level == 'اول'    %}selected{% endif %}>اول</option>
+        <option value="دوم"    {% if class.level == 'دوم'    %}selected{% endif %}>دوم</option>
+        <option value="سوم"    {% if class.level == 'سوم'    %}selected{% endif %}>سوم</option>
+        <option value="چهارم"  {% if class.level == 'چهارم'  %}selected{% endif %}>چهارم</option>
+        <option value="پنجم"   {% if class.level == 'پنجم'   %}selected{% endif %}>پنجم</option>
+        <option value="ششم"    {% if class.level == 'ششم'    %}selected{% endif %}>ششم</option>
+        <option value="primary"{% if class.level == 'primary'%}selected{% endif %}>ابتدایی</option>
+        <option value="middle" {% if class.level == 'middle' %}selected{% endif %}>متوسطه</option>
+        <option value="high"   {% if class.level == 'high'   %}selected{% endif %}>عالی</option>
+      </select>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-submit">
+        {% if edit_mode %}💾 بروزرسانی کلاس{% else %}💾 ذخیره کلاس{% endif %}
+      </button>
+      <a href="{% url 'classes_list' %}" class="btn-cancel">← لغو</a>
+    </div>
+  </form>
+</div>
+
+<script>
+/* ══ NUMERIC INPUT HANDLER ══ */
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('.num-field').forEach(function(inp){
+    inp.addEventListener('keydown', function(e){
+      if([8,9,27,13,46,37,38,39,40,35,36].indexOf(e.keyCode) !== -1) return;
+      if((e.ctrlKey||e.metaKey) && [65,67,86,88].indexOf(e.keyCode) !== -1) return;
+      if(e.keyCode >= 48 && e.keyCode <= 57) return;
+      if(e.keyCode >= 96 && e.keyCode <= 105) return;
+      if(e.keyCode === 190 || e.keyCode === 110) return;
+      e.preventDefault();
+    });
+    inp.addEventListener('paste', function(){
+      setTimeout(function(){ inp.value = inp.value.replace(/[^0-9.]/g, ''); }, 0);
+    });
+  });
+});
+</script>
+{% endblock %}

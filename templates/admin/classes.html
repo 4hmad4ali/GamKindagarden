@@ -1,0 +1,449 @@
+{% extends 'admin_base.html' %}
+{% block title %}کلاس‌ها - GAAM{% endblock %}
+{% block page_title %}کلاس‌ها{% endblock %}
+
+{% block content %}
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html,body { height:100%; font-family:'Vazirmatn',sans-serif; direction:rtl; background:#f5f7fa; }
+  body.dark-mode { background:#1a1a2e; }
+
+  /* NAVBAR */
+  .theme-btn-navbar { padding:6px 12px; border:none; background:transparent; color:#7f8c8d; cursor:pointer; border-radius:4px; font-size:1.1rem; }
+  .theme-btn-navbar.active { background:white; color:#3498db; }
+  body.dark-mode .theme-btn-navbar.active { background:#2a2a3e; }
+
+  /* SIDEBAR */
+
+  /* MAIN */
+  body.dark-mode .main-container { color:white; }
+
+  /* PAGE HEADER */
+  .page-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:30px; }
+  .page-header-right h1 { font-size:1.8rem; color:#2c3e50; font-weight:700; }
+  body.dark-mode .page-header-right h1 { color:white; }
+  .page-header-right p { color:#7f8c8d; font-size:.95rem; margin-top:5px; }
+  .page-header-left { display:flex; gap:12px; align-items:center; }
+  .btn-primary { padding:10px 22px; background:linear-gradient(135deg,#3498db,#2980b9); color:white; border:none; border-radius:8px; cursor:pointer; font-size:.95rem; font-weight:600; text-decoration:none; display:inline-flex; align-items:center; gap:8px; transition:all .3s; font-family:'Vazirmatn',sans-serif; }
+  .btn-primary:hover { transform:translateY(-2px); box-shadow:0 5px 15px rgba(52,152,219,.4); }
+  .btn-back { padding:10px 20px; background:white; color:#7f8c8d; border:2px solid #ddd; border-radius:8px; cursor:pointer; font-size:.95rem; text-decoration:none; display:inline-flex; align-items:center; gap:8px; transition:all .3s; font-family:'Vazirmatn',sans-serif; }
+  body.dark-mode .btn-back { background:#2a2a3e; color:#aaa; border-color:#444; }
+  .btn-back:hover { border-color:#3498db; color:#3498db; }
+
+  /* STATS */
+  .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:20px; margin-bottom:30px; }
+  .stat-mini { background:white; padding:20px 25px; border-radius:12px; box-shadow:0 3px 15px rgba(0,0,0,.08); display:flex; align-items:center; gap:15px; transition:all .3s; }
+  body.dark-mode .stat-mini { background:#2a2a3e; }
+  .stat-mini:hover { transform:translateY(-4px); box-shadow:0 8px 25px rgba(0,0,0,.12); }
+  .stat-mini-icon { width:50px; height:50px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.5rem; }
+  .stat-mini-icon.blue { background:linear-gradient(135deg,#667eea,#764ba2); }
+  .stat-mini-icon.green { background:linear-gradient(135deg,#43e97b,#38f9d7); }
+  .stat-mini-icon.orange { background:linear-gradient(135deg,#f7971e,#ffd200); }
+  .stat-mini-icon.red { background:linear-gradient(135deg,#f093fb,#f5576c); }
+  .stat-mini-info { text-align:right; }
+  .stat-mini-num { font-size:1.8rem; font-weight:700; color:#2c3e50; }
+  body.dark-mode .stat-mini-num { color:white; }
+  .stat-mini-lbl { font-size:.85rem; color:#7f8c8d; margin-top:2px; }
+
+  /* TABLE CARD */
+  .table-card { background:white; border-radius:15px; box-shadow:0 3px 15px rgba(0,0,0,.08); overflow:hidden; }
+  body.dark-mode .table-card { background:#2a2a3e; }
+  .table-card-header { padding:20px 25px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #f0f0f0; }
+  body.dark-mode .table-card-header { border-color:#3a3a50; }
+  .table-card-header h3 { font-size:1.1rem; font-weight:600; color:#2c3e50; }
+  body.dark-mode .table-card-header h3 { color:white; }
+  .search-box { padding:8px 15px; border:1px solid #ddd; border-radius:8px; font-family:'Vazirmatn',sans-serif; font-size:.9rem; width:220px; outline:none; background:white; color:#333; }
+  body.dark-mode .search-box { background:#3a3a50; border-color:#555; color:white; }
+  .search-box::placeholder { color:#aaa; }
+
+  table { width:100%; border-collapse:collapse; }
+  thead tr { background:#f8f9fa; }
+  body.dark-mode thead tr { background:#1e1e30; }
+  th { padding:14px 18px; text-align:right; font-size:.85rem; color:#6c757d; font-weight:600; text-transform:uppercase; letter-spacing:.5px; border-bottom:1px solid #f0f0f0; white-space:nowrap; }
+  body.dark-mode th { color:#aaa; border-color:#3a3a50; }
+  td { padding:14px 18px; border-bottom:1px solid #f5f5f5; font-size:.9rem; color:#444; }
+  body.dark-mode td { color:#ccc; border-color:#3a3a50; }
+  tbody tr:hover { background:#f8f9fa; }
+  body.dark-mode tbody tr:hover { background:#1e1e30; }
+  tbody tr:last-child td { border-bottom:none; }
+
+  .badge { display:inline-block; padding:4px 12px; border-radius:20px; font-size:.8rem; font-weight:600; }
+  .badge-primary { background:#e8f4fd; color:#3498db; }
+  .badge-middle { background:#fef9e7; color:#f39c12; }
+  .badge-high { background:#eafaf1; color:#27ae60; }
+  .badge-active { background:#eafaf1; color:#27ae60; }
+  .badge-inactive { background:#fdf2f8; color:#e74c3c; }
+
+  .actions-cell { display:flex; gap:8px; align-items:center; }
+  .btn-edit { padding:6px 14px; background:linear-gradient(135deg,#43e97b,#38f9d7); color:white; border:none; border-radius:6px; cursor:pointer; font-size:.8rem; font-weight:600; text-decoration:none; transition:all .3s; font-family:'Vazirmatn',sans-serif; }
+  .btn-edit:hover { opacity:.85; transform:translateY(-1px); }
+  .btn-delete { padding:6px 14px; background:linear-gradient(135deg,#f093fb,#f5576c); color:white; border:none; border-radius:6px; cursor:pointer; font-size:.8rem; font-weight:600; transition:all .3s; font-family:'Vazirmatn',sans-serif; }
+  .btn-delete:hover { opacity:.85; transform:translateY(-1px); }
+  .empty-row { text-align:center; padding:60px 20px; color:#999; }
+  .empty-icon { font-size:3rem; margin-bottom:15px; }
+
+  /* MODAL */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:2000; display:none; align-items:center; justify-content:center; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:white; border-radius:16px; padding:0; width:560px; max-width:95vw; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.3); animation:slideUp .3s ease; }
+  body.dark-mode .modal { background:#2a2a3e; color:white; }
+  @keyframes slideUp { from{transform:translateY(30px);opacity:0} to{transform:translateY(0);opacity:1} }
+  .modal-header { padding:24px 28px 20px; border-bottom:1px solid #f0f0f0; display:flex; justify-content:space-between; align-items:center; }
+  body.dark-mode .modal-header { border-color:#3a3a50; }
+  .modal-header h3 { font-size:1.2rem; font-weight:700; color:#2c3e50; }
+  body.dark-mode .modal-header h3 { color:white; }
+  .modal-close { background:none; border:none; font-size:1.5rem; cursor:pointer; color:#999; transition:all .2s; }
+  .modal-close:hover { color:#e74c3c; transform:rotate(90deg); }
+  .modal-body { padding:24px 28px; }
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  .form-group { display:flex; flex-direction:column; gap:6px; }
+  .form-group.full-width { grid-column:span 2; }
+  .form-label { font-size:.85rem; font-weight:600; color:#555; }
+  body.dark-mode .form-label { color:#ccc; }
+  .form-label span { color:#e74c3c; }
+  .form-input { padding:10px 14px; border:2px solid #e8ecef; border-radius:8px; font-family:'Vazirmatn',sans-serif; font-size:.95rem; color:#333; outline:none; transition:all .3s; background:white; }
+  body.dark-mode .form-input { background:#3a3a50; border-color:#555; color:white; }
+  .form-input:focus { border-color:#3498db; box-shadow:0 0 0 3px rgba(52,152,219,.1); }
+  .subjects-section { margin-top:6px; }
+  .subjects-label { font-size:.85rem; font-weight:600; color:#555; margin-bottom:10px; }
+  body.dark-mode .subjects-label { color:#ccc; }
+  .subjects-grid { display:flex; flex-wrap:wrap; gap:10px; }
+  .subject-item { display:flex; align-items:center; gap:6px; padding:6px 14px; border:2px solid #e8ecef; border-radius:8px; cursor:pointer; transition:all .2s; background:white; }
+  body.dark-mode .subject-item { background:#3a3a50; border-color:#555; }
+  .subject-item:hover { border-color:#3498db; }
+  .subject-item input[type="checkbox"] { display:none; }
+  .subject-item.checked { background:#e8f4fd; border-color:#3498db; color:#3498db; }
+  body.dark-mode .subject-item.checked { background:#1a3a5c; }
+  .subject-item span { font-size:.85rem; font-weight:600; pointer-events:none; }
+  .modal-footer { padding:20px 28px; border-top:1px solid #f0f0f0; display:flex; gap:12px; justify-content:flex-end; }
+  body.dark-mode .modal-footer { border-color:#3a3a50; }
+  .btn-save { padding:11px 28px; background:linear-gradient(135deg,#3498db,#2980b9); color:white; border:none; border-radius:8px; cursor:pointer; font-size:.95rem; font-weight:700; font-family:'Vazirmatn',sans-serif; transition:all .3s; }
+  .btn-save:hover { transform:translateY(-2px); box-shadow:0 5px 15px rgba(52,152,219,.4); }
+  .btn-cancel { padding:11px 22px; background:#f5f6fa; color:#555; border:2px solid #ddd; border-radius:8px; cursor:pointer; font-size:.95rem; font-weight:600; font-family:'Vazirmatn',sans-serif; transition:all .3s; }
+  body.dark-mode .btn-cancel { background:#3a3a50; color:#ccc; border-color:#555; }
+  .btn-cancel:hover { border-color:#e74c3c; color:#e74c3c; }
+
+  /* DELETE CONFIRM */
+  .delete-modal { width:440px; text-align:center; }
+  .delete-icon { font-size:4rem; margin-bottom:15px; }
+  .delete-title { font-size:1.3rem; font-weight:700; color:#2c3e50; margin-bottom:8px; }
+  body.dark-mode .delete-title { color:white; }
+  .delete-text { font-size:.95rem; color:#7f8c8d; margin-bottom:24px; }
+  .btn-confirm-delete { padding:11px 28px; background:linear-gradient(135deg,#e74c3c,#c0392b); color:white; border:none; border-radius:8px; cursor:pointer; font-size:.95rem; font-weight:700; font-family:'Vazirmatn',sans-serif; transition:all .3s; }
+  .btn-confirm-delete:hover { transform:translateY(-2px); box-shadow:0 5px 15px rgba(231,76,60,.4); }
+
+  @media(max-width:768px) { .stats-row{grid-template-columns:repeat(2,1fr);} .form-grid{grid-template-columns:1fr;} .form-group.full-width{grid-column:span 1;} }
+</style>
+
+
+
+</style>
+
+<!-- MAIN -->
+<div class="main-container">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-header-right">
+      <h1>🏫 Classes (کلاس‌ها)</h1>
+      <p>مدیریت کلاس‌های مکتب GAAM Kindergarten</p>
+    </div>
+    <div class="page-header-left">
+      <a href="{% url 'admin_dashboard' %}" class="btn-back">⬅ بازگشت</a>
+      <button class="btn-primary" onclick="openAddModal()">➕ Add Class</button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-mini">
+      <div class="stat-mini-icon blue">🏫</div>
+      <div class="stat-mini-info">
+        <div class="stat-mini-num">{{ total_classes }}</div>
+        <div class="stat-mini-lbl">مجموع کلاس‌ها</div>
+      </div>
+    </div>
+    <div class="stat-mini">
+      <div class="stat-mini-icon green">✅</div>
+      <div class="stat-mini-info">
+        <div class="stat-mini-num">{{ active_classes }}</div>
+        <div class="stat-mini-lbl">کلاس‌های فعال</div>
+      </div>
+    </div>
+    <div class="stat-mini">
+      <div class="stat-mini-icon orange">👨‍🎓</div>
+      <div class="stat-mini-info">
+        <div class="stat-mini-num">{{ total_students }}</div>
+        <div class="stat-mini-lbl">مجموع شاگردان</div>
+      </div>
+    </div>
+    <div class="stat-mini">
+      <div class="stat-mini-icon red">📊</div>
+      <div class="stat-mini-info">
+        <div class="stat-mini-num">{{ total_capacity }}</div>
+        <div class="stat-mini-lbl">مجموع ظرفیت</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE CARD -->
+  <div class="table-card">
+    <div class="table-card-header">
+      <h3>📋 لیست کلاس‌ها</h3>
+      <input class="search-box" type="text" placeholder="🔍 جستجو..." onkeyup="filterTable(this)" />
+    </div>
+
+    <table id="classTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>نام کلاس</th>
+          <th>سطح / Grade</th>
+          <th>معلم</th>
+          <th>شاگردان</th>
+          <th>ظرفیت</th>
+          <th>اتاق</th>
+          <th>وضعیت</th>
+          <th>عملیات</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in classes %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td><strong>{{ c.class_name }}</strong></td>
+          <td>
+            {% if c.level == 'primary' %}<span class="badge badge-primary">ابتدایی</span>
+            {% elif c.level == 'middle' %}<span class="badge badge-middle">متوسطه</span>
+            {% elif c.level == 'high' %}<span class="badge badge-high">عالی</span>
+            {% else %}<span class="badge badge-primary">{{ c.level }}</span>{% endif %}
+          </td>
+          <td>{% if c.teacher %}{{ c.teacher.user.first_name }} {{ c.teacher.user.last_name }}{% else %}<span style="color:#ccc">—</span>{% endif %}</td>
+          <td>{{ c.student_count|default:"0" }}</td>
+          <td>{{ c.capacity }}</td>
+          <td>{{ c.room_number }}</td>
+          <td>
+            {% if c.is_active %}<span class="badge badge-active">✅ فعال</span>
+            {% else %}<span class="badge badge-inactive">❌ غیرفعال</span>{% endif %}
+          </td>
+          <td>
+            <div class="actions-cell">
+              <button class="btn-edit"
+                data-id="{{ c.id }}"
+                data-name="{{ c.class_name|escapejs }}"
+                data-level="{{ c.level }}"
+                data-room="{{ c.room_number|escapejs }}"
+                data-capacity="{{ c.capacity }}"
+                data-teacher="{{ c.teacher.id|default:'' }}"
+                data-url="{% url 'class_edit' c.id %}"
+                onclick="openEditModal(this)">✏️ ویرایش</button>
+              <form method="POST" action="{% url 'class_delete' c.id %}" id="delForm_{{ c.id }}" style="display:inline">
+                {% csrf_token %}
+                <button type="button" class="btn-delete">🗑️ حذف</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="9">
+            <div class="empty-row">
+              <div class="empty-icon">🏫</div>
+              <div>هیچ کلاسی ثبت نشده است</div>
+              <br><button class="btn-primary" onclick="openAddModal()" style="margin-top:10px">➕ افزودن اولین کلاس</button>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ ADD MODAL ═══ -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>🏫 Create New Class</h3>
+      <button class="modal-close" onclick="closeModal('addModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <form method="POST" action="{% url 'class_add' %}" id="addForm">
+        {% csrf_token %}
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">نام کلاس <span>*</span></label>
+            <input type="text" name="class_name" class="form-input" placeholder="e.g. 10A" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">سطح / Grade <span>*</span></label>
+            <input type="text" name="level" class="form-input" placeholder="e.g. 10">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Section</label>
+            <input type="text" name="room_number" class="form-input" placeholder="شماره اتاق" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Capacity</label>
+            <input type="text" class="form-input num-field-modal" name="capacity" value="50" placeholder="مثال: 30" autocomplete="off" required>
+          </div>
+          <div class="form-group full-width">
+            <label class="form-label">Class Teacher</label>
+            <select name="teacher" class="form-input">
+              <option value="">Select Teacher</option>
+              {% for t in teachers %}
+              <option value="{{ t.id }}">{{ t.user.first_name }} {{ t.user.last_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group full-width subjects-section">
+            <div class="subjects-label">Assign Subjects</div>
+            <div class="subjects-grid">
+              {% for subject in all_subjects %}
+              <label class="subject-item">
+                <input type="checkbox" name="subjects" value="{{ subject }}">
+                <span>{{ subject }}</span>
+              </label>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('addModal')">Cancel</button>
+      <button class="btn-save" onclick="document.getElementById('addForm').submit()">🏫 Create Class</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ EDIT MODAL ═══ -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>✏️ ویرایش کلاس</h3>
+      <button class="modal-close" onclick="closeModal('editModal')">✕</button>
+    </div>
+    <div class="modal-body">
+      <form method="POST" id="editForm">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="edit">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">نام کلاس <span>*</span></label>
+            <input type="text" name="class_name" id="edit_class_name" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">سطح / Grade <span>*</span></label>
+            <input type="text" name="level" id="edit_level" class="form-input">
+          </div>
+          <div class="form-group">
+            <label class="form-label">شماره اتاق <span>*</span></label>
+            <input type="text" name="room_number" id="edit_room" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">ظرفیت</label>
+            <input type="text" class="form-input num-field-modal" name="capacity" id="edit_capacity" placeholder="مثال: 30" autocomplete="off">
+          </div>
+          <div class="form-group full-width">
+            <label class="form-label">معلم</label>
+            <select name="teacher" id="edit_teacher" class="form-input">
+              <option value="">-- بدون معلم --</option>
+              {% for t in teachers %}
+              <option value="{{ t.id }}">{{ t.user.first_name }} {{ t.user.last_name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal('editModal')">انصراف</button>
+      <button class="btn-save" onclick="document.getElementById('editForm').submit()">💾 ذخیره تغییرات</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ DELETE CONFIRM MODAL ═══ -->
+<!-- delete confirm is handled by admin_base adm-cfm -->
+
+<style>
+.num-field-modal{
+  direction:ltr!important;
+  text-align:left!important;
+  letter-spacing:1px;
+}
+.num-field-modal::placeholder{
+  direction:rtl;text-align:right;
+  color:#aaa;font-size:12px;
+}
+</style>
+<script>
+/* ══ MODAL FUNCTIONS ══ */
+function openAddModal(){
+  document.getElementById('addModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal(id){
+  document.getElementById(id).classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ── جستجو در جدول ── */
+function filterTable(input) {
+  var q = input.value.toLowerCase();
+  var rows = document.querySelectorAll('#classTable tbody tr');
+  rows.forEach(function(row) {
+    var text = row.textContent.toLowerCase();
+    row.style.display = text.indexOf(q) !== -1 ? '' : 'none';
+  });
+}
+
+/* delete handled by admin_base cfmOpen/cfmDo */
+document.addEventListener('DOMContentLoaded', function(){
+  /* Close on overlay click */
+  document.querySelectorAll('.modal-overlay').forEach(function(el){
+    el.addEventListener('click', function(e){
+      if(e.target === el) closeModal(el.id);
+    });
+  });
+  /* ══ NUMERIC INPUT HANDLER for capacity fields ══ */
+  document.querySelectorAll('.num-field-modal').forEach(function(inp){
+    inp.addEventListener('keydown', function(e){
+      if([8,9,27,13,46,37,38,39,40,35,36].indexOf(e.keyCode) !== -1) return;
+      if((e.ctrlKey||e.metaKey) && [65,67,86,88].indexOf(e.keyCode) !== -1) return;
+      if(e.keyCode >= 48 && e.keyCode <= 57) return;
+      if(e.keyCode >= 96 && e.keyCode <= 105) return;
+      if(e.keyCode === 190 || e.keyCode === 110) return;
+      e.preventDefault();
+    });
+    inp.addEventListener('paste', function(){
+      setTimeout(function(){ inp.value = inp.value.replace(/[^0-9.]/g, ''); }, 0);
+    });
+  });
+  /* Edit modal populate (data-attribute buttons) */
+  document.querySelectorAll('.btn-edit-class').forEach(function(btn){
+    btn.addEventListener('click', function(){ openEditModal(btn); });
+  });
+  /* Delete modal populate (data-attribute buttons) */
+  document.querySelectorAll('.btn-del-class').forEach(function(btn){
+    // delete buttons now use inline onclick='confirmDelete()'
+  });
+});
+
+/* ══ ONCLICK MODAL WRAPPERS (called by inline onclick) ══ */
+function openEditModal(btn) {
+  var d = btn.dataset;
+  document.getElementById('edit_class_name').value = d.name || '';
+  document.getElementById('edit_level').value      = d.level || '';
+  document.getElementById('edit_room').value       = d.room || '';
+  document.getElementById('edit_capacity').value   = d.capacity || '';
+  var sel = document.getElementById('edit_teacher');
+  if (sel) sel.value = d.teacher || '';
+  document.getElementById('editForm').action = d.url;
+  document.getElementById('editModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,329 @@
+{% extends 'admin_base.html' %}
+{% block title %}معاینات پزشکی - GAAM{% endblock %}
+
+{% block content %}
+<style>
+  .medical-container {
+    padding: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .medical-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  .medical-header h2 {
+    color: #2c3e50;
+    font-size: 1.8rem;
+    text-align: right;
+  }
+
+  .header-buttons {
+    display: flex;
+    gap: 10px;
+  }
+
+  .btn-back {
+    padding: 10px 20px;
+    background: #95a5a6;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-back:hover {
+    background: #7f8c8d;
+  }
+
+  .btn-add {
+    padding: 12px 30px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-add:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+  }
+
+  /* STATS */
+  .medical-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+  }
+
+  .stat-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+    text-align: center;
+  }
+
+  .stat-label {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+  }
+
+  .stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #2c3e50;
+  }
+
+  /* TABLE */
+  .medical-table {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+    margin-top: 20px;
+    overflow-x: auto;
+  }
+
+  .medical-table table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .medical-table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+  }
+
+  .medical-table th {
+    padding: 15px;
+    text-align: right;
+    font-weight: 600;
+  }
+
+  .medical-table tbody tr {
+    border-bottom: 1px solid #ecf0f1;
+    transition: all 0.3s;
+  }
+
+  .medical-table tbody tr:hover {
+    background: #f8f9fa;
+  }
+
+  .medical-table td {
+    padding: 15px;
+  }
+
+  .student-name {
+    color: #2c3e50;
+    font-weight: 500;
+  }
+
+  .health-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  .health-excellent {
+    background: #d4edda;
+    color: #155724;
+  }
+
+  .health-good {
+    background: #d1ecf1;
+    color: #0c5460;
+  }
+
+  .health-normal {
+    background: #fff3cd;
+    color: #856404;
+  }
+
+  .health-care {
+    background: #f8d7da;
+    color: #721c24;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .btn-edit {
+    padding: 6px 12px;
+    background: #3498db;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    transition: all 0.3s;
+  }
+
+  .btn-edit:hover {
+    background: #2980b9;
+  }
+
+  .btn-delete {
+    padding: 6px 12px;
+    background: #e74c3c;
+    color: white;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    transition: all 0.3s;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-delete:hover {
+    background: #c0392b;
+  }
+
+  .no-records {
+    text-align: center;
+    padding: 40px;
+    color: #7f8c8d;
+  }
+
+  @media (max-width: 768px) {
+    .medical-header {
+      flex-direction: column-reverse;
+    }
+
+    .medical-header h2 {
+      width: 100%;
+    }
+
+    .medical-stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .medical-table table {
+      font-size: 0.85rem;
+    }
+
+    .medical-table th,
+    .medical-table td {
+      padding: 10px;
+    }
+  }
+</style>
+
+<div class="medical-container">
+  <!-- HEADER -->
+  <div class="medical-header">
+    <h2>⚕️ معاینات پزشکی</h2>
+    
+    <div class="header-buttons">
+      <a href="{% url 'admin_dashboard' %}" class="btn-back">
+        <span>←</span>
+        <span>بازگشت</span>
+      </a>
+      <a href="{% url 'medical_add' %}" class="btn-add">
+        <span>➕</span>
+        <span>افزودن معاینه</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="medical-stats">
+    <div class="stat-card">
+      <div class="stat-label">کل معاینات</div>
+      <div class="stat-value">{{ total_checkups }}</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-label">شاگردان معاینه شده</div>
+      <div class="stat-value">{{ students_checked }}</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-label">شاگردان سلام</div>
+      <div class="stat-value">{{ healthy_students }}</div>
+    </div>
+    
+    <div class="stat-card">
+      <div class="stat-label">نیاز به مراقبت</div>
+      <div class="stat-value">{{ care_needed }}</div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="medical-table">
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 15%;">شاگرد</th>
+          <th style="width: 12%;">تاریخ</th>
+          <th style="width: 10%;">قد (cm)</th>
+          <th style="width: 10%;">وزن (kg)</th>
+          <th style="width: 12%;">فشار خون</th>
+          <th style="width: 10%;">دما (°C)</th>
+          <th style="width: 13%;">وضعیت</th>
+          <th style="width: 22%;">عملیات</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for m in medical_records %}
+        <tr>
+          <td class="student-name">{{ m.student.first_name }} {{ m.student.last_name }}</td>
+          <td>{{ m.checkup_date|date:"Y-m-d" }}</td>
+          <td>{{ m.height }}</td>
+          <td>{{ m.weight }}</td>
+          <td>{{ m.blood_pressure }}</td>
+          <td>{{ m.temperature }}</td>
+          <td>
+            {% if m.health_status == 'excellent' %}
+              <span class="health-badge health-excellent">✅ عالی</span>
+            {% elif m.health_status == 'good' %}
+              <span class="health-badge health-good">👍 خوب</span>
+            {% elif m.health_status == 'normal' %}
+              <span class="health-badge health-normal">😐 معمولی</span>
+            {% elif m.health_status == 'needs_care' %}
+              <span class="health-badge health-care">⚠️ نیاز به مراقبت</span>
+            {% endif %}
+          </td>
+          <td>
+            <div class="action-buttons">
+              <a href="{% url 'medical_edit' m.id %}" class="btn-edit">✏️ ویرایش</a>
+              <form method="POST" action="{% url 'medical_delete' m.id %}" style="display: inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn-delete">🗑️ حذف</button>
+              </form>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="8" class="no-records">
+            <p>هیچ رکورد معاینه وجود ندارد</p>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends 'admin_base.html' %}
+{% block title %}{% if edit_mode %}ویرایش{% else %}افزودن{% endif %} شاگرد - GAAM{% endblock %}
+{% block page_title %}{% if edit_mode %}ویرایش شاگرد{% else %}افزودن شاگرد{% endif %}{% endblock %}
+
+{% block content %}
+<style>
+.form-container{max-width:750px;margin:0 auto;background:var(--card);border-radius:14px;
+  padding:30px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.form-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;
+  padding-bottom:16px;border-bottom:2px solid var(--border)}
+.form-header h2{font-size:17px;font-weight:800;color:var(--text);margin:0}
+.btn-back-form{padding:8px 16px;background:var(--border);color:var(--text);
+  text-decoration:none;border-radius:8px;font-size:12px;font-weight:600;transition:.2s}
+.btn-back-form:hover{background:var(--pri);color:#fff}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;margin-bottom:5px;font-size:12px;font-weight:700;color:var(--text2)}
+.form-group input,.form-group select,.form-group textarea{
+  width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:8px;
+  font-size:13px;font-family:'Vazirmatn',sans-serif;direction:rtl;
+  background:var(--bg);color:var(--text);transition:.2s}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{
+  border-color:var(--pri);outline:none;box-shadow:0 0 0 3px rgba(79,70,229,.1)}
+.form-group textarea{min-height:75px;resize:vertical}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.section-sep{margin:20px 0 14px;padding:8px 12px;background:var(--pri-l);
+  border-radius:8px;border-right:3px solid var(--pri);font-size:12px;
+  font-weight:700;color:var(--pri)}
+.form-actions{display:flex;gap:12px;margin-top:24px}
+.btn-submit{flex:1;padding:12px;background:linear-gradient(135deg,#4f46e5,#7c3aed);
+  color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:800;
+  cursor:pointer;font-family:'Vazirmatn',sans-serif;transition:.2s}
+.btn-submit:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(79,70,229,.3)}
+.btn-cancel{padding:12px 24px;background:var(--border);color:var(--text);border:none;
+  border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;
+  font-family:'Vazirmatn',sans-serif;text-decoration:none;display:inline-flex;
+  align-items:center;gap:6px;transition:.2s}
+.btn-cancel:hover{background:#94a3b8;color:#fff}
+.hint{font-size:11px;color:var(--text2);margin-top:3px}
+@media(max-width:600px){.form-row{grid-template-columns:1fr}.form-actions{flex-direction:column}}
+</style>
+
+<div class="form-container">
+  <div class="form-header">
+    <h2>{% if edit_mode %}✏️ ویرایش شاگرد{% else %}➕ افزودن شاگرد جدید{% endif %}</h2>
+    <a href="{% url 'students_list' %}" class="btn-back-form">← بازگشت</a>
+  </div>
+
+  <form method="POST">
+    {% csrf_token %}
+
+    <!-- اطلاعات شخصی -->
+    <div class="section-sep">👤 اطلاعات شخصی</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>نام</label>
+        <input type="text" name="first_name" value="{% if student %}{{ student.first_name }}{% endif %}" required>
+      </div>
+      <div class="form-group">
+        <label>نام خانوادگی</label>
+        <input type="text" name="last_name" value="{% if student %}{{ student.last_name }}{% endif %}" required>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>👨 نام پدر</label>
+      <input type="text" name="father_name" value="{% if student %}{{ student.father_name }}{% endif %}" required>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>📧 ایمیل</label>
+        <input type="email" name="email" value="{% if student %}{{ student.email }}{% endif %}" required>
+      </div>
+      <div class="form-group">
+        <label>📱 شماره تماس</label>
+        <input type="tel" name="phone" value="{% if student %}{{ student.phone }}{% endif %}" required>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>🏠 آدرس</label>
+      <textarea name="address" required>{% if student %}{{ student.address }}{% endif %}</textarea>
+    </div>
+
+    <!-- اطلاعات تحصیلی -->
+    <div class="section-sep">🏫 اطلاعات تحصیلی</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>🆔 شناسه شاگرد</label>
+        <input type="text" name="student_id" value="{% if student %}{{ student.student_id }}{% endif %}" required>
+      </div>
+      <div class="form-group">
+        <label>🏫 کلاس</label>
+        <input type="text" name="class_field" value="{% if student %}{{ student.class_field }}{% endif %}" required>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>📅 تاریخ نام‌نویسی</label>
+      <input type="date" name="enrollment_date" value="{% if student %}{{ student.enrollment_date|date:'Y-m-d' }}{% endif %}" required>
+    </div>
+
+    <!-- اطلاعات ورود به سیستم -->
+    <div class="section-sep">🔐 اطلاعات ورود به سیستم (داشبورد شاگرد)</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>نام کاربری (username)</label>
+        <input type="text" name="username" value="{% if student and student.user %}{{ student.user.username }}{% endif %}" 
+               placeholder="مثال: ali123" {% if not edit_mode %}required{% endif %}>
+        <div class="hint">شاگرد با این نام وارد سیستم می‌شود</div>
+      </div>
+      <div class="form-group">
+        <label>پسورد</label>
+        <input type="text" name="password" placeholder="{% if edit_mode %}خالی بگذارید اگر تغییر نمی‌خواهید{% else %}حداقل ۶ رقم{% endif %}">
+        <div class="hint">{% if edit_mode %}اگر خالی باشد پسورد تغییر نمی‌کند{% else %}پسورد برای ورود شاگرد{% endif %}</div>
+      </div>
+    </div>
+    {% if student and student.user %}
+    <div style="background:var(--pri-l);padding:10px 14px;border-radius:8px;font-size:12px;color:var(--pri);margin-bottom:10px">
+      ✅ این شاگرد دارای حساب کاربری است — نام کاربری: <strong>{{ student.user.username }}</strong>
+    </div>
+    {% endif %}
+
+    <div class="form-actions">
+      <button type="submit" class="btn-submit">{% if edit_mode %}💾 بروزرسانی{% else %}💾 ذخیره{% endif %}</button>
+      <a href="{% url 'students_list' %}" class="btn-cancel">← لغو</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

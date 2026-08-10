@@ -1,0 +1,175 @@
+{% extends 'admin_base.html' %}
+{% block title %}{% if edit_mode %}ویرایش{% else %}افزودن{% endif %} معاینه - GAAM{% endblock %}
+{% block page_title %}{% if edit_mode %}ویرایش معاینه{% else %}افزودن معاینه جدید{% endif %}{% endblock %}
+{% block sb_role %}ادمین{% endblock %}
+
+{% block content %}
+<style>
+/* ══ NUM-FIELD: بدون type=number، بدون spinner، بدون مشکل RTL ══ */
+.num-field{
+  width:100%;padding:12px 15px;
+  border:1.5px solid var(--border);border-radius:9px;
+  font-size:14px;font-family:'Vazirmatn',sans-serif;
+  background:var(--bg);color:var(--text);transition:.2s;
+  direction:ltr;text-align:left;letter-spacing:1px;
+}
+.num-field:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(79,70,229,.1);outline:none}
+.num-field::placeholder{direction:rtl;text-align:right;color:#aaa;font-size:12px;letter-spacing:0}
+.dark .num-field{background:#0f172a!important;color:var(--text)!important;border-color:var(--border)!important}
+
+/* ══ FORM ══ */
+.form-container{max-width:700px;margin:0 auto;background:var(--card);
+  border-radius:14px;padding:30px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.form-header{display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px}
+.form-header h2{font-size:18px;font-weight:900;color:var(--text);margin:0}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;margin-bottom:6px;color:var(--text2);
+  font-weight:700;font-size:12px;text-align:right}
+.form-group input,.form-group select,.form-group textarea{
+  width:100%;padding:12px 15px;border:1.5px solid var(--border);border-radius:9px;
+  font-size:13px;transition:.2s;direction:rtl;font-family:'Vazirmatn',sans-serif;
+  background:var(--bg);color:var(--text)}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{
+  border-color:var(--pri);box-shadow:0 0 0 3px rgba(79,70,229,.1);outline:none}
+.form-group textarea{min-height:80px;resize:vertical}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-actions{display:flex;gap:12px;margin-top:24px}
+.btn-submit{flex:1;padding:13px;background:linear-gradient(135deg,#312e81,#4f46e5);
+  color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:700;
+  cursor:pointer;font-family:'Vazirmatn',sans-serif;transition:.2s}
+.btn-submit:hover{opacity:.9;transform:translateY(-1px)}
+.btn-cancel{padding:13px 24px;background:var(--border);color:var(--text);border:none;
+  border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;
+  font-family:'Vazirmatn',sans-serif;display:inline-flex;align-items:center;gap:6px;transition:.2s}
+.btn-cancel:hover{background:#94a3b8;color:#fff}
+@media(max-width:768px){.form-row{grid-template-columns:1fr}.form-actions{flex-direction:column}}
+</style>
+
+<div class="form-container">
+  <div class="form-header">
+    <h2>{% if edit_mode %}✏️ ویرایش معاینه{% else %}➕ افزودن معاینه جدید{% endif %}</h2>
+    <a href="{% url 'medical_list' %}" class="btn-cancel">← بازگشت</a>
+  </div>
+
+  {% if messages %}
+  {% for m in messages %}
+  <div style="padding:10px 14px;border-radius:8px;margin-bottom:14px;font-size:13px;font-weight:600;
+    {% if '❌' in m.message or 'خطا' in m.message %}background:#fee2e2;color:#991b1b{% else %}background:#dcfce7;color:#166534{% endif %}">
+    {{ m }}</div>
+  {% endfor %}
+  {% endif %}
+
+  <form method="POST">{% csrf_token %}
+
+    <!-- شاگرد -->
+    <div class="form-group">
+      <label>👨‍🎓 انتخاب شاگرد *</label>
+      <select name="student" required>
+        <option value="">-- شاگرد را انتخاب کنید --</option>
+        {% for s in students %}
+        <option value="{{ s.id }}" {% if medical.student.id == s.id %}selected{% endif %}>
+          {{ s.first_name }} {{ s.last_name }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- تاریخ -->
+    <div class="form-group">
+      <label>📅 تاریخ معاینه *</label>
+      <input type="date" name="checkup_date"
+        value="{% if medical %}{{ medical.checkup_date|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}" required>
+    </div>
+
+    <!-- قد و وزن — type="text" + class="num-field" -->
+    <div class="form-row">
+      <div class="form-group">
+        <label>📏 قد (سانتی‌متر)</label>
+        <input type="text" class="num-field" name="height"
+          value="{% if medical %}{{ medical.height }}{% endif %}"
+          placeholder="مثال: 120" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <label>⚖️ وزن (کیلوگرم)</label>
+        <input type="text" class="num-field" name="weight"
+          value="{% if medical %}{{ medical.weight }}{% endif %}"
+          placeholder="مثال: 25" autocomplete="off">
+      </div>
+    </div>
+
+    <!-- فشار خون و دما -->
+    <div class="form-row">
+      <div class="form-group">
+        <!-- فشار خون: text معمولی — چون 120/80 دارد -->
+        <label>🩺 فشار خون</label>
+        <input type="text" name="blood_pressure"
+          value="{% if medical %}{{ medical.blood_pressure }}{% endif %}"
+          placeholder="مثال: 120/80">
+      </div>
+      <div class="form-group">
+        <!-- دما — type="text" + class="num-field" -->
+        <label>🌡️ دما (درجه سلسیوس)</label>
+        <input type="text" class="num-field" name="temperature"
+          value="{% if medical %}{{ medical.temperature }}{% endif %}"
+          placeholder="مثال: 36.5" autocomplete="off">
+      </div>
+    </div>
+
+    <!-- تشخیص -->
+    <div class="form-group">
+      <label>📋 تشخیص</label>
+      <textarea name="diagnosis">{% if medical %}{{ medical.diagnosis }}{% endif %}</textarea>
+    </div>
+
+    <!-- توصیه‌ها -->
+    <div class="form-group">
+      <label>💊 توصیه‌ها</label>
+      <textarea name="recommendations">{% if medical %}{{ medical.recommendations }}{% endif %}</textarea>
+    </div>
+
+    <!-- وضعیت -->
+    <div class="form-group">
+      <label>❤️ وضعیت سلامتی *</label>
+      <select name="health_status" required>
+        <option value="excellent" {% if medical.health_status == 'excellent' %}selected{% endif %}>✅ عالی</option>
+        <option value="good"      {% if medical.health_status == 'good'      %}selected{% endif %}>👍 خوب</option>
+        <option value="normal"    {% if medical.health_status == 'normal'    %}selected{% endif %}>😐 معمولی</option>
+        <option value="needs_care"{% if medical.health_status == 'needs_care'%}selected{% endif %}>⚠️ نیاز به مراقبت</option>
+      </select>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-submit">
+        {% if edit_mode %}💾 بروزرسانی{% else %}💾 ذخیره{% endif %}
+      </button>
+      <a href="{% url 'medical_list' %}" class="btn-cancel">← لغو</a>
+    </div>
+  </form>
+</div>
+
+<script>
+/* ══ NUMERIC INPUT — فقط اعداد قبول می‌کند ══ */
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('.num-field').forEach(function(inp){
+    inp.addEventListener('keydown', function(e){
+      // اجازه: backspace, delete, tab, esc, enter, arrows, home, end
+      if([8,9,27,13,46,37,38,39,40,35,36].indexOf(e.keyCode) !== -1) return;
+      // اجازه: Ctrl/Cmd + A,C,V,X
+      if((e.ctrlKey||e.metaKey) && [65,67,86,88].indexOf(e.keyCode) !== -1) return;
+      // اجازه: اعداد keyboard (0-9)
+      if(e.keyCode >= 48 && e.keyCode <= 57) return;
+      // اجازه: اعداد numpad (0-9)
+      if(e.keyCode >= 96 && e.keyCode <= 105) return;
+      // اجازه: نقطه اعشار (. و numpad .)
+      if(e.keyCode === 190 || e.keyCode === 110) return;
+      // بلاک بقیه کلیدها
+      e.preventDefault();
+    });
+    inp.addEventListener('paste', function(){
+      setTimeout(function(){ inp.value = inp.value.replace(/[^0-9.]/g, ''); }, 0);
+    });
+  });
+});
+</script>
+{% endblock %}

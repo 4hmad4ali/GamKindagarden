@@ -1,0 +1,114 @@
+{% extends 'admin_base.html' %}
+{% block title %}داشبورد - GAAM Kindergarten{% endblock %}
+{% block page_title %}داشبورد اصلی{% endblock %}
+{% block sb_role %}ادمین{% endblock %}
+
+{% block content %}
+<style>
+.welcome{
+  background:linear-gradient(135deg,#312e81,#4f46e5 55%,#7c3aed);
+  border-radius:14px;padding:26px 28px;color:#fff;
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:22px;flex-wrap:wrap;gap:14px;
+}
+.welcome h1{font-size:20px;font-weight:900;margin-bottom:4px}
+.welcome p{font-size:13px;opacity:.8}
+.welcome .em{font-size:52px}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.sc{background:var(--card);border-radius:12px;padding:20px 16px;
+    box-shadow:var(--shadow);border:1px solid var(--border);
+    border-top:3px solid var(--pri);transition:.2s;cursor:default;text-align:center}
+.sc:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(79,70,229,.15)}
+.sc .si{font-size:28px;margin-bottom:8px}
+.sc .sn{font-size:28px;font-weight:900;line-height:1;color:var(--pri)}
+.sc .sl{font-size:11px;color:var(--text2);margin-top:5px;font-weight:600}
+.sc.blue{border-top-color:#2563eb}.sc.blue .sn{color:#2563eb}
+.sc.green{border-top-color:#16a34a}.sc.green .sn{color:#16a34a}
+.sc.orange{border-top-color:#d97706}.sc.orange .sn{color:#d97706}
+.sc.purple{border-top-color:#7c3aed}.sc.purple .sn{color:#7c3aed}
+
+.section-title{font-size:12px;font-weight:700;color:var(--text2);
+  margin-bottom:12px;letter-spacing:.5px;text-transform:uppercase}
+
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.qb{background:var(--card);border:1.5px solid var(--border);border-radius:12px;
+    padding:18px 12px;text-align:center;text-decoration:none;color:var(--text);
+    transition:.2s;display:flex;flex-direction:column;align-items:center;gap:8px}
+.qb:hover{border-color:var(--pri);background:var(--pri-l);transform:translateY(-2px)}
+.qb .qi{font-size:26px}
+.qb .ql{font-size:12px;font-weight:700}
+
+.info-card{background:var(--card);border-radius:12px;padding:20px;
+           box-shadow:var(--shadow);border:1px solid var(--border)}
+.ir{display:flex;align-items:center;gap:10px;padding:9px 0;
+    border-bottom:1px solid var(--border);font-size:13px}
+.ir:last-child{border:none;padding-bottom:0}
+.ir .iv{font-weight:700;color:var(--text)}
+.ir .il{color:var(--text2);font-size:11px;min-width:50px}
+.ir .em{font-size:16px}
+
+@media(max-width:768px){
+  .stats,.quick{grid-template-columns:repeat(2,1fr)}
+  .welcome h1{font-size:16px}
+  .welcome .em{display:none}
+}
+</style>
+
+<!-- WELCOME -->
+<div class="welcome">
+  <div>
+    <h1>سلام، {{ username }} 👋</h1>
+    <p>به سیستم مدیریت GAAM Kindergarten خوش آمدید</p>
+  </div>
+  <div class="em">🏫</div>
+</div>
+
+<!-- STATS -->
+<div class="section-title">آمار کلی</div>
+<div class="stats">
+  <div class="sc blue">
+    <div class="si">👨‍🏫</div>
+    <div class="sn">{{ total_teachers }}</div>
+    <div class="sl">معلمان فعال</div>
+  </div>
+  <div class="sc green">
+    <div class="si">👨‍🎓</div>
+    <div class="sn">{{ total_students }}</div>
+    <div class="sl">شاگردان فعال</div>
+  </div>
+  <div class="sc orange">
+    <div class="si">👥</div>
+    <div class="sn">{{ total_employees }}</div>
+    <div class="sl">کارمندان</div>
+  </div>
+  <div class="sc purple">
+    <div class="si">👑</div>
+    <div class="sn">{{ total_admins }}</div>
+    <div class="sl">ادمین‌ها</div>
+  </div>
+</div>
+
+<!-- QUICK ACTIONS -->
+<div class="section-title">دسترسی سریع</div>
+<div class="quick">
+  <a href="{% url 'teachers_list' %}" class="qb"><span class="qi">👨‍🏫</span><span class="ql">معلمان</span></a>
+  <a href="{% url 'students_list' %}" class="qb"><span class="qi">👨‍🎓</span><span class="ql">شاگردان</span></a>
+  <a href="{% url 'attendance_list' %}" class="qb"><span class="qi">✅</span><span class="ql">حضوری</span></a>
+  <a href="{% url 'finance_list' %}" class="qb"><span class="qi">💰</span><span class="ql">مالی</span></a>
+  <a href="{% url 'medical_list' %}" class="qb"><span class="qi">⚕️</span><span class="ql">پزشکی</span></a>
+  <a href="{% url 'reports' %}" class="qb"><span class="qi">📊</span><span class="ql">گزارشات</span></a>
+  <a href="{% url 'classes_list' %}" class="qb"><span class="qi">🏫</span><span class="ql">کلاس‌ها</span></a>
+  <a href="{% url 'profile' %}" class="qb"><span class="qi">👤</span><span class="ql">پروفایل</span></a>
+</div>
+
+<!-- SCHOOL INFO -->
+<div class="section-title">اطلاعات مدرسه</div>
+<div class="info-card">
+  <div class="ir"><span class="em">🏫</span><span class="il">نام:</span><span class="iv">GAAM Kindergarten</span></div>
+  <div class="ir"><span class="em">📍</span><span class="il">آدرس:</span><span class="iv">{{ address }}</span></div>
+  <div class="ir"><span class="em">📞</span><span class="il">تماس:</span><span class="iv">{{ phone }}</span></div>
+  <div class="ir"><span class="em">✅</span><span class="il">وضعیت:</span><span class="iv" style="color:#16a34a">فعال</span></div>
+</div>
+
+{% endblock %}

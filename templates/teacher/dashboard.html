@@ -1,0 +1,773 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>داشبورد معلم - GAAM</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#4f46e5;--primary-dark:#3730a3;--accent:#f43f5e;--success:#10b981;--warning:#f59e0b;--danger:#ef4444;--sidebar-w:260px;--bg:#f1f5f9;--card:#fff;--text:#1e293b;--text2:#64748b;--border:#e2e8f0;--shadow:0 2px 16px rgba(79,70,229,.08)}
+[data-dark="true"]{--bg:#0f172a;--card:#1e293b;--text:#f1f5f9;--text2:#94a3b8;--border:#334155;--shadow:0 2px 16px rgba(0,0,0,.3)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Vazirmatn',sans-serif;background:var(--bg);color:var(--text);transition:background .3s,color .3s}
+.sidebar{position:fixed;top:0;right:0;width:var(--sidebar-w);height:100vh;background:var(--primary);color:#fff;display:flex;flex-direction:column;z-index:1000;transition:transform .3s;overflow-y:auto}
+.sidebar.closed{transform:translateX(100%)}
+.sb-logo{padding:20px;border-bottom:1px solid rgba(255,255,255,.15);display:flex;align-items:center;gap:10px}
+.sb-logo .icon{width:38px;height:38px;background:rgba(255,255,255,.2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.sb-logo span{font-size:13px;font-weight:700}
+.sb-nav{flex:1;padding:12px 0}
+.nav-sec{padding:8px 16px 4px;font-size:10px;letter-spacing:1px;opacity:.5;font-weight:600;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;cursor:pointer;transition:.2s;border-right:3px solid transparent;font-size:14px;font-weight:500}
+.nav-item:hover{background:rgba(255,255,255,.1)}
+.nav-item.active{background:rgba(255,255,255,.2);border-right-color:#fff;font-weight:600}
+.nav-item .ico{width:20px;text-align:center}
+.sb-footer{padding:14px;border-top:1px solid rgba(255,255,255,.15)}
+.user-mini{display:flex;align-items:center;gap:8px}
+.ua{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:14px;overflow:hidden}
+.ua img{width:100%;height:100%;object-fit:cover}
+.main{margin-right:var(--sidebar-w);min-height:100vh;transition:margin .3s}
+.main.exp{margin-right:0}
+.topbar{position:sticky;top:0;z-index:100;background:var(--card);border-bottom:1px solid var(--border);padding:0 20px;height:60px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow)}
+.tb-btn{width:38px;height:38px;border:1px solid var(--border);background:var(--card);border-radius:10px;cursor:pointer;font-size:15px;color:var(--text2);display:flex;align-items:center;justify-content:center;transition:.2s}
+.tb-btn:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+.tb-title{font-size:15px;font-weight:700;flex:1}
+.clock{font-size:13px;color:var(--text2);font-weight:600;background:var(--bg);padding:5px 10px;border-radius:8px}
+.page{display:none;padding:20px;animation:fi .3s ease}
+.page.active{display:block}
+@keyframes fi{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.welcome{background:linear-gradient(135deg,var(--primary),#7c3aed);color:#fff;border-radius:14px;padding:24px;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center;position:relative;overflow:hidden}
+.welcome::before{content:'';position:absolute;right:-30px;top:-30px;width:160px;height:160px;background:rgba(255,255,255,.08);border-radius:50%}
+.welcome h2{font-size:20px;font-weight:800;margin-bottom:4px}
+.welcome p{font-size:13px;opacity:.85}
+.welcome .wi{font-size:56px;position:relative;z-index:1}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:20px}
+.sc{background:var(--card);border-radius:12px;padding:18px;box-shadow:var(--shadow);border:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.si{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.sv{font-size:24px;font-weight:800;line-height:1}
+.sl{font-size:11px;color:var(--text2);margin-top:3px}
+.card{background:var(--card);border-radius:12px;padding:20px;box-shadow:var(--shadow);border:1px solid var(--border);margin-bottom:16px}
+.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.ct{font-size:14px;font-weight:700}
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.page-title{font-size:17px;font-weight:700}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:9px 16px;border:none;border-radius:9px;cursor:pointer;font-family:'Vazirmatn',sans-serif;font-size:13px;font-weight:600;transition:.2s;text-decoration:none}
+.btn-primary{background:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-dark)}
+.btn-success{background:var(--success);color:#fff}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-warning{background:var(--warning);color:#fff}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text)}
+.btn-outline:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+.btn-sm{padding:5px 10px;font-size:12px}
+.back-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border:1px solid var(--border);border-radius:9px;background:var(--card);color:var(--text);cursor:pointer;font-family:'Vazirmatn',sans-serif;font-size:13px;font-weight:600;transition:.2s}
+.back-btn:hover{background:var(--primary);color:#fff;border-color:var(--primary)}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.fl{font-size:12px;font-weight:600;color:var(--text2)}
+.fi,.fs,.ft{padding:10px 12px;border:1.5px solid var(--border);border-radius:9px;background:var(--bg);color:var(--text);font-family:'Vazirmatn',sans-serif;font-size:13px;transition:.2s;outline:none;width:100%}
+.fi:focus,.fs:focus,.ft:focus{border-color:var(--primary);box-shadow:0 0 0 3px rgba(79,70,229,.1)}
+.ft{resize:vertical;min-height:80px}
+.fg2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tw{overflow-x:auto;border-radius:10px;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead{background:var(--bg)}
+th{padding:11px 14px;text-align:right;font-weight:700;color:var(--text2);font-size:11px;text-transform:uppercase;border-bottom:1px solid var(--border)}
+td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg)}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.bs{background:#d1fae5;color:#065f46}.bd{background:#fee2e2;color:#991b1b}.bw{background:#fef3c7;color:#92400e}.bb{background:#dbeafe;color:#1e40af}
+[data-dark="true"] .bs{background:#064e3b;color:#6ee7b7}[data-dark="true"] .bd{background:#7f1d1d;color:#fca5a5}[data-dark="true"] .bw{background:#78350f;color:#fcd34d}[data-dark="true"] .bb{background:#1e3a8a;color:#93c5fd}
+.acts{display:flex;gap:5px}
+.empty{text-align:center;padding:40px;color:var(--text2)}
+.empty .ei{font-size:48px;margin-bottom:12px}
+.msg-ok{background:#d1fae5;color:#065f46;padding:10px 14px;border-radius:9px;margin-bottom:14px;font-size:13px;font-weight:600}
+.msg-err{background:#fee2e2;color:#991b1b;padding:10px 14px;border-radius:9px;margin-bottom:14px;font-size:13px;font-weight:600}
+.tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:20px}
+.tab-btn{padding:9px 18px;background:none;border:none;cursor:pointer;font-family:'Vazirmatn',sans-serif;font-size:13px;font-weight:600;color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-2px;transition:.2s}
+.tab-btn.active{color:var(--primary);border-bottom-color:var(--primary)}
+.tp{display:none}.tp.active{display:block}
+.ph{background:linear-gradient(135deg,var(--primary),#7c3aed);border-radius:14px;padding:28px;color:#fff;text-align:center;margin-bottom:20px}
+.avw{position:relative;width:90px;height:90px;margin:0 auto 12px}
+.avw img,.av-ph{width:90px;height:90px;border-radius:50%;border:4px solid rgba(255,255,255,.4);object-fit:cover}
+.av-ph{background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:36px}
+.av-edit{position:absolute;bottom:0;left:0;width:28px;height:28px;background:var(--accent);border:3px solid #fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;color:#fff}
+.sb-bar{height:6px;background:var(--border);border-radius:3px;margin-top:6px;overflow:hidden}
+.sb-fill{height:100%;border-radius:3px;transition:.3s}
+.tt-table{width:100%;border-collapse:collapse;font-size:12px}
+.tt-table th,.tt-table td{border:1px solid var(--border);padding:10px 8px;text-align:center}
+.tt-table th{background:var(--primary);color:#fff;font-weight:700}
+.tt-table td:first-child{background:var(--bg);font-weight:700;font-size:11px}
+.tt-cell{background:linear-gradient(135deg,var(--primary),#818cf8);color:#fff;border-radius:6px;padding:5px 8px;font-size:11px;line-height:1.4}
+.tt-empty{color:var(--text2);font-size:11px}
+@media(max-width:768px){.main{margin-right:0}.sidebar{transform:translateX(100%)}.sidebar.open{transform:none}.fg2{grid-template-columns:1fr}.welcome .wi{display:none}}
+
+/* Fix RTL number inputs */
+input[inputmode="decimal"]{direction:ltr!important;text-align:right!important}
+input[inputmode="decimal"]::-webkit-inner-spin-button{-webkit-appearance:none}
+</style>
+</head>
+<body>
+
+<!-- ═══ SIDEBAR ═══ -->
+<div class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <div class="icon">🏫</div>
+    <div><span>GAAM Kindergarten</span><br><small style="opacity:.7;font-size:11px">سیستم معلم</small></div>
+  </div>
+  <nav class="sb-nav">
+    <div class="nav-sec">منوی اصلی</div>
+    <div class="nav-item active" onclick="showPage('dashboard')"><span class="ico">🏠</span> داشبورد</div>
+    <div class="nav-item" onclick="showPage('students')"><span class="ico">👦</span> معلومات شاگردان</div>
+    <div class="nav-item" onclick="showPage('sp')"><span class="ico">✅</span> حضوری شاگردان</div>
+    <div class="nav-item" onclick="showPage('health')"><span class="ico">🏥</span> گزارش صحی شاگرد</div>
+    <div class="nav-item" onclick="showPage('tp')"><span class="ico">📋</span> حضوری معلم</div>
+    <div class="nav-item" onclick="showPage('plans')"><span class="ico">📚</span> پلان بوک</div>
+    <div class="nav-item" onclick="showPage('timetable')"><span class="ico">📅</span> جدول وقت</div>
+    <div class="nav-sec">حساب</div>
+    <div class="nav-item" onclick="showPage('profile')"><span class="ico">👤</span> پروفایل</div>
+    <div class="nav-item" onclick="window.location.href='/logout/'"><span class="ico">🚪</span> خروج</div>
+  </nav>
+  <div class="sb-footer">
+    <div class="user-mini">
+      <div class="ua" id="sb-av">
+        {% if profile_picture %}<img src="{{ profile_picture }}" alt="">{% else %}👨‍🏫{% endif %}
+      </div>
+      <div><span style="font-size:13px;font-weight:600">{{ username }}</span><br><small style="opacity:.7;font-size:11px">معلم</small></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MAIN ═══ -->
+<div class="main" id="main">
+  <div class="topbar">
+    <button class="tb-btn" onclick="toggleSB()">☰</button>
+    <div class="tb-title" id="tb-title">داشبورد معلم</div>
+    <div class="clock" id="clock">⏰ ...</div>
+    <button class="tb-btn" onclick="toggleDark()" id="dark-btn">🌙</button>
+    <button onclick="showPage('profile')" style="background:none;border:none;cursor:pointer;padding:0;width:38px;height:38px;border-radius:50%;overflow:hidden;flex-shrink:0">
+      {% if profile_picture %}
+        <img src="{{ profile_picture }}" style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:2px solid var(--border)">
+      {% else %}
+        <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#312e81,#4f46e5);display:flex;align-items:center;justify-content:center;font-size:17px">👨‍🏫</div>
+      {% endif %}
+    </button>
+  </div>
+
+  <!-- ══ MESSAGES ══ -->
+  {% if messages %}
+  <div style="padding:16px 20px 0">
+    {% for m in messages %}
+    <div class="{% if 'خطا' in m.message or '❌' in m.message %}msg-err{% else %}msg-ok{% endif %}">{{ m }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- ════════ DASHBOARD ════════ -->
+  <div class="page active" id="page-dashboard">
+    <div class="welcome">
+      <div>
+        <h2>خوش آمدید، {{ username }} جان! 👋</h2>
+        <p>معلم محترم — امروز یک روز عالی برای تدریس است</p>
+        <p style="margin-top:6px;font-size:12px;opacity:.7" id="welcome-date"></p>
+      </div>
+      <div class="wi">
+        {% if profile_picture %}
+        <img src="{{ profile_picture }}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,.5);box-shadow:0 4px 20px rgba(0,0,0,.2)">
+        {% else %}
+        <div style="width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:44px;border:3px solid rgba(255,255,255,.3)">👨‍🏫</div>
+        {% endif %}
+      </div>
+    </div>
+    <div class="stats">
+      <div class="sc"><div class="si" style="background:#ede9fe">👦</div><div><div class="sv">{{ total_students }}</div><div class="sl">مجموع شاگردان</div></div></div>
+      <div class="sc"><div class="si" style="background:#d1fae5">✅</div><div><div class="sv">{{ present_today }}</div><div class="sl">حاضر امروز</div></div></div>
+      <div class="sc"><div class="si" style="background:#fee2e2">❌</div><div><div class="sv">{{ absent_today }}</div><div class="sl">غایب امروز</div></div></div>
+      <div class="sc"><div class="si" style="background:#fef3c7">📚</div><div><div class="sv">{{ total_plans }}</div><div class="sl">پلان‌های ثبت شده</div></div></div>
+    </div>
+    <!-- خلاصه حضوری -->
+    <div class="card">
+      <div class="ct" style="margin-bottom:14px">📊 خلاصه حضوری</div>
+      {% with total_sp=sp_present|add:sp_absent|add:sp_leave %}
+      <div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>حاضری</span><span>{{ sp_present }}</span></div><div class="sb-bar"><div class="sb-fill" style="width:{% if total_sp %}{% widthratio sp_present total_sp 100 %}{% else %}0{% endif %}%;background:#10b981"></div></div></div>
+      <div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>غیابت</span><span>{{ sp_absent }}</span></div><div class="sb-bar"><div class="sb-fill" style="width:{% if total_sp %}{% widthratio sp_absent total_sp 100 %}{% else %}0{% endif %}%;background:#ef4444"></div></div></div>
+      <div><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span>مرخصی</span><span>{{ sp_leave }}</span></div><div class="sb-bar"><div class="sb-fill" style="width:{% if total_sp %}{% widthratio sp_leave total_sp 100 %}{% else %}0{% endif %}%;background:#f59e0b"></div></div></div>
+      {% endwith %}
+    </div>
+  </div>
+
+  <!-- ════════ STUDENTS ════════ -->
+  <div class="page" id="page-students">
+    <div class="sh">
+      <div class="page-title">👦 معلومات شاگردان</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="showPage('student-add')">➕ افزودن شاگرد</button>
+        <button onclick="showPage('profile')" title="پروفایل" style="background:none;border:none;cursor:pointer;padding:0;flex-shrink:0;display:flex;align-items:center">
+      {% if profile_picture %}<img src="{{ profile_picture }}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border)">{% else %}<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:16px">👨‍🏫</div>{% endif %}
+    </button>
+        <button class="back-btn" onclick="showPage('dashboard')">← بازگشت</button>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="sc"><div class="si" style="background:#ede9fe">👦</div><div><div class="sv">{{ total_students }}</div><div class="sl">کل</div></div></div>
+      <div class="sc"><div class="si" style="background:#d1fae5">✅</div><div><div class="sv">{{ active_students }}</div><div class="sl">فعال</div></div></div>
+      <div class="sc"><div class="si" style="background:#fee2e2">❌</div><div><div class="sv">{{ inactive_students }}</div><div class="sl">غیرفعال</div></div></div>
+    </div>
+    <div class="card">
+      <div class="tw">
+        <table>
+          <thead><tr><th>#</th><th>نام</th><th>تخلص</th><th>نام پدر</th><th>شماره</th><th>کلاس</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+          <tbody>
+            {% for s in all_students %}
+            <tr>
+              <td>{{ forloop.counter }}</td>
+              <td>{{ s.first_name }}</td><td>{{ s.last_name }}</td><td>{{ s.father_name }}</td>
+              <td>{{ s.phone }}</td><td>{{ s.class_field }}</td>
+              <td><span class="badge {% if s.is_active %}bs{% else %}bd{% endif %}">{% if s.is_active %}فعال{% else %}غیرفعال{% endif %}</span></td>
+              <td><div class="acts">
+                <button class="btn btn-warning btn-sm" onclick="showEditStudent({{ s.id }},'{{ s.first_name }}','{{ s.last_name }}','{{ s.father_name }}','{{ s.phone }}','{{ s.class_field }}',{% if s.is_active %}true{% else %}false{% endif %})">✏️</button>
+                <form method="POST" action="/core/teacher/students/{{ s.id }}/delete/" style="display:inline" onsubmit="return confirm('حذف شود؟')">{% csrf_token %}<button class="btn btn-danger btn-sm" type="submit">🗑</button></form>
+              </div></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="8"><div class="empty"><div class="ei">📭</div><p>هنوز شاگردی ثبت نشده</p></div></td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ ADD STUDENT ════════ -->
+  <div class="page" id="page-student-add">
+    <div class="sh">
+      <div class="page-title">➕ افزودن شاگرد</div>
+      <button class="back-btn" onclick="showPage('students')">← بازگشت</button>
+    </div>
+    <div class="card">
+      <form method="POST" action="/core/teacher/students/add/">
+        {% csrf_token %}
+        <div class="fg2">
+          <div class="fg"><label class="fl">نام *</label><input class="fi" name="fname" required placeholder="نام..."></div>
+          <div class="fg"><label class="fl">تخلص</label><input class="fi" name="lname" placeholder="تخلص..."></div>
+          <div class="fg"><label class="fl">نام پدر</label><input class="fi" name="father" placeholder="نام پدر..."></div>
+          <div class="fg"><label class="fl">شماره تلفون</label><input class="fi" name="phone" placeholder="شماره..."></div>
+          <div class="fg"><label class="fl">ایمیل</label><input class="fi" name="email" type="email" placeholder="ایمیل..."></div>
+          <div class="fg"><label class="fl">کلاس</label>
+            <select class="fs" name="cls">
+              <option value="">انتخاب...</option>
+              {% for c in all_classes %}<option value="{{ c.class_name }}">{{ c.class_name }}</option>{% endfor %}
+              <option value="کلاس اول">کلاس اول</option>
+              <option value="کلاس دوم">کلاس دوم</option>
+              <option value="کلاس سوم">کلاس سوم</option>
+            </select>
+          </div>
+          <div class="fg" style="grid-column:1/-1"><label class="fl">آدرس</label><input class="fi" name="address" placeholder="آدرس..."></div>
+          <div class="fg"><label class="fl">وضعیت</label>
+            <select class="fs" name="status"><option value="active">فعال</option><option value="inactive">غیرفعال</option></select>
+          </div>
+        </div>
+        <button class="btn btn-primary" type="submit">💾 ذخیره</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ════════ EDIT STUDENT ════════ -->
+  <div class="page" id="page-student-edit">
+    <div class="sh">
+      <div class="page-title">✏️ ویرایش شاگرد</div>
+      <button class="back-btn" onclick="showPage('students')">← بازگشت</button>
+    </div>
+    <div class="card">
+      <form method="POST" id="edit-student-form" action="">
+        {% csrf_token %}
+        <div class="fg2">
+          <div class="fg"><label class="fl">نام</label><input class="fi" name="fname" id="es-fname"></div>
+          <div class="fg"><label class="fl">تخلص</label><input class="fi" name="lname" id="es-lname"></div>
+          <div class="fg"><label class="fl">نام پدر</label><input class="fi" name="father" id="es-father"></div>
+          <div class="fg"><label class="fl">شماره</label><input class="fi" name="phone" id="es-phone"></div>
+          <div class="fg"><label class="fl">کلاس</label><input class="fi" name="cls" id="es-cls"></div>
+          <div class="fg"><label class="fl">وضعیت</label>
+            <select class="fs" name="status" id="es-status"><option value="active">فعال</option><option value="inactive">غیرفعال</option></select>
+          </div>
+        </div>
+        <button class="btn btn-success" type="submit">💾 ذخیره</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ════════ STUDENT PRESENCE ════════ -->
+  <div class="page" id="page-sp">
+    <div class="sh">
+      <div class="page-title">✅ حضوری شاگردان</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="showPage('sp-add')">➕ ثبت حضوری</button>
+        <button onclick="showPage('profile')" title="پروفایل" style="background:none;border:none;cursor:pointer;padding:0;flex-shrink:0;display:flex;align-items:center">
+      {% if profile_picture %}<img src="{{ profile_picture }}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border)">{% else %}<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:16px">👨‍🏫</div>{% endif %}
+    </button>
+        <button class="back-btn" onclick="showPage('dashboard')">← بازگشت</button>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="sc"><div class="si" style="background:#d1fae5">✅</div><div><div class="sv">{{ sp_present }}</div><div class="sl">حاضر</div></div></div>
+      <div class="sc"><div class="si" style="background:#fee2e2">❌</div><div><div class="sv">{{ sp_absent }}</div><div class="sl">غایب</div></div></div>
+      <div class="sc"><div class="si" style="background:#fef3c7">🏖</div><div><div class="sv">{{ sp_leave }}</div><div class="sl">مرخصی</div></div></div>
+    </div>
+    <div class="card">
+      <div class="tw">
+        <table>
+          <thead><tr><th>#</th><th>نام شاگرد</th><th>تاریخ</th><th>وضعیت</th><th>یادداشت</th><th>عملیات</th></tr></thead>
+          <tbody>
+            {% for r in student_presence %}
+            <tr>
+              <td>{{ forloop.counter }}</td><td>{{ r.student_name }}</td><td>{{ r.date }}</td>
+              <td><span class="badge {% if r.status == 'present' %}bs{% elif r.status == 'absent' %}bd{% else %}bw{% endif %}">{% if r.status == 'present' %}حاضر ✅{% elif r.status == 'absent' %}غایب ❌{% else %}مرخصی 🏖{% endif %}</span></td>
+              <td>{{ r.note|default:"—" }}</td>
+              <td><form method="POST" action="/core/teacher/student-presence/{{ r.id }}/delete/" style="display:inline" onsubmit="return confirm('حذف شود؟')">{% csrf_token %}<button class="btn btn-danger btn-sm" type="submit">🗑</button></form></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6"><div class="empty"><div class="ei">📭</div><p>هنوز حضوری ثبت نشده</p></div></td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ ADD SP ════════ -->
+  <div class="page" id="page-sp-add">
+    <div class="sh"><div class="page-title">✅ ثبت حضوری شاگرد</div><button class="back-btn" onclick="showPage('sp')">← بازگشت</button>
+        <button onclick="showPage('profile')" title="پروفایل" style="background:none;border:none;cursor:pointer;padding:0;flex-shrink:0;display:flex;align-items:center">
+      {% if profile_picture %}<img src="{{ profile_picture }}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border)">{% else %}<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:16px">👨‍🏫</div>{% endif %}
+    </button></div>
+    <div class="card">
+      <form method="POST" action="/core/teacher/student-presence/add/">
+        {% csrf_token %}
+        <div class="fg2">
+          <div class="fg"><label class="fl">انتخاب شاگرد *</label>
+            <select class="fs" name="student_id" required onchange="autoFillName(this,'sp-name')">
+              <option value="">-- شاگرد انتخاب کنید --</option>
+              {% for s in all_students %}
+              <option value="{{ s.id }}" data-name="{{ s.first_name }} {{ s.last_name }}">{{ s.first_name }} {{ s.last_name }}{% if s.class_field %} — {{ s.class_field }}{% endif %}</option>
+              {% endfor %}
+            </select>
+            <input type="hidden" name="name" id="sp-name">
+          </div>
+          <div class="fg"><label class="fl">تاریخ *</label><input class="fi" name="date" type="date" required value="{{ today }}"></div>
+          <div class="fg"><label class="fl">وضعیت</label>
+            <select class="fs" name="status"><option value="present">حاضر ✅</option><option value="absent">غایب ❌</option><option value="leave">مرخصی 🏖</option></select>
+          </div>
+          <div class="fg" style="grid-column:1/-1"><label class="fl">یادداشت</label><textarea class="ft" name="note" placeholder="یادداشت..."></textarea></div>
+        </div>
+        <button class="btn btn-primary" type="submit">💾 ذخیره</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ════════ HEALTH ════════ -->
+  <div class="page" id="page-health">
+    <div class="sh">
+      <div class="page-title">🏥 گزارش صحی شاگردان</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="showPage('health-add')">➕ ثبت گزارش</button>
+        <button onclick="showPage('profile')" title="پروفایل" style="background:none;border:none;cursor:pointer;padding:0;flex-shrink:0;display:flex;align-items:center">
+      {% if profile_picture %}<img src="{{ profile_picture }}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border)">{% else %}<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:16px">👨‍🏫</div>{% endif %}
+    </button>
+        <button class="back-btn" onclick="showPage('dashboard')">← بازگشت</button>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="sc"><div class="si" style="background:#d1fae5">💚</div><div><div class="sv">{{ h_excellent }}</div><div class="sl">عالی</div></div></div>
+      <div class="sc"><div class="si" style="background:#dbeafe">💙</div><div><div class="sv">{{ h_good }}</div><div class="sl">خوب</div></div></div>
+      <div class="sc"><div class="si" style="background:#fee2e2">❤</div><div><div class="sv">{{ h_care }}</div><div class="sl">نیاز به مراقبت</div></div></div>
+    </div>
+    <div class="card">
+      <div class="tw">
+        <table>
+          <thead><tr><th>#</th><th>نام</th><th>تاریخ</th><th>قد</th><th>وزن</th><th>وضعیت</th><th>تشخیص</th><th>عملیات</th></tr></thead>
+          <tbody>
+            {% for r in health_reports %}
+            <tr>
+              <td>{{ forloop.counter }}</td><td>{{ r.student_name }}</td><td>{{ r.date }}</td>
+              <td>{{ r.height|default:"—" }}</td><td>{{ r.weight|default:"—" }}</td>
+              <td><span class="badge {% if r.health_status == 'excellent' %}bs{% elif r.health_status == 'good' %}bb{% elif r.health_status == 'normal' %}bw{% else %}bd{% endif %}">{% if r.health_status == 'excellent' %}عالی 💚{% elif r.health_status == 'good' %}خوب 💙{% elif r.health_status == 'normal' %}معمولی 💛{% else %}نیاز به مراقبت ❤{% endif %}</span></td>
+              <td>{{ r.diagnosis|default:"—"|truncatechars:30 }}</td>
+              <td><form method="POST" action="/core/teacher/health/{{ r.id }}/delete/" style="display:inline" onsubmit="return confirm('حذف شود؟')">{% csrf_token %}<button class="btn btn-danger btn-sm" type="submit">🗑</button></form></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="8"><div class="empty"><div class="ei">📭</div><p>هنوز گزارشی ثبت نشده</p></div></td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ ADD HEALTH ════════ -->
+  <div class="page" id="page-health-add">
+    <div class="sh"><div class="page-title">🏥 ثبت گزارش صحی</div><button class="back-btn" onclick="showPage('health')">← بازگشت</button>
+        <button onclick="showPage('profile')" title="پروفایل" style="background:none;border:none;cursor:pointer;padding:0;flex-shrink:0;display:flex;align-items:center">
+      {% if profile_picture %}<img src="{{ profile_picture }}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border)">{% else %}<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:16px">👨‍🏫</div>{% endif %}
+    </button></div>
+    <div class="card">
+      <form method="POST" action="/core/teacher/health/add/">
+        {% csrf_token %}
+        <div class="fg2">
+          <div class="fg"><label class="fl">انتخاب شاگرد *</label>
+            <select class="fs" name="student_id" required onchange="autoFillName(this,'h-name')">
+              <option value="">-- شاگرد انتخاب کنید --</option>
+              {% for s in all_students %}
+              <option value="{{ s.id }}" data-name="{{ s.first_name }} {{ s.last_name }}">{{ s.first_name }} {{ s.last_name }}{% if s.class_field %} — {{ s.class_field }}{% endif %}</option>
+              {% endfor %}
+            </select>
+            <input type="hidden" name="name" id="h-name">
+          </div>
+          <div class="fg"><label class="fl">تاریخ *</label><input class="fi" name="date" type="date" required value="{{ today }}"></div>
+          <div class="fg"><label class="fl">قد (cm)</label><input class="fi" name="height" type="text" inputmode="decimal" dir="ltr" style="text-align:right" placeholder="قد..."></div>
+          <div class="fg"><label class="fl">وزن (kg)</label><input class="fi" name="weight" type="text" inputmode="decimal" dir="ltr" style="text-align:right" placeholder="وزن..."></div>
+          <div class="fg"><label class="fl">وضعیت صحی</label>
+            <select class="fs" name="status"><option value="excellent">عالی 💚</option><option value="good">خوب 💙</option><option value="normal">معمولی 💛</option><option value="needs_care">نیاز به مراقبت ❤</option></select>
+          </div>
+          <div class="fg" style="grid-column:1/-1"><label class="fl">تشخیص</label><textarea class="ft" name="diagnosis" placeholder="تشخیص پزشکی..."></textarea></div>
+        </div>
+        <button class="btn btn-primary" type="submit">💾 ذخیره</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ════════ TEACHER PRESENCE ════════ -->
+  <div class="page" id="page-tp">
+    <div class="sh">
+      <div class="page-title">📋 حضوری معلم</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="showPage('tp-add')">➕ ثبت حضوری</button>
+        <button onclick="showPage('profile')" title="پروفایل" style="background:none;border:none;cursor:pointer;padding:0;flex-shrink:0;display:flex;align-items:center">
+      {% if profile_picture %}<img src="{{ profile_picture }}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border)">{% else %}<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:16px">👨‍🏫</div>{% endif %}
+    </button>
+        <button class="back-btn" onclick="showPage('dashboard')">← بازگشت</button>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="sc"><div class="si" style="background:#d1fae5">✅</div><div><div class="sv">{{ tp_present }}</div><div class="sl">حاضر</div></div></div>
+      <div class="sc"><div class="si" style="background:#fee2e2">❌</div><div><div class="sv">{{ tp_absent }}</div><div class="sl">غایب</div></div></div>
+      <div class="sc"><div class="si" style="background:#fef3c7">📊</div><div><div class="sv">{{ tp_rate }}%</div><div class="sl">درصد حضور</div></div></div>
+    </div>
+    <div class="card">
+      <div class="tw">
+        <table>
+          <thead><tr><th>#</th><th>تاریخ</th><th>ورود</th><th>خروج</th><th>وضعیت</th><th>یادداشت</th><th>عملیات</th></tr></thead>
+          <tbody>
+            {% for r in teacher_presence %}
+            <tr>
+              <td>{{ forloop.counter }}</td><td>{{ r.date }}</td><td>{{ r.check_in_time|default:"—" }}</td><td>{{ r.check_out_time|default:"—" }}</td>
+              <td><span class="badge {% if r.status == 'present' %}bs{% elif r.status == 'absent' %}bd{% else %}bw{% endif %}">{% if r.status == 'present' %}حاضر ✅{% elif r.status == 'absent' %}غایب ❌{% else %}مرخصی 🏖{% endif %}</span></td>
+              <td>{{ r.note|default:"—" }}</td>
+              <td><form method="POST" action="/core/teacher/presence/{{ r.id }}/delete/" style="display:inline" onsubmit="return confirm('حذف شود؟')">{% csrf_token %}<button class="btn btn-danger btn-sm" type="submit">🗑</button></form></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="7"><div class="empty"><div class="ei">📭</div><p>هنوز حضوری ثبت نشده</p></div></td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ ADD TP ════════ -->
+  <div class="page" id="page-tp-add">
+    <div class="sh"><div class="page-title">📋 ثبت حضوری معلم</div><button class="back-btn" onclick="showPage('tp')">← بازگشت</button>
+        <button onclick="showPage('profile')" title="پروفایل" style="background:none;border:none;cursor:pointer;padding:0;flex-shrink:0;display:flex;align-items:center">
+      {% if profile_picture %}<img src="{{ profile_picture }}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border)">{% else %}<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:16px">👨‍🏫</div>{% endif %}
+    </button></div>
+    <div class="card">
+      <form method="POST" action="/core/teacher/presence/add/">
+        {% csrf_token %}
+        <div class="fg2">
+          <div class="fg"><label class="fl">تاریخ *</label><input class="fi" name="date" type="date" required value="{{ today }}"></div>
+          <div class="fg"><label class="fl">وضعیت</label>
+            <select class="fs" name="status"><option value="present">حاضر ✅</option><option value="absent">غایب ❌</option><option value="leave">مرخصی 🏖</option></select>
+          </div>
+          <div class="fg"><label class="fl">وقت ورود</label><input class="fi" name="in_time" type="time"></div>
+          <div class="fg"><label class="fl">وقت خروج</label><input class="fi" name="out_time" type="time"></div>
+          <div class="fg" style="grid-column:1/-1"><label class="fl">یادداشت</label><textarea class="ft" name="note" placeholder="یادداشت..."></textarea></div>
+        </div>
+        <button class="btn btn-primary" type="submit">💾 ذخیره</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ════════ PLANS ════════ -->
+  <div class="page" id="page-plans">
+    <div class="sh">
+      <div class="page-title">📚 پلان‌های درسی</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="showPage('plan-add')">➕ پلان جدید</button>
+        <button onclick="showPage('profile')" title="پروفایل" style="background:none;border:none;cursor:pointer;padding:0;flex-shrink:0;display:flex;align-items:center">
+      {% if profile_picture %}<img src="{{ profile_picture }}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border)">{% else %}<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:16px">👨‍🏫</div>{% endif %}
+    </button>
+        <button class="back-btn" onclick="showPage('dashboard')">← بازگشت</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="tw">
+        <table>
+          <thead><tr><th>#</th><th>موضوع</th><th>عنوان</th><th>کلاس</th><th>تاریخ</th><th>عملیات</th></tr></thead>
+          <tbody>
+            {% for p in plans %}
+            <tr>
+              <td>{{ forloop.counter }}</td><td>{{ p.subject }}</td><td>{{ p.topic|default:"—" }}</td><td>{{ p.class_name|default:"—" }}</td><td>{{ p.date|default:"—" }}</td>
+              <td><form method="POST" action="/core/teacher/plan/{{ p.id }}/delete/" style="display:inline" onsubmit="return confirm('حذف شود؟')">{% csrf_token %}<button class="btn btn-danger btn-sm" type="submit">🗑</button></form></td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="6"><div class="empty"><div class="ei">📭</div><p>هنوز پلانی ثبت نشده</p></div></td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ ADD PLAN ════════ -->
+  <div class="page" id="page-plan-add">
+    <div class="sh"><div class="page-title">📚 افزودن پلان درسی</div><button class="back-btn" onclick="showPage('plans')">← بازگشت</button>
+        <button onclick="showPage('profile')" title="پروفایل" style="background:none;border:none;cursor:pointer;padding:0;flex-shrink:0;display:flex;align-items:center">
+      {% if profile_picture %}<img src="{{ profile_picture }}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border)">{% else %}<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:16px">👨‍🏫</div>{% endif %}
+    </button></div>
+    <div class="card">
+      <form method="POST" action="/core/teacher/plan/add/">
+        {% csrf_token %}
+        <div class="fg2">
+          <div class="fg"><label class="fl">موضوع (Subject) *</label><input class="fi" name="subject" required placeholder="مثال: ریاضی"></div>
+          <div class="fg"><label class="fl">عنوان درس (Topic)</label><input class="fi" name="topic" placeholder="مثال: جمع و تفریق"></div>
+          <div class="fg"><label class="fl">کلاس</label><input class="fi" name="cls" placeholder="مثال: کلاس اول"></div>
+          <div class="fg"><label class="fl">تاریخ</label><input class="fi" name="date" type="date" value="{{ today }}"></div>
+          <div class="fg" style="grid-column:1/-1"><label class="fl">هدف درس (Goal)</label><textarea class="ft" name="goal" placeholder="هدف این درس..."></textarea></div>
+          <div class="fg" style="grid-column:1/-1"><label class="fl">مواد درسی (Material)</label><textarea class="ft" name="material" placeholder="کتاب، تخته، رنگ..."></textarea></div>
+          <div class="fg" style="grid-column:1/-1"><label class="fl">فعالیت‌های صنفی (Class Activities)</label><textarea class="ft" name="activities" placeholder="فعالیت‌ها..."></textarea></div>
+          <div class="fg" style="grid-column:1/-1"><label class="fl">ارزیابی (Evaluation)</label><textarea class="ft" name="evaluation" placeholder="روش ارزیابی..."></textarea></div>
+        </div>
+        <button class="btn btn-primary" type="submit">💾 ذخیره پلان</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ════════ TIMETABLE ════════ -->
+  <div class="page" id="page-timetable">
+    <div class="sh">
+      <div class="page-title">📅 جدول وقت</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-primary" onclick="showPage('tt-add')">➕ افزودن درس</button>
+        <button onclick="showPage('profile')" title="پروفایل" style="background:none;border:none;cursor:pointer;padding:0;flex-shrink:0;display:flex;align-items:center">
+      {% if profile_picture %}<img src="{{ profile_picture }}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border)">{% else %}<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:16px">👨‍🏫</div>{% endif %}
+    </button>
+        <button class="back-btn" onclick="showPage('dashboard')">← بازگشت</button>
+      </div>
+    </div>
+    <div class="card">
+      <div style="overflow-x:auto">
+        <table class="tt-table">
+          <thead><tr><th>وقت</th><th>شنبه</th><th>یکشنبه</th><th>دوشنبه</th><th>سه‌شنبه</th><th>چهارشنبه</th></tr></thead>
+          <tbody>
+            {% for slot in time_slots %}
+            <tr>
+              <td>{{ slot }}</td>
+              {% for day in days_list %}
+              <td>
+                {% with found=False %}
+                {% for tt in timetable %}
+                  {% if tt.day == day and tt.time_slot == slot %}
+                  <div class="tt-cell">
+                    <strong style="font-size:12px">{{ tt.subject }}</strong>
+                    {% if tt.note %}<br><small style="opacity:.8">{{ tt.note }}</small>{% endif %}
+                    <br>
+                    <form method="POST" action="/core/teacher/timetable/{{ tt.id }}/delete/" style="display:inline;margin-top:4px" onsubmit="return confirm('حذف شود؟')">
+                      {% csrf_token %}
+                      <button style="font-size:10px;background:rgba(220,53,69,.7);border:none;color:white;cursor:pointer;border-radius:4px;padding:2px 6px;margin-top:3px" type="submit">🗑️ حذف</button>
+                    </form>
+                  </div>
+                  {% endif %}
+                {% endfor %}
+                {% endwith %}
+                <span class="tt-empty" id="cell-{{ slot|slugify }}-{{ day|slugify }}">خالی</span>
+              </td>
+              {% endfor %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ ADD TIMETABLE ════════ -->
+  <div class="page" id="page-tt-add">
+    <div class="sh"><div class="page-title">📅 افزودن به جدول وقت</div><button class="back-btn" onclick="showPage('timetable')">← بازگشت</button>
+        <button onclick="showPage('profile')" title="پروفایل" style="background:none;border:none;cursor:pointer;padding:0;flex-shrink:0;display:flex;align-items:center">
+      {% if profile_picture %}<img src="{{ profile_picture }}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border)">{% else %}<div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:16px">👨‍🏫</div>{% endif %}
+    </button></div>
+    <div class="card">
+      <form method="POST" action="/core/teacher/timetable/add/">
+        {% csrf_token %}
+        <div class="fg2">
+          <div class="fg"><label class="fl">روز</label>
+            <select class="fs" name="day"><option>شنبه</option><option>یکشنبه</option><option>دوشنبه</option><option>سه‌شنبه</option><option>چهارشنبه</option></select>
+          </div>
+          <div class="fg"><label class="fl">وقت</label>
+            <select class="fs" name="time"><option>7:30 - 8:15</option><option>8:15 - 9:00</option><option>9:15 - 10:00</option><option>10:00 - 10:45</option><option>11:00 - 11:45</option><option>11:45 - 12:30</option></select>
+          </div>
+          <div class="fg" style="grid-column:1/-1"><label class="fl">موضوع درسی *</label><input class="fi" name="subject" required placeholder="مثال: ریاضی"></div>
+          <div class="fg" style="grid-column:1/-1"><label class="fl">یادداشت</label><input class="fi" name="note" placeholder="یادداشت..."></div>
+        </div>
+        <button class="btn btn-primary" type="submit">💾 ذخیره</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ════════ PROFILE ════════ -->
+  <div class="page" id="page-profile">
+    <div class="sh"><div class="page-title">👤 پروفایل من</div><button class="back-btn" onclick="showPage('dashboard')">← بازگشت</button></div>
+    <div class="ph">
+      <div class="avw">
+        {% if profile_picture %}<img src="{{ profile_picture }}" id="pav">{% else %}<div class="av-ph" id="pav">👨‍🏫</div>{% endif %}
+        <label class="av-edit" for="pic-inp">📷</label>
+        <form method="POST" action="/core/teacher/profile/picture/" id="pic-form" enctype="multipart/form-data">
+          {% csrf_token %}
+          <input type="file" id="pic-inp" name="profile_picture" accept="image/*" style="display:none" onchange="document.getElementById('pic-form').submit()">
+        </form>
+      </div>
+      <h3 style="font-size:18px;font-weight:800">{{ username }}</h3>
+      <p style="opacity:.8;font-size:13px;margin-top:4px">معلم | GAAM Kindergarten</p>
+    </div>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab(this,'t-info')">📋 معلومات</button>
+      <button class="tab-btn" onclick="showTab(this,'t-sec')">🔒 امنیت</button>
+    </div>
+    <div class="tp active" id="t-info">
+      <div class="card">
+        <form method="POST" action="/core/teacher/profile/update/">
+          {% csrf_token %}
+          <input type="hidden" name="form_type" value="info">
+          <div class="fg2">
+            <div class="fg"><label class="fl">نام</label><input class="fi" name="first_name" value="{{ request.user.first_name }}"></div>
+            <div class="fg"><label class="fl">تخلص</label><input class="fi" name="last_name" value="{{ request.user.last_name }}"></div>
+            <div class="fg"><label class="fl">ایمیل</label><input class="fi" name="email" type="email" value="{{ request.user.email }}"></div>
+            <div class="fg"><label class="fl">شماره تلفون</label><input class="fi" name="phone" value="{{ profile_phone }}"></div>
+            <div class="fg"><label class="fl">بخش</label><input class="fi" name="department" value="{{ profile_department }}"></div>
+            <div class="fg" style="grid-column:1/-1"><label class="fl">معرفی</label><textarea class="ft" name="bio">{{ profile_bio }}</textarea></div>
+          </div>
+          <button class="btn btn-success" type="submit">💾 ذخیره</button>
+        </form>
+      </div>
+    </div>
+    <div class="tp" id="t-sec">
+      <div class="card">
+        <div class="ct" style="margin-bottom:14px">🔒 تغییر پسورد</div>
+        <form method="POST" action="/core/teacher/profile/update/">
+          {% csrf_token %}
+          <input type="hidden" name="form_type" value="password">
+          <div class="fg"><label class="fl">پسورد فعلی</label><input class="fi" name="current_password" type="password"></div>
+          <div class="fg"><label class="fl">پسورد جدید</label><input class="fi" name="new_password" type="password" oninput="chkStr(this.value)">
+            <div class="sb-bar"><div class="sb-fill" id="str-fill"></div></div>
+            <small id="str-txt" style="font-size:11px;color:var(--text2)"></small>
+          </div>
+          <div class="fg"><label class="fl">تأیید پسورد جدید</label><input class="fi" name="confirm_password" type="password"></div>
+          <button class="btn btn-primary" type="submit" style="margin-top:8px">🔒 تغییر پسورد</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end .main -->
+
+<script>
+// ── Clock ──
+function updateClock(){
+  const now=new Date();
+  const af=new Date(now.getTime()+(4.5*60-now.getTimezoneOffset())*60000);
+  const h=String(af.getUTCHours()).padStart(2,'0'),m=String(af.getUTCMinutes()).padStart(2,'0'),s=String(af.getUTCSeconds()).padStart(2,'0');
+  document.getElementById('clock').textContent=`⏰ ${h}:${m}:${s}`;
+  const days=['یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنجشنبه','جمعه','شنبه'];
+  const months=['جنوری','فبروری','مارچ','اپریل','می','جون','جولای','اگست','سپتمبر','اکتوبر','نوامبر','دسمبر'];
+  const el=document.getElementById('welcome-date');
+  if(el)el.textContent=`📅 ${days[af.getUTCDay()]} ${af.getUTCDate()} ${months[af.getUTCMonth()]} ${af.getUTCFullYear()} — کابل، افغانستان`;
+}
+setInterval(updateClock,1000); updateClock();
+
+// ── Sidebar ──
+let sbOpen=true;
+function toggleSB(){sbOpen=!sbOpen;document.getElementById('sidebar').classList.toggle('closed',!sbOpen);document.getElementById('main').classList.toggle('exp',!sbOpen);}
+
+// ── Dark ──
+function toggleDark(){const d=document.documentElement.getAttribute('data-dark')==='true';document.documentElement.setAttribute('data-dark',!d);document.getElementById('dark-btn').textContent=!d?'☀️':'🌙';}
+
+// ── Pages ──
+const titles={'dashboard':'داشبورد معلم','students':'معلومات شاگردان','student-add':'افزودن شاگرد','student-edit':'ویرایش شاگرد','sp':'حضوری شاگردان','sp-add':'ثبت حضوری','health':'گزارش صحی','health-add':'ثبت گزارش صحی','tp':'حضوری معلم','tp-add':'ثبت حضوری معلم','plans':'پلان‌های درسی','plan-add':'افزودن پلان','timetable':'جدول وقت','tt-add':'افزودن به جدول','profile':'پروفایل'};
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const pg=document.getElementById('page-'+id);
+  if(pg){pg.classList.add('active');}
+  const tb=document.getElementById('tb-title');
+  if(tb) tb.textContent=titles[id]||id;
+  window.scrollTo(0,0);
+  // Hide 'خالی' labels where a subject cell exists
+  if(id==='timetable'){
+    document.querySelectorAll('#page-timetable td').forEach(function(td){
+      var hasCell = td.querySelector('.tt-cell');
+      var empty = td.querySelector('.tt-empty');
+      if(empty) empty.style.display = hasCell ? 'none' : '';
+    });
+  }
+}
+
+// ── Auto-open page from URL param ──
+(function(){
+  try{
+    var p = new URLSearchParams(window.location.search).get('page');
+    if(p) window.addEventListener('load', function(){ showPage(p); });
+  }catch(e){}
+})();
+
+// ── Edit Student ──
+function showEditStudent(id,fname,lname,father,phone,cls,isActive){
+  document.getElementById('edit-student-form').action=`/core/teacher/students/${id}/edit/`;
+  document.getElementById('es-fname').value=fname;
+  document.getElementById('es-lname').value=lname;
+  document.getElementById('es-father').value=father;
+  document.getElementById('es-phone').value=phone;
+  document.getElementById('es-cls').value=cls;
+  document.getElementById('es-status').value=isActive?'active':'inactive';
+  showPage('student-edit');
+}
+
+// ── Tabs ──
+function showTab(btn,id){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.tp').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+
+// ── Password strength ──
+function chkStr(v){
+  const f=document.getElementById('str-fill'),t=document.getElementById('str-txt');
+  let s=0;
+  if(v.length>=8)s++;if(/[A-Z]/.test(v))s++;if(/[0-9]/.test(v))s++;if(/[^a-zA-Z0-9]/.test(v))s++;
+  const c=['#ef4444','#f59e0b','#10b981','#059669'],l=['ضعیف','متوسط','خوب','عالی'];
+  f.style.width=(s*25)+'%';f.style.background=c[s-1]||'#e5e7eb';t.textContent=v?l[s-1]||'':'';
+}
+
+// ── Auto-show page from URL hash ──
+if(location.hash){showPage(location.hash.replace('#',''));}
+
+// Auto-fill hidden name field from dropdown
+function autoFillName(sel, targetId) {
+    const opt = sel.options[sel.selectedIndex];
+    const name = opt ? (opt.getAttribute('data-name') || '') : '';
+    const inp = document.getElementById(targetId);
+    if(inp) inp.value = name;
+}
+
+</script>
+</body>
+</html>

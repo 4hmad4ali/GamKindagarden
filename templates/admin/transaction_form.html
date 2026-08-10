@@ -1,0 +1,154 @@
+{% extends 'admin_base.html' %}
+{% block title %}{% if edit_mode %}ویرایش{% else %}افزودن{% endif %} تراکنش - GAAM{% endblock %}
+{% block page_title %}{% if edit_mode %}ویرایش تراکنش{% else %}افزودن تراکنش جدید{% endif %}{% endblock %}
+{% block sb_role %}ادمین{% endblock %}
+
+{% block content %}
+<style>
+.num-field{
+  width:100%;padding:11px 14px;
+  border:1.5px solid var(--border);border-radius:9px;
+  font-size:14px;font-family:'Vazirmatn',sans-serif;
+  background:var(--bg);color:var(--text);
+  transition:.2s;direction:ltr;text-align:left;letter-spacing:1px;
+}
+.num-field:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(79,70,229,.1);outline:none}
+.num-field::placeholder{direction:rtl;text-align:right;color:#aaa;font-size:12px;letter-spacing:0}
+.dark .num-field{background:#0f172a!important;color:var(--text)!important;border-color:var(--border)!important}
+
+.form-container{max-width:700px;margin:0 auto;background:var(--card);
+  border-radius:14px;padding:30px;box-shadow:var(--shadow);border:1px solid var(--border)}
+.form-header{display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px}
+.form-header h2{font-size:18px;font-weight:900;color:var(--text)}
+.form-group{margin-bottom:18px}
+.form-group label{display:block;margin-bottom:6px;color:var(--text2);
+  font-weight:700;font-size:12px;text-align:right}
+.form-group input,.form-group select,.form-group textarea{
+  width:100%;padding:11px 14px;border:1.5px solid var(--border);border-radius:9px;
+  font-size:13px;transition:.2s;direction:rtl;font-family:'Vazirmatn',sans-serif;
+  background:var(--bg);color:var(--text)}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{
+  border-color:var(--pri);box-shadow:0 0 0 3px rgba(79,70,229,.1);outline:none}
+.form-group textarea{min-height:80px;resize:vertical}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.form-actions{display:flex;gap:12px;margin-top:24px}
+.btn-submit{flex:1;padding:12px;background:linear-gradient(135deg,#312e81,#4f46e5);
+  color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:700;
+  cursor:pointer;font-family:'Vazirmatn',sans-serif;transition:.2s}
+.btn-submit:hover{opacity:.9;transform:translateY(-1px)}
+.btn-cancel{padding:12px 24px;background:var(--border);color:var(--text);border:none;
+  border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;
+  font-family:'Vazirmatn',sans-serif;display:inline-flex;align-items:center;gap:6px;transition:.2s}
+.btn-cancel:hover{background:#94a3b8;color:#fff}
+@media(max-width:768px){.form-row{grid-template-columns:1fr}.form-actions{flex-direction:column}}
+</style>
+
+<div class="form-container">
+  <div class="form-header">
+    <h2>{% if edit_mode %}✏️ ویرایش تراکنش{% else %}➕ افزودن تراکنش جدید{% endif %}</h2>
+    <a href="{% url 'finance_list' %}" class="btn-cancel">← بازگشت</a>
+  </div>
+
+  {% if messages %}
+  {% for m in messages %}
+  <div style="padding:10px 14px;border-radius:8px;margin-bottom:14px;font-size:13px;font-weight:600;
+    {% if '❌' in m.message or 'خطا' in m.message %}background:#fee2e2;color:#991b1b{% else %}background:#dcfce7;color:#166534{% endif %}">
+    {{ m }}</div>
+  {% endfor %}
+  {% endif %}
+
+  <form method="POST">{% csrf_token %}
+
+    {% if edit_mode %}
+    <div class="form-group">
+      <label>📋 شناسه تراکنش</label>
+      <input type="text" value="{{ transaction.transaction_id }}" readonly
+        style="background:var(--border);cursor:not-allowed;opacity:.7;direction:ltr">
+    </div>
+    {% endif %}
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>📊 نوع تراکنش *</label>
+        <select name="transaction_type" required>
+          <option value="income" {% if transaction.transaction_type == 'income' %}selected{% endif %}>💵 درآمد</option>
+          <option value="expense" {% if transaction.transaction_type == 'expense' %}selected{% endif %}>💸 هزینه</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>💰 مبلغ (افغانی) *</label>
+        <input type="text" class="num-field" name="amount"
+          value="{% if transaction %}{{ transaction.amount }}{% endif %}"
+          placeholder="مثال: 3000" autocomplete="off" required>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>📅 تاریخ *</label>
+        <input type="date" name="transaction_date"
+          value="{% if transaction %}{{ transaction.transaction_date|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}" required>
+      </div>
+      <div class="form-group">
+        <label>🏷️ دسته‌بندی *</label>
+        <input type="text" name="category"
+          value="{% if transaction %}{{ transaction.category }}{% endif %}"
+          placeholder="مثال: فیس شاگرد، معاش، تجهیزات" required>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>وضعیت</label>
+        <select name="status">
+          <option value="completed" {% if transaction.status == 'completed' or not transaction %}selected{% endif %}>✅ تکمیل شده</option>
+          <option value="pending" {% if transaction.status == 'pending' %}selected{% endif %}>⏳ در انتظار</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>👨‍🎓 شاگرد مربوطه (اختیاری)</label>
+        <select name="student">
+          <option value="">-- بدون شاگرد --</option>
+          {% for s in students %}
+          <option value="{{ s.id }}" {% if transaction.student.id == s.id %}selected{% endif %}>
+            {{ s.first_name }} {{ s.last_name }} - {{ s.student_id }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>📝 توضیحات</label>
+      <textarea name="description">{% if transaction %}{{ transaction.description }}{% endif %}</textarea>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-submit">
+        {% if edit_mode %}💾 بروزرسانی تراکنش{% else %}💾 ذخیره تراکنش{% endif %}
+      </button>
+      <a href="{% url 'finance_list' %}" class="btn-cancel">← لغو</a>
+    </div>
+  </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+  document.querySelectorAll('.num-field').forEach(function(inp){
+    inp.addEventListener('keydown',function(e){
+      var ok=[8,9,27,13,46,37,38,39,40,35,36];
+      if(ok.indexOf(e.keyCode)!==-1) return;
+      if((e.ctrlKey||e.metaKey)&&[65,67,86,88].indexOf(e.keyCode)!==-1) return;
+      if(e.keyCode>=48&&e.keyCode<=57) return;
+      if(e.keyCode>=96&&e.keyCode<=105) return;
+      if(e.keyCode===190||e.keyCode===110) return;
+      e.preventDefault();
+    });
+    inp.addEventListener('paste',function(){
+      setTimeout(function(){inp.value=inp.value.replace(/[^0-9.]/g,'');},0);
+    });
+  });
+});
+</script>
+{% endblock %}

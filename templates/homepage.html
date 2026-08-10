@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="سیستم مدیریت هوشمند کودکستان گام در کابل">
+  <title>کودکستان گام | مدیریت هوشمند کودکستان</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy: #172554;
+      --blue: #2563eb;
+      --sky: #eaf4ff;
+      --ink: #172033;
+      --muted: #64748b;
+      --line: #e2e8f0;
+      --surface: #ffffff;
+      --page: #f8fafc;
+      --shadow: 0 16px 42px rgba(23, 37, 84, .09);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--page);
+      font-family: "Vazirmatn", Tahoma, sans-serif;
+      line-height: 1.7;
+    }
+
+    a { color: inherit; }
+    .container { width: min(1120px, calc(100% - 40px)); margin-inline: auto; }
+
+    .site-header {
+      position: absolute;
+      inset: 0 0 auto;
+      z-index: 2;
+      padding: 20px 0;
+      color: #fff;
+    }
+    .nav { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 800; font-size: 1.08rem; }
+    .brand-mark {
+      width: 38px; height: 38px; display: grid; place-items: center;
+      border: 1px solid rgba(255,255,255,.38); border-radius: 12px;
+      background: rgba(255,255,255,.14); backdrop-filter: blur(8px);
+    }
+    .brand-mark svg { width: 23px; height: 23px; }
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
+    .nav-login { text-decoration: none; font-weight: 600; font-size: .9rem; padding: 9px 16px; }
+    .nav-signup { text-decoration: none; background: #fff; color: var(--navy); border-radius: 9px; padding: 9px 16px; font-weight: 700; font-size: .9rem; }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 150px 0 116px;
+      color: #fff;
+      background: radial-gradient(circle at 9% 84%, rgba(56,189,248,.32), transparent 30%), linear-gradient(125deg, #172554 0%, #1d4ed8 56%, #2563eb 100%);
+    }
+    .hero::after, .hero::before { content: ""; position: absolute; border-radius: 999px; pointer-events: none; }
+    .hero::before { width: 430px; height: 430px; left: -150px; top: -190px; border: 68px solid rgba(255,255,255,.06); }
+    .hero::after { width: 280px; height: 280px; right: 6%; bottom: -155px; background: rgba(147,197,253,.12); }
+    .hero-content { position: relative; z-index: 1; max-width: 710px; }
+    .eyebrow { display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border: 1px solid rgba(255,255,255,.25); border-radius: 999px; background: rgba(255,255,255,.1); font-size: .82rem; font-weight: 600; }
+    .eyebrow::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #7dd3fc; }
+    h1 { margin: 18px 0 16px; max-width: 650px; font-size: clamp(2rem, 5vw, 4rem); line-height: 1.25; letter-spacing: -.04em; }
+    .hero-copy { max-width: 570px; margin: 0; color: #dbeafe; font-size: 1.08rem; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+    .button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 11px 19px; border-radius: 10px; text-decoration: none; font-size: .94rem; font-weight: 700; transition: transform .2s ease, box-shadow .2s ease, background .2s ease; }
+    .button:hover { transform: translateY(-2px); }
+    .button-primary { color: var(--navy); background: #fff; box-shadow: 0 10px 24px rgba(15,23,42,.18); }
+    .button-secondary { border: 1px solid rgba(255,255,255,.35); color: #fff; background: rgba(255,255,255,.08); }
+    .button svg { width: 17px; height: 17px; }
+
+    .details { position: relative; z-index: 1; margin-top: -50px; }
+    .details-grid { display: grid; grid-template-columns: repeat(3, 1fr); overflow: hidden; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); box-shadow: var(--shadow); }
+    .detail { display: flex; align-items: center; gap: 13px; min-width: 0; padding: 21px 24px; }
+    .detail + .detail { border-right: 1px solid var(--line); }
+    .detail-icon { flex: 0 0 auto; width: 42px; height: 42px; display: grid; place-items: center; color: var(--blue); background: var(--sky); border-radius: 11px; }
+    .detail-icon svg { width: 20px; height: 20px; }
+    .detail-label { display: block; color: var(--muted); font-size: .78rem; }
+    .detail-value { display: block; overflow: hidden; font-weight: 700; font-size: .92rem; text-overflow: ellipsis; white-space: nowrap; }
+
+    main { padding: 84px 0 68px; }
+    .section-heading { max-width: 620px; margin-bottom: 32px; }
+    .section-kicker { margin: 0 0 7px; color: var(--blue); font-weight: 700; font-size: .85rem; }
+    h2 { margin: 0; font-size: clamp(1.55rem, 3vw, 2.25rem); letter-spacing: -.03em; line-height: 1.4; }
+    .section-copy { margin: 10px 0 0; color: var(--muted); font-size: .96rem; }
+    .features { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+    .feature { position: relative; display: flex; gap: 17px; padding: 24px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+    .feature:hover { border-color: #bfdbfe; box-shadow: 0 12px 30px rgba(30,64,175,.08); transform: translateY(-2px); }
+    .feature-icon { flex: 0 0 auto; width: 45px; height: 45px; display: grid; place-items: center; border-radius: 12px; color: #1d4ed8; background: #eff6ff; }
+    .feature:nth-child(2) .feature-icon { color: #7c3aed; background: #f5f3ff; }
+    .feature:nth-child(3) .feature-icon { color: #047857; background: #ecfdf5; }
+    .feature:nth-child(4) .feature-icon { color: #c2410c; background: #fff7ed; }
+    .feature-icon svg { width: 22px; height: 22px; }
+    .feature h3 { margin: 0 0 4px; font-size: 1rem; }
+    .feature p { margin: 0; color: var(--muted); font-size: .86rem; }
+
+    .cta { margin-top: 70px; padding: 42px; overflow: hidden; position: relative; border-radius: 18px; color: #fff; background: linear-gradient(120deg, #172554, #1e40af); }
+    .cta::after { content: ""; position: absolute; left: -46px; bottom: -90px; width: 240px; height: 240px; border: 32px solid rgba(255,255,255,.09); border-radius: 50%; }
+    .cta-inner { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 25px; }
+    .cta h2 { font-size: clamp(1.4rem, 3vw, 2rem); }
+    .cta p { margin: 7px 0 0; color: #bfdbfe; font-size: .91rem; }
+    .cta .button { flex-shrink: 0; }
+
+    footer { border-top: 1px solid var(--line); padding: 25px 0; color: var(--muted); background: #fff; font-size: .8rem; }
+    .footer-inner { display: flex; justify-content: space-between; gap: 16px; }
+    footer p { margin: 0; }
+
+    @media (max-width: 760px) {
+      .site-header { padding-top: 14px; }
+      .nav-login { display: none; }
+      .hero { padding: 125px 0 95px; }
+      .details-grid, .features { grid-template-columns: 1fr; }
+      .detail + .detail { border-top: 1px solid var(--line); border-right: 0; }
+      main { padding-top: 58px; }
+      .cta { padding: 30px 25px; }
+      .cta-inner, .footer-inner { align-items: flex-start; flex-direction: column; }
+    }
+    @media (max-width: 410px) {
+      .container { width: min(100% - 28px, 1120px); }
+      .brand { font-size: .96rem; }
+      .nav-signup { padding-inline: 12px; }
+      .hero-actions { flex-direction: column; }
+      .hero-actions .button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <nav class="container nav" aria-label="ناوبری اصلی">
+      <a class="brand" href="{% url 'homepage' %}" aria-label="صفحه اصلی کودکستان گام">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 4l9 6.5"/><path d="M5.5 9.5V20h13V9.5"/><path d="M9 20v-5h6v5"/></svg>
+        </span>
+        کودکستان گام
+      </a>
+      <div class="nav-actions">
+        <a class="nav-login" href="{% url 'login_chat' %}">ورود</a>
+        <a class="nav-signup" href="{% url 'signup' %}">ایجاد حساب</a>
+      </div>
+    </nav>
+  </header>
+
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="container hero-content">
+      <span class="eyebrow">مدیریت ساده، ارتباط نزدیک</span>
+      <h1 id="hero-title">همراه مطمئن برای مدیریت کودکستان شما</h1>
+      <p class="hero-copy">کودکستان گام، همه اطلاعات آموزشی، حضور و غیاب، امور مالی و ارتباطات را در یک فضای منظم و قابل‌اعتماد گرد هم می‌آورد.</p>
+      <div class="hero-actions">
+        <a class="button button-primary" href="{% url 'signup' %}">
+          شروع کنید
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+        </a>
+        <a class="button button-secondary" href="{% url 'login_chat' %}">ورود به سامانه</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="details container" aria-label="اطلاعات تماس کودکستان">
+    <div class="details-grid">
+      <div class="detail">
+        <span class="detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></svg></span>
+        <div><span class="detail-label">آدرس</span><span class="detail-value">مکروریان سوم، کابل</span></div>
+      </div>
+      <div class="detail">
+        <span class="detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.12 4.2 2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.12.9.34 1.77.65 2.6a2 2 0 0 1-.45 2.11L8.04 9.7a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.83.31 1.7.53 2.6.65A2 2 0 0 1 22 16.9Z"/></svg></span>
+        <div><span class="detail-label">تماس</span><span class="detail-value" dir="ltr">0788919112</span></div>
+      </div>
+      <div class="detail">
+        <span class="detail-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg></span>
+        <div><span class="detail-label">وب‌سایت</span><span class="detail-value" dir="ltr">gaam-kindergarten.com</span></div>
+      </div>
+    </div>
+  </section>
+
+  <main class="container" id="features">
+    <div class="section-heading">
+      <p class="section-kicker">همه‌چیز در یک‌جا</p>
+      <h2>ابزارهای ضروری برای یک کودکستان منظم</h2>
+      <p class="section-copy">تجربه‌ای روشن و ساده برای مدیران، آموزگاران، شاگردان، داکتر و بخش مالی.</p>
+    </div>
+
+    <div class="features">
+      <article class="feature">
+        <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></span>
+        <div><h3>داشبوردهای نقش‌محور</h3><p>هر عضو، اطلاعات و کارهای مربوط به نقش خود را سریع و شفاف می‌بیند.</p></div>
+      </article>
+      <article class="feature">
+        <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8A8.5 8.5 0 0 1 12.5 20a8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7A8.4 8.4 0 0 1 4 11.5 8.5 8.5 0 0 1 8.7 3.9 8.4 8.4 0 0 1 12.5 3h.5a8.5 8.5 0 0 1 8 8v.5Z"/></svg></span>
+        <div><h3>ارتباطات درون‌سامانه‌ای</h3><p>با پیام‌رسان داخلی، گفت‌وگو و پیگیری امور روزانه همیشه در دسترس است.</p></div>
+      </article>
+      <article class="feature">
+        <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v7c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12v7c0 1.7 3.6 3 8 3s8-1.3 8-3v-7"/></svg></span>
+        <div><h3>داده‌های منظم و مطمئن</h3><p>اطلاعات شاگردان، حضور و غیاب و پرداخت‌ها با ساختاری روشن نگهداری می‌شود.</p></div>
+      </article>
+      <article class="feature">
+        <span class="feature-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/><path d="M9 5h6"/></svg></span>
+        <div><h3>طراحی واکنش‌گرا</h3><p>رابطی روان و خوانا در موبایل، تبلت و کامپیوتر برای استفاده روزانه.</p></div>
+      </article>
+    </div>
+
+    <section class="cta" aria-labelledby="cta-title">
+      <div class="cta-inner">
+        <div><h2 id="cta-title">آماده‌اید کارها را ساده‌تر کنید؟</h2><p>حساب خود را ایجاد کنید و وارد محیط مدیریت کودکستان گام شوید.</p></div>
+        <a class="button button-primary" href="{% url 'signup' %}">ایجاد حساب کاربری</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <p>© ۲۰۲۶ کودکستان گام. تمامی حقوق محفوظ است.</p>
+      <p>مکروریان سوم، کابل · <span dir="ltr">0788919112</span></p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,276 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}GAAM Kindergarten{% endblock %}</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --sb-w:260px;--tb-h:58px;
+  --bg:#f1f5f9;--card:#fff;--border:#e2e8f0;
+  --text:#1e293b;--text2:#64748b;
+  --pri:#4f46e5;--pri-l:#ede9ff;
+  --shadow:0 1px 4px rgba(0,0,0,.07);
+}
+.dark{
+  --bg:#0f172a;--card:#1e293b;--border:#334155;
+  --text:#f1f5f9;--text2:#94a3b8;--pri-l:#1e1b4b;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Vazirmatn',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .25s,color .25s}
+
+/* ══ SIDEBAR ══ */
+#adm-sb{
+  position:fixed;top:0;right:0;width:var(--sb-w);height:100vh;
+  background:linear-gradient(160deg,#312e81,#4f46e5 55%,#6d28d9);
+  z-index:1000;display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:-2px 0 20px rgba(79,70,229,.2);
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+#adm-sb.sb-off{transform:translateX(100%)}
+#adm-sb::-webkit-scrollbar{width:0}
+
+.sb-head{padding:16px 14px 12px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:9px;flex-shrink:0}
+.sb-logo{width:36px;height:36px;background:rgba(255,255,255,.15);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.sb-t1{font-size:12px;font-weight:800;color:#fff;line-height:1.3}
+.sb-t2{font-size:10px;color:rgba(255,255,255,.5)}
+
+.sb-me{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:9px;flex-shrink:0}
+.sb-av{width:38px;height:38px;border-radius:50%;border:2px solid rgba(255,255,255,.3);overflow:hidden;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.sb-av img{width:100%;height:100%;object-fit:cover}
+.sb-uname{font-size:12px;font-weight:700;color:#fff}
+.sb-urole{font-size:10px;color:rgba(255,255,255,.5)}
+
+.sb-nav{flex:1;padding:6px 0;overflow-y:auto;overflow-x:hidden}
+.sb-nav::-webkit-scrollbar{width:3px}
+.sb-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2);border-radius:3px}
+.sb-cat{font-size:9px;letter-spacing:1.5px;font-weight:700;color:rgba(255,255,255,.35);padding:9px 16px 2px;text-transform:uppercase}
+.sb-a{display:flex;align-items:center;gap:8px;padding:8px 16px;color:rgba(255,255,255,.75);font-size:12px;font-weight:500;text-decoration:none;border-right:3px solid transparent;transition:.15s}
+.sb-a:hover{background:rgba(255,255,255,.1);color:#fff}
+.sb-a.on{background:rgba(255,255,255,.15);color:#fff;font-weight:700;border-right-color:#a5f3fc}
+.sb-a .ic{width:18px;text-align:center;font-size:13px}
+
+.sb-foot{padding:12px 14px;border-top:2px solid rgba(255,255,255,.2);flex-shrink:0;background:rgba(0,0,0,.2)}
+.sb-out{display:flex;align-items:center;justify-content:center;gap:9px;color:#fff;font-size:13px;font-weight:800;text-decoration:none;padding:11px 14px;border-radius:9px;background:linear-gradient(135deg,#dc2626,#b91c1c);transition:.2s;width:100%}
+.sb-out:hover{background:linear-gradient(135deg,#ef4444,#dc2626);transform:translateY(-1px);box-shadow:0 4px 15px rgba(220,38,38,.4)}
+
+/* ══ TOPBAR ══ */
+#adm-tb{
+  position:fixed;top:0;right:var(--sb-w);left:0;height:var(--tb-h);
+  background:var(--card);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 18px;z-index:900;box-shadow:var(--shadow);
+  transition:right .3s cubic-bezier(.4,0,.2,1),background .25s,border-color .25s;
+}
+#adm-tb.tb-w{right:0}
+.tb-r,.tb-l{display:flex;align-items:center;gap:7px}
+.tb-pg{font-size:13px;font-weight:700;color:var(--text)}
+.tb-btn{width:35px;height:35px;border:1.5px solid var(--border);background:var(--card);border-radius:8px;cursor:pointer;font-size:14px;color:var(--text2);display:flex;align-items:center;justify-content:center;transition:.15s;font-family:'Vazirmatn',sans-serif;text-decoration:none}
+.tb-btn:hover{background:var(--pri);color:#fff;border-color:var(--pri)}
+.tb-clk{font-size:12px;font-weight:800;color:var(--pri);background:var(--pri-l);padding:5px 10px;border-radius:8px;white-space:nowrap;letter-spacing:.3px}
+.tb-av{width:34px;height:34px;border-radius:50%;border:2px solid var(--pri);overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--pri-l);font-size:14px;text-decoration:none;flex-shrink:0;transition:.15s}
+.tb-av:hover{border-width:3px}
+.tb-av img{width:100%;height:100%;object-fit:cover}
+
+/* ══ MAIN ══ */
+#adm-main{
+  margin-right:var(--sb-w);margin-top:var(--tb-h);
+  min-height:calc(100vh - var(--tb-h));padding:20px;
+  transition:margin-right .3s cubic-bezier(.4,0,.2,1);
+}
+#adm-main.mn-w{margin-right:0}
+
+/* ══ MESSAGES ══ */
+.adm-msg{padding:10px 14px;border-radius:8px;font-size:13px;font-weight:600;margin-bottom:12px}
+.msg-ok{background:#dcfce7;color:#166534}
+.msg-err{background:#fee2e2;color:#991b1b}
+.dark .msg-ok{background:#14532d;color:#86efac}
+.dark .msg-err{background:#7f1d1d;color:#fca5a5}
+
+/* ══ DARK MODE OVERRIDES ══ */
+.dark .form-container,.dark .take-attendance-section,.dark .attendance-table,.dark .attendance-row,
+.dark .employees-table,.dark .finance-table,.dark .medical-table,.dark .students-table,.dark .teachers-table,
+.dark .stat-card,.dark .attendance-header,.dark .employees-header,.dark .finance-header,
+.dark .medical-header,.dark .students-header,.dark .teachers-header{background:var(--card)!important;color:var(--text)!important}
+.dark table thead{background:linear-gradient(135deg,#312e81,#4f46e5)!important}
+.dark table tbody tr{border-color:var(--border)!important}
+.dark table tbody tr:hover{background:rgba(255,255,255,.04)!important}
+.dark td,.dark th,.dark h2,.dark h3,.dark label{color:var(--text)!important}
+.dark .stat-label,.dark .stat-value,.dark .employee-name,.dark .student-name,.dark .teacher-name,.dark .teacher-id,.dark .no-records{color:var(--text)!important}
+.dark input,.dark select,.dark textarea{background:#0f172a!important;color:var(--text)!important;border-color:var(--border)!important}
+.dark .btn-back,.dark .btn-back-form,.dark .btn-cancel{background:var(--card)!important;color:var(--text)!important;border-color:var(--border)!important}
+.dark .section-title{background:linear-gradient(135deg,#312e81,#4f46e5)!important}
+.dark .login-box{background:#1e293b!important;border-color:#4f46e5!important}
+.dark .login-box p,.dark .hint,.dark .user-info{color:var(--text2)!important}
+
+/* ══ CONFIRM MODAL ══ */
+#adm-cfm{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+#adm-cfm.on{display:flex}
+.cfm-box{background:var(--card);border-radius:14px;padding:26px 22px;max-width:330px;width:90%;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.3);animation:pop .2s ease}
+@keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+.cfm-ic{font-size:42px;margin-bottom:8px}
+.cfm-ti{font-size:15px;font-weight:800;margin-bottom:5px;color:var(--text)}
+.cfm-ms{font-size:12px;color:var(--text2);margin-bottom:18px}
+.cfm-bs{display:flex;gap:9px}
+.cfm-no{flex:1;padding:9px;border:1.5px solid var(--border);background:var(--card);border-radius:9px;cursor:pointer;font-family:'Vazirmatn',sans-serif;font-size:13px;font-weight:600;color:var(--text);transition:.15s}
+.cfm-no:hover{background:var(--border)}
+.cfm-ok{flex:1;padding:9px;background:#dc2626;color:#fff;border:none;border-radius:9px;cursor:pointer;font-family:'Vazirmatn',sans-serif;font-size:13px;font-weight:700;transition:.15s}
+.cfm-ok:hover{background:#b91c1c}
+
+@media(max-width:768px){
+  #adm-tb{right:0}
+  #adm-main{margin-right:0}
+  #adm-sb{transform:translateX(100%)}
+  #adm-sb.sb-mob{transform:none}
+}
+</style>
+</head>
+<body id="adm-body">
+
+<!-- CONFIRM MODAL -->
+<div id="adm-cfm">
+  <div class="cfm-box">
+    <div class="cfm-ic">🗑️</div>
+    <div class="cfm-ti">تأیید حذف</div>
+    <div class="cfm-ms">آیا مطمئن هستید؟ این عملیات برگشت ندارد.</div>
+    <div class="cfm-bs">
+      <button class="cfm-no" onclick="cfmClose()">✕ لغو</button>
+      <button class="cfm-ok" onclick="cfmDo()">🗑️ حذف</button>
+    </div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<aside id="adm-sb">
+  <div class="sb-head">
+    <div class="sb-logo">🏫</div>
+    <div><div class="sb-t1">GAAM Kindergarten</div><div class="sb-t2">سیستم مدیریت</div></div>
+  </div>
+
+  {% if user.is_authenticated %}
+  <div class="sb-me">
+    <div class="sb-av">
+      {% if profile_picture %}<img src="{{ profile_picture }}" alt="">{% else %}👤{% endif %}
+    </div>
+    <div>
+      <div class="sb-uname">{{ username|default:user.first_name|default:user.username }}</div>
+      <div class="sb-urole">{% block sb_role %}ادمین{% endblock %}</div>
+    </div>
+  </div>
+  {% endif %}
+
+  <nav class="sb-nav">
+    {% block sidebar_nav %}
+    <div class="sb-cat">منوی اصلی</div>
+    <a href="{% url 'admin_dashboard' %}" class="sb-a {% if request.resolver_match.url_name == 'admin_dashboard' %}on{% endif %}"><span class="ic">🏠</span> داشبورد</a>
+    <div class="sb-cat">مدیریت</div>
+    <a href="{% url 'teachers_list' %}" class="sb-a {% if 'teacher' in request.resolver_match.url_name|default:'' %}on{% endif %}"><span class="ic">👨‍🏫</span> معلمان</a>
+    <a href="{% url 'students_list' %}" class="sb-a {% if 'student' in request.resolver_match.url_name|default:'' %}on{% endif %}"><span class="ic">👨‍🎓</span> شاگردان</a>
+    <a href="{% url 'employees_list' %}" class="sb-a {% if 'employee' in request.resolver_match.url_name|default:'' %}on{% endif %}"><span class="ic">👥</span> کارمندان</a>
+    <a href="{% url 'classes_list' %}" class="sb-a {% if 'class' in request.resolver_match.url_name|default:'' %}on{% endif %}"><span class="ic">🏫</span> کلاس‌ها</a>
+    <div class="sb-cat">عملیات</div>
+    <a href="{% url 'attendance_list' %}" class="sb-a {% if 'attendance' in request.resolver_match.url_name|default:'' %}on{% endif %}"><span class="ic">✅</span> حضوری</a>
+    <a href="{% url 'finance_list' %}" class="sb-a {% if 'finance' in request.resolver_match.url_name|default:'' or 'transaction' in request.resolver_match.url_name|default:'' %}on{% endif %}"><span class="ic">💰</span> مالی</a>
+    <a href="{% url 'medical_list' %}" class="sb-a {% if 'medical' in request.resolver_match.url_name|default:'' %}on{% endif %}"><span class="ic">⚕️</span> پزشکی</a>
+    <a href="{% url 'reports' %}" class="sb-a {% if 'report' in request.resolver_match.url_name|default:'' %}on{% endif %}"><span class="ic">📊</span> گزارشات</a>
+    <div class="sb-cat">حساب</div>
+    <a href="{% url 'profile' %}" class="sb-a {% if 'profile' in request.resolver_match.url_name|default:'' %}on{% endif %}"><span class="ic">👤</span> پروفایل</a>
+    {% endblock %}
+  </nav>
+
+  <div class="sb-foot">
+    <a href="{% url 'logout_chat' %}" class="sb-out"><span>🚪</span> خروج</a>
+  </div>
+</aside>
+
+<!-- TOPBAR -->
+<header id="adm-tb">
+  <div class="tb-r">
+    <button class="tb-btn" onclick="sbToggle()">☰</button>
+    <span class="tb-pg">{% block page_title %}{% endblock %}</span>
+  </div>
+  <div class="tb-l">
+    <span class="tb-clk" id="adm-clk">⏰ --:--:--</span>
+    <button class="tb-btn" onclick="darkToggle()" id="dk-btn">🌙</button>
+    {% if user.is_authenticated %}
+    <a href="{% url 'profile' %}" class="tb-av">
+      {% if profile_picture %}<img src="{{ profile_picture }}" alt="">{% else %}👤{% endif %}
+    </a>
+    {% endif %}
+  </div>
+</header>
+
+<!-- MAIN -->
+<main id="adm-main">
+  {% if messages %}
+  {% for m in messages %}
+  <div class="adm-msg {% if '❌' in m.message or 'خطا' in m.message %}msg-err{% else %}msg-ok{% endif %}">{{ m }}</div>
+  {% endfor %}
+  {% endif %}
+  {% block content %}{% endblock %}
+</main>
+
+<script>
+/* CLOCK */
+function tick(){
+  const n=new Date(),u=n.getTime()+n.getTimezoneOffset()*60000,a=new Date(u+4.5*3600000);
+  const p=v=>String(v).padStart(2,'0');
+  const el=document.getElementById('adm-clk');
+  if(el)el.textContent=`⏰ ${p(a.getHours())}:${p(a.getMinutes())}:${p(a.getSeconds())}`;
+}
+setInterval(tick,1000);tick();
+
+/* SIDEBAR */
+let _sb=true,_mob=window.innerWidth<=768;
+window.addEventListener('resize',()=>_mob=window.innerWidth<=768);
+function sbToggle(){
+  const sb=document.getElementById('adm-sb'),tb=document.getElementById('adm-tb'),mn=document.getElementById('adm-main');
+  if(_mob){sb.classList.toggle('sb-mob')}
+  else{
+    _sb=!_sb;
+    sb.classList.toggle('sb-off',!_sb);
+    tb.classList.toggle('tb-w',!_sb);
+    mn.classList.toggle('mn-w',!_sb);
+    localStorage.setItem('adm_sb',_sb);
+  }
+}
+if(localStorage.getItem('adm_sb')==='false'&&!_mob){
+  _sb=false;
+  document.getElementById('adm-sb').classList.add('sb-off');
+  document.getElementById('adm-tb').classList.add('tb-w');
+  document.getElementById('adm-main').classList.add('mn-w');
+}
+
+/* DARK MODE */
+function darkToggle(){
+  const d=document.body.classList.toggle('dark');
+  document.getElementById('dk-btn').textContent=d?'☀️':'🌙';
+  localStorage.setItem('adm_dark',d);
+}
+if(localStorage.getItem('adm_dark')==='true'){
+  document.body.classList.add('dark');
+  document.getElementById('dk-btn').textContent='☀️';
+}
+
+/* CONFIRM DELETE */
+let _form=null;
+function cfmOpen(f){_form=f;document.getElementById('adm-cfm').classList.add('on');return false}
+function cfmClose(){document.getElementById('adm-cfm').classList.remove('on');_form=null}
+function cfmDo(){if(_form)_form.submit();cfmClose()}
+document.getElementById('adm-cfm').addEventListener('click',function(e){if(e.target===this)cfmClose()});
+
+document.addEventListener('DOMContentLoaded',function(){
+  document.querySelectorAll('.btn-delete').forEach(btn=>{
+    btn.removeAttribute('onclick');
+    btn.addEventListener('click',function(e){
+      e.preventDefault();e.stopPropagation();
+      cfmOpen(this.closest('form'));
+    });
+  });
+});
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>
