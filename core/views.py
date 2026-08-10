@@ -5,7 +5,10 @@ from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from datetime import datetime
 from django.db.models import Sum, Count, Q
+from django.db import transaction
 from django.contrib.auth.models import User
+from accounts.roles import assign_role
+from django.utils import timezone
 from .models import StudentPresence, DoctorPresence
 from .models import Teacher, Student, Employee, Medical, Class, Transaction, StudentPayment, Attendance, TeacherPlan, TeacherPresence, StudentPresence, StudentHealthReport, TeacherTimetable, UserProfile
 
@@ -75,12 +78,19 @@ def attendance_list(request):
     - دکمه ویرایش و حذف شامل کریں
     - فرم ثبت حضوری روزانه
     """
+    today = timezone.localdate()
     attendances = Attendance.objects.all().order_by('-date', '-id')
     all_employees = Employee.objects.filter(is_active=True).order_by('first_name')
+    today_statuses = dict(
+        Attendance.objects.filter(date=today).values_list('employee_id', 'status')
+    )
+    for employee in all_employees:
+        employee.today_status = today_statuses.get(employee.id, 'present')
     
     context = {
         'attendances': attendances,
         'all_employees': all_employees,
+        'today': today,
     }
     context.update(_get_profile_context(request.user))
     return render(request, 'admin/attendance.html', context)
@@ -96,9 +106,9 @@ def attendance_add(request):
     if request.method == 'POST':
         try:
             # بررسی اینکه آیا این رکورد روزانه است یا منفرد
-            if 'employee_' in list(request.POST.keys())[0]:
+            if request.POST.get('bulk_attendance') == '1':
                 # رکورد روزانه - برای تمام کارمندان
-                today = datetime.now().date()
+                today = timezone.localdate()
                 all_employees = Employee.objects.filter(is_active=True)
                 
                 for emp in all_employees:
@@ -232,6 +242,7 @@ def teacher_add(request):
                 employee_id=request.POST.get('employee_id'),
                 hire_date=request.POST.get('hire_date')
             )
+            assign_role(user, 'teacher')
             
             messages.success(request, f'✅ معلم {user.first_name} با موفقیت اضافه شد')
             return redirect('teachers_list')
@@ -369,6 +380,7 @@ def student_add(request):
                 class_field=request.POST.get('class_field',''),
                 enrollment_date=request.POST.get('enrollment_date') or datetime.today().date(),
             )
+            assign_role(user, 'student')
             
             messages.success(request, f'✅ شاگرد {student.first_name} اضافه شد | نام کاربری: {username} | پسورد: {password}')
             return redirect('students_list')
@@ -864,18 +876,54 @@ def reports(request):
 # ════════════════════════════════════════════════════════════════
 
 @login_required(login_url='login_chat')
+def _class_payload(request):
+    """Validate and normalize the fields shared by class create and edit."""
+    class_name = request.POST.get('class_name', '').strip()
+    level = request.POST.get('level', '').strip()
+    room_number = request.POST.get('room_number', '').strip()
+    capacity_value = request.POST.get('capacity', '').strip()
+
+    if not class_name or not level or not room_number or not capacity_value:
+        raise ValueError('نام، سطح، اتاق و ظرفیت کلاس الزامی هستند.')
+    try:
+        capacity = int(capacity_value)
+    except (TypeError, ValueError):
+        raise ValueError('ظرفیت باید یک عدد صحیح باشد.')
+    if capacity <= 0:
+        raise ValueError('ظرفیت کلاس باید بیشتر از صفر باشد.')
+
+    teacher = None
+    teacher_id = request.POST.get('teacher')
+    if teacher_id:
+        teacher = Teacher.objects.filter(pk=teacher_id, is_active=True).first()
+        if teacher is None:
+            raise ValueError('معلم انتخاب‌شده معتبر یا فعال نیست.')
+
+    return {
+        'class_name': class_name,
+        'level': level,
+        'room_number': room_number,
+        'capacity': capacity,
+        'teacher': teacher,
+        'is_active': request.POST.get('is_active') == 'on',
+    }
+
+
+@login_required(login_url='login_chat')
 def classes_list(request):
     classes = Class.objects.all().select_related('teacher__user').order_by('class_name')
-    # Annotate student count per class
+    student_counts = dict(
+        Student.objects.filter(is_active=True)
+        .values('class_field')
+        .annotate(count=Count('id'))
+        .values_list('class_field', 'count')
+    )
     for c in classes:
-        c.student_count = Student.objects.filter(class_field=c.class_name).count()
-
-    all_subjects = ['Mathematics', 'Science', 'English', 'Dari', 'Pashto', 'Social Studies', 'Art', 'Physical Ed', 'math']
+        c.student_count = student_counts.get(c.class_name, 0)
 
     context = {
         'classes': classes,
         'teachers': Teacher.objects.filter(is_active=True).select_related('user'),
-        'all_subjects': all_subjects,
         'total_classes': Class.objects.count(),
         'active_classes': Class.objects.filter(is_active=True).count(),
         'total_students': Student.objects.filter(is_active=True).count(),
@@ -889,22 +937,13 @@ def classes_list(request):
 def class_add(request):
     if request.method == 'POST':
         try:
-            teacher_id = request.POST.get('teacher')
-            teacher = Teacher.objects.get(id=teacher_id) if teacher_id else None
-            Class.objects.create(
-                class_name=request.POST.get('class_name'),
-                teacher=teacher,
-                room_number=request.POST.get('room_number', ''),
-                capacity=request.POST.get('capacity', 50),
-                level=request.POST.get('level', ''),
-                is_active=True
-            )
+            Class.objects.create(**_class_payload(request))
             messages.success(request, '✅ کلاس با موفقیت اضافه شد')
             return redirect('classes_list')
         except Exception as e:
             messages.error(request, f'❌ خطا: {str(e)}')
     # GET: نمایش فرم
-    teachers = Teacher.objects.all()
+    teachers = Teacher.objects.filter(is_active=True).select_related('user')
     context = {'teachers': teachers}
     context.update(_get_profile_context(request.user))
     return render(request, 'admin/class_form.html', context)
@@ -915,19 +954,22 @@ def class_edit(request, pk):
     class_obj = get_object_or_404(Class, pk=pk)
     if request.method == 'POST':
         try:
-            teacher_id = request.POST.get('teacher')
-            class_obj.class_name = request.POST.get('class_name')
-            class_obj.level = request.POST.get('level', '')
-            class_obj.room_number = request.POST.get('room_number', '')
-            class_obj.capacity = request.POST.get('capacity', 50)
-            class_obj.teacher = Teacher.objects.get(id=teacher_id) if teacher_id else None
-            class_obj.save()
+            payload = _class_payload(request)
+            old_name = class_obj.class_name
+            with transaction.atomic():
+                for field, value in payload.items():
+                    setattr(class_obj, field, value)
+                class_obj.save()
+                if old_name != class_obj.class_name:
+                    Student.objects.filter(class_field=old_name).update(
+                        class_field=class_obj.class_name
+                    )
             messages.success(request, '✅ کلاس با موفقیت ویرایش شد')
             return redirect('classes_list')
         except Exception as e:
             messages.error(request, f'❌ خطا: {str(e)}')
     # GET: نمایش فرم ویرایش
-    teachers = Teacher.objects.all()
+    teachers = Teacher.objects.filter(is_active=True).select_related('user')
     context = {'class': class_obj, 'teachers': teachers, 'edit_mode': True}
     context.update(_get_profile_context(request.user))
     return render(request, 'admin/class_form.html', context)
@@ -2323,4 +2365,3 @@ def finance_profile_picture(request):
         except Exception as e:
             messages.error(request, f'❌ خطا در آپلود عکس: {str(e)}')
     return redirect('finance_dashboard')
-

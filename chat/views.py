@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
 from .models import ChatUserProfile, DirectMessage
+from accounts.roles import dashboard_for_user
 
 
 # ══════════════════════════════════════════════
@@ -23,7 +24,7 @@ def get_or_create_profile(user):
 
 def signup(request):
     if request.user.is_authenticated:
-        return redirect('chat_dashboard')
+        return redirect(dashboard_for_user(request.user))
 
     error = ''
     if request.method == 'POST':
@@ -67,14 +68,12 @@ def signup(request):
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('chat_dashboard')
+        return redirect(dashboard_for_user(request.user))
 
     error = ''
     if request.method == 'POST':
         email        = request.POST.get('email', '').strip().lower()
         password     = request.POST.get('password', '')
-        account_type = request.POST.get('account_type', '')
-
         try:
             user_obj = User.objects.get(email=email)
             user = authenticate(request, username=user_obj.username, password=password)
@@ -86,15 +85,8 @@ def login_view(request):
                 profile.is_online = True
                 profile.save()
 
-                # Route by account type
-                dest_map = {
-                    'admin':   'admin_dashboard',
-                    'teacher': 'teacher_dashboard',
-                    'student': 'student_dashboard',
-                    'doctor':  'doctor_dashboard',
-                    'finance': 'finance_dashboard',
-                }
-                return redirect(dest_map.get(account_type, 'chat_dashboard'))
+                # The destination is derived from server-side privileges only.
+                return redirect(dashboard_for_user(user))
             else:
                 error = 'Incorrect password.'
         except User.DoesNotExist:

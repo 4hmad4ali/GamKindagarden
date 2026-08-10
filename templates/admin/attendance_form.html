@@ -1,298 +1,75 @@
 {% extends 'admin_base.html' %}
-{% block title %}{% if edit_mode %}ویرایش{% else %}افزودن{% endif %} حضوری - GAAM{% endblock %}
+
+{% block title %}{% if edit_mode %}ویرایش{% else %}ثبت{% endif %} حضور و غیاب | کودکستان گام{% endblock %}
+{% block page_title %}{% if edit_mode %}ویرایش حضور و غیاب{% else %}ثبت حضور و غیاب{% endif %}{% endblock %}
 
 {% block content %}
 <style>
-  .form-container {
-    max-width: 700px;
-    margin: 40px auto;
-    padding: 40px;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 3px 15px rgba(0,0,0,0.1);
-  }
-
-  .form-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-  }
-
-  .form-header h2 {
-    color: #2c3e50;
-    font-size: 1.8rem;
-    text-align: right;
-    margin: 0;
-  }
-
-  .btn-back-form {
-    padding: 10px 20px;
-    background: #95a5a6;
-    color: white;
-    text-decoration: none;
-    border-radius: 5px;
-    transition: all 0.3s;
-  }
-
-  .btn-back-form:hover {
-    background: #7f8c8d;
-  }
-
-  .form-group {
-    margin-bottom: 20px;
-  }
-
-  .form-group label {
-    display: block;
-    margin-bottom: 8px;
-    color: #2c3e50;
-    font-weight: 500;
-    text-align: right;
-  }
-
-  .form-group input,
-  .form-group select,
-  .form-group textarea {
-    width: 100%;
-    padding: 12px 15px;
-    border: 2px solid #ecf0f1;
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: all 0.3s;
-    direction: rtl;
-    font-family: 'Vazirmatn', sans-serif;
-  }
-
-  .form-group input:focus,
-  .form-group select:focus,
-  .form-group textarea:focus {
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-    outline: none;
-  }
-
-  .form-group textarea {
-    min-height: 100px;
-    resize: vertical;
-  }
-
-  .radio-group {
-    display: flex;
-    gap: 30px;
-    margin-top: 10px;
-    justify-content: flex-end;
-  }
-
-  .radio-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .radio-item input[type="radio"] {
-    width: auto;
-    margin: 0;
-    cursor: pointer;
-  }
-
-  .radio-item label {
-    margin: 0;
-    cursor: pointer;
-    font-weight: 400;
-  }
-
-  .form-actions {
-    display: flex;
-    gap: 15px;
-    margin-top: 30px;
-    justify-content: flex-start;
-  }
-
-  .btn-submit {
-    flex: 1;
-    padding: 14px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s;
-  }
-
-  .btn-submit:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-  }
-
-  .btn-cancel {
-    padding: 14px 30px;
-    background: #95a5a6;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    font-weight: bold;
-    cursor: pointer;
-    transition: all 0.3s;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .btn-cancel:hover {
-    background: #7f8c8d;
-  }
-
-  .error-message {
-    color: #e74c3c;
-    font-size: 0.9rem;
-    margin-top: 5px;
-  }
-
-  .success-message {
-    background: #d4edda;
-    color: #155724;
-    padding: 12px 15px;
-    border-radius: 5px;
-    margin-bottom: 20px;
-  }
-
-  /* Responsive */
-  @media (max-width: 768px) {
-    .form-container {
-      margin: 20px;
-      padding: 20px;
-    }
-
-    .form-header {
-      flex-direction: column-reverse;
-      gap: 15px;
-    }
-
-    .form-header h2 {
-      width: 100%;
-    }
-
-    .radio-group {
-      gap: 20px;
-    }
-
-    .form-actions {
-      flex-direction: column;
-    }
-
-    .btn-cancel {
-      justify-content: center;
-    }
-  }
+  .attendance-form-page { max-width:860px; margin:0 auto; }
+  .attendance-intro { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; margin-bottom:18px; padding:22px 24px; border:1px solid var(--border); border-radius:14px; background:var(--card); box-shadow:var(--shadow); }
+  .intro-title { display:flex; align-items:center; gap:12px; }.intro-icon { display:grid; flex:0 0 auto; width:43px; height:43px; place-items:center; border-radius:11px; color:#2563eb; background:#eff6ff; }.intro-icon svg{width:22px;height:22px}.intro-title h1{margin:0;color:var(--text);font-size:1.2rem}.intro-title p{margin:4px 0 0;color:var(--text2);font-size:.77rem}.back-link { display:inline-flex; flex:0 0 auto; align-items:center; gap:7px; padding:8px 12px; border:1px solid var(--border); border-radius:9px; color:var(--text2); background:var(--card); font-size:.78rem; font-weight:700; text-decoration:none; transition:.18s; }.back-link:hover{border-color:#93c5fd;color:#1d4ed8;background:#eff6ff}.back-link svg{width:15px;height:15px}
+  .attendance-form { overflow:hidden; border:1px solid var(--border); border-radius:14px; background:var(--card); box-shadow:var(--shadow); }.form-section { padding:25px; }.form-section+.form-section { border-top:1px solid var(--border); }.section-label { display:flex; align-items:center; gap:8px; margin:0 0 18px; color:var(--text); font-size:.9rem; font-weight:800; }.section-label span { display:grid; width:25px; height:25px; place-items:center; border-radius:7px; color:#2563eb; background:#eff6ff; font-size:.72rem; }.field-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }.field { min-width:0; }.field label:not(.status-option) { display:block; margin-bottom:7px; color:var(--text); font-size:.78rem; font-weight:700; }.field label .optional { color:var(--text2); font-weight:400; }.field select,.field input,.field textarea { width:100%; border:1px solid var(--border); border-radius:9px; color:var(--text); background:var(--card); font:inherit; font-size:.82rem; outline:0; transition:border-color .18s,box-shadow .18s; }.field select,.field input { height:44px; padding:9px 11px; }.field textarea { min-height:100px; padding:11px; resize:vertical; }.field select:focus,.field input:focus,.field textarea:focus { border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,.12); }
+  .status-options { display:grid; grid-template-columns:repeat(3,1fr); gap:11px; }.status-option { position:relative; display:flex; align-items:center; justify-content:center; gap:7px; min-height:45px; border:1px solid var(--border); border-radius:9px; color:var(--text2); background:var(--card); cursor:pointer; font-size:.78rem; font-weight:700; transition:.18s; }.status-option input { position:absolute; opacity:0; pointer-events:none; }.status-option::before { content:""; width:8px; height:8px; border-radius:50%; background:currentColor; }.status-option:has(input:checked) { border-color:#2563eb; color:#1d4ed8; background:#eff6ff; box-shadow:0 0 0 3px rgba(37,99,235,.08); }.status-option.absent:has(input:checked) { border-color:#dc2626; color:#b91c1c; background:#fff7f7; box-shadow:0 0 0 3px rgba(220,38,38,.07); }.status-option.leave:has(input:checked) { border-color:#d97706; color:#b45309; background:#fffbeb; box-shadow:0 0 0 3px rgba(217,119,6,.07); }
+  .form-actions { display:flex; align-items:center; justify-content:flex-end; gap:10px; padding:18px 25px; border-top:1px solid var(--border); background:#fafcff; }.cancel-button,.save-button { display:inline-flex; align-items:center; justify-content:center; gap:8px; min-height:43px; border-radius:9px; font:inherit; font-size:.8rem; font-weight:800; text-decoration:none; cursor:pointer; transition:.18s; }.cancel-button { padding:9px 15px; border:1px solid var(--border); color:var(--text2); background:var(--card); }.cancel-button:hover { color:#1d4ed8; border-color:#93c5fd; background:#eff6ff; }.save-button { padding:9px 18px; border:0; color:#fff; background:linear-gradient(135deg,#1d4ed8,#2563eb); box-shadow:0 7px 15px rgba(37,99,235,.2); }.save-button:hover { transform:translateY(-1px); box-shadow:0 10px 19px rgba(37,99,235,.27); }.save-button svg,.cancel-button svg { width:15px; height:15px; }.dark .attendance-intro,.dark .attendance-form { background:var(--card)!important; }.dark .intro-icon,.dark .section-label span{background:#172554}.dark .form-actions{background:rgba(15,23,42,.35)}.dark .status-option:has(input:checked){background:#172554}.dark .status-option.absent:has(input:checked){background:#450a0a}.dark .status-option.leave:has(input:checked){background:#451a03}
+  @media(max-width:620px){.attendance-intro{padding:18px;align-items:flex-start}.attendance-intro h1{font-size:1.03rem}.back-link span{display:none}.field-grid{grid-template-columns:1fr}.form-section{padding:20px 17px}.form-actions{padding:15px 17px;flex-direction:column-reverse}.cancel-button,.save-button{width:100%}.status-options{grid-template-columns:1fr}.status-option{min-height:42px}}
 </style>
 
-<div class="form-container">
-  <!-- HEADER -->
-  <div class="form-header">
-    <h2>
-      {% if edit_mode %}
-        ✏️ ویرایش
-      {% else %}
-        ➕ افزودن
-      {% endif %}
-    </h2>
-    <a href="{% url 'attendance_list' %}" class="btn-back-form">← بازگشت</a>
-  </div>
+<div class="attendance-form-page">
+  <header class="attendance-intro">
+    <div class="intro-title">
+      <span class="intro-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M8 12l2 2 5-5"/></svg></span>
+      <div><h1>{% if edit_mode %}ویرایش حضور و غیاب{% else %}ثبت حضور و غیاب{% endif %}</h1><p>{% if edit_mode %}جزئیات رکورد انتخاب‌شده را به‌روزرسانی کنید.{% else %}حضور روزانه کارمند را با دقت ثبت کنید.{% endif %}</p></div>
+    </div>
+    <a href="{% url 'attendance_list' %}" class="back-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg><span>بازگشت به لیست</span></a>
+  </header>
 
-  <!-- MESSAGES -->
-  {% if messages %}
-    {% for message in messages %}
-      <div class="success-message">{{ message }}</div>
-    {% endfor %}
-  {% endif %}
-
-  <!-- FORM -->
-  <form method="POST">
+  <form method="POST" class="attendance-form">
     {% csrf_token %}
-
-    <!-- Employee Selection -->
-    <div class="form-group">
-      <label for="employee">👤 انتخاب کارمند</label>
-      <select name="employee" id="employee" required>
-        <option value="">-- کارمند را انتخاب کنید --</option>
-        {% for emp in employees %}
-          <option value="{{ emp.id }}" {% if attendance.employee.id == emp.id %}selected{% endif %}>
-            {{ emp.first_name }} {{ emp.last_name }} (کد: {{ emp.id }})
-          </option>
-        {% endfor %}
-      </select>
-    </div>
-
-    <!-- Date -->
-    <div class="form-group">
-      <label for="date">📅 تاریخ</label>
-      <input type="date" name="date" id="date" 
-             value="{% if attendance.date %}{{ attendance.date|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}" 
-             required>
-    </div>
-
-    <!-- Check In Time -->
-    <div class="form-group">
-      <label for="check_in">⏰ زمان ورود</label>
-      <input type="time" name="check_in" id="check_in"
-             value="{% if attendance.check_in_time %}{{ attendance.check_in_time|time:'H:i' }}{% endif %}">
-    </div>
-
-    <!-- Check Out Time -->
-    <div class="form-group">
-      <label for="check_out">⏰ زمان خروج</label>
-      <input type="time" name="check_out" id="check_out"
-             value="{% if attendance.check_out_time %}{{ attendance.check_out_time|time:'H:i' }}{% endif %}">
-    </div>
-
-    <!-- Status -->
-    <div class="form-group">
-      <label>📊 وضعیت</label>
-      <div class="radio-group">
-        <div class="radio-item">
-          <input type="radio" name="status" id="present" value="present" 
-                 {% if not attendance or attendance.status == 'present' %}checked{% endif %} required>
-          <label for="present">✅ حاضر</label>
+    <section class="form-section" aria-labelledby="attendance-details">
+      <h2 class="section-label" id="attendance-details"><span>۱</span>اطلاعات حضور</h2>
+      <div class="field-grid">
+        <div class="field">
+          <label for="employee">کارمند</label>
+          <select name="employee" id="employee" required>
+            <option value="">کارمند را انتخاب کنید</option>
+            {% for emp in employees %}
+              <option value="{{ emp.id }}" {% if attendance.employee.id == emp.id %}selected{% endif %}>{{ emp.first_name }} {{ emp.last_name }} — کد {{ emp.employee_id }}</option>
+            {% endfor %}
+          </select>
         </div>
-        <div class="radio-item">
-          <input type="radio" name="status" id="absent" value="absent"
-                 {% if attendance.status == 'absent' %}checked{% endif %}>
-          <label for="absent">❌ غایب</label>
+        <div class="field">
+          <label for="date">تاریخ</label>
+          <input type="date" name="date" id="date" value="{% if attendance.date %}{{ attendance.date|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}" required>
         </div>
-        <div class="radio-item">
-          <input type="radio" name="status" id="leave" value="leave"
-                 {% if attendance.status == 'leave' %}checked{% endif %}>
-          <label for="leave">📋 مرخصی</label>
+        <div class="field">
+          <label for="check_in">زمان ورود <span class="optional">(اختیاری)</span></label>
+          <input type="time" name="check_in" id="check_in" value="{% if attendance.check_in_time %}{{ attendance.check_in_time|time:'H:i' }}{% endif %}">
+        </div>
+        <div class="field">
+          <label for="check_out">زمان خروج <span class="optional">(اختیاری)</span></label>
+          <input type="time" name="check_out" id="check_out" value="{% if attendance.check_out_time %}{{ attendance.check_out_time|time:'H:i' }}{% endif %}">
         </div>
       </div>
-    </div>
+    </section>
 
-    <!-- Notes -->
-    <div class="form-group">
-      <label for="notes">📝 یادداشت‌ها</label>
-      <textarea name="notes" id="notes" placeholder="یادداشت یا توضیح">{% if attendance.notes %}{{ attendance.notes }}{% endif %}</textarea>
-    </div>
+    <section class="form-section" aria-labelledby="attendance-status">
+      <h2 class="section-label" id="attendance-status"><span>۲</span>وضعیت روز</h2>
+      <div class="status-options" role="radiogroup" aria-label="وضعیت حضور">
+        <label class="status-option present"><input type="radio" name="status" value="present" {% if not attendance or attendance.status == 'present' %}checked{% endif %} required>حاضر</label>
+        <label class="status-option absent"><input type="radio" name="status" value="absent" {% if attendance.status == 'absent' %}checked{% endif %}>غایب</label>
+        <label class="status-option leave"><input type="radio" name="status" value="leave" {% if attendance.status == 'leave' %}checked{% endif %}>مرخصی</label>
+      </div>
+    </section>
 
-    <!-- Action Buttons -->
-    <div class="form-actions">
-      <button type="submit" class="btn-submit">
-        {% if edit_mode %}
-          💾 بروزرسانی
-        {% else %}
-          💾 ذخیره
-        {% endif %}
-      </button>
-      <a href="{% url 'attendance_list' %}" class="btn-cancel">
-        <span>←</span>
-        <span>لغو</span>
-      </a>
-    </div>
+    <section class="form-section" aria-labelledby="attendance-notes">
+      <h2 class="section-label" id="attendance-notes"><span>۳</span>یادداشت</h2>
+      <div class="field"><label for="notes">توضیحات <span class="optional">(اختیاری)</span></label><textarea name="notes" id="notes" placeholder="هر توضیح لازم درباره این حضور را بنویسید.">{% if attendance.notes %}{{ attendance.notes }}{% endif %}</textarea></div>
+    </section>
+
+    <footer class="form-actions">
+      <a href="{% url 'attendance_list' %}" class="cancel-button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>انصراف</a>
+      <button type="submit" class="save-button">{% if edit_mode %}ذخیره تغییرات{% else %}ثبت حضور{% endif %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></button>
+    </footer>
   </form>
 </div>
-
 {% endblock %}

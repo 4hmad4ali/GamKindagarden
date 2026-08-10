@@ -210,6 +210,25 @@ body{font-family:'Vazirmatn',sans-serif;background:var(--bg);color:var(--text);m
   {% block content %}{% endblock %}
 </main>
 
+<!-- Shared design layer for all custom administration pages. -->
+<style>
+  #adm-sb { background:linear-gradient(165deg,#172554 0%,#1e40af 58%,#2563eb 100%) !important; box-shadow:-4px 0 24px rgba(15,23,42,.17) !important; }
+  .sb-head { padding:18px 16px 14px !important; }.sb-logo { border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.11) !important; }.sb-a { border-right-width:2px !important; border-radius:0 8px 8px 0; margin-left:9px; }.sb-a.on { border-right-color:#7dd3fc !important; background:rgba(255,255,255,.14) !important; }.sb-a:hover { background:rgba(255,255,255,.09) !important; }.sb-foot { background:rgba(0,0,0,.13) !important; }
+  #adm-tb { box-shadow:0 1px 3px rgba(15,23,42,.04) !important; }.tb-clk { color:#1d4ed8 !important; background:#eff6ff !important; }.tb-av { border-color:#2563eb !important; background:#eff6ff !important; }
+  #adm-main { background:var(--bg); }
+  #adm-main .teachers-header, #adm-main .students-header, #adm-main .employees-header, #adm-main .finance-header, #adm-main .medical-header, #adm-main .attendance-header, #adm-main .page-header { margin-bottom:18px !important; padding:21px 23px !important; border:1px solid var(--border) !important; border-radius:14px !important; color:var(--text) !important; background:var(--card) !important; box-shadow:var(--shadow) !important; }
+  #adm-main .teachers-header h2, #adm-main .students-header h2, #adm-main .employees-header h2, #adm-main .finance-header h2, #adm-main .medical-header h2, #adm-main .attendance-header h2, #adm-main .page-header h1, #adm-main .page-header-right h1 { color:var(--text) !important; font-size:1.25rem !important; }
+  #adm-main .teachers-header p, #adm-main .students-header p, #adm-main .employees-header p, #adm-main .finance-header p, #adm-main .medical-header p, #adm-main .attendance-header p, #adm-main .page-header p, #adm-main .page-header-right p { color:var(--text2) !important; }
+  #adm-main .btn-back, #adm-main .btn-back-form, #adm-main .btn-cancel { border:1px solid var(--border) !important; border-radius:9px !important; color:var(--text2) !important; background:var(--card) !important; box-shadow:none !important; }
+  #adm-main .btn-back:hover, #adm-main .btn-back-form:hover, #adm-main .btn-cancel:hover { border-color:#93c5fd !important; color:#1d4ed8 !important; background:#eff6ff !important; }
+  #adm-main .btn-add, #adm-main .btn-primary, #adm-main .btn-submit, #adm-main .btn-save, #adm-main button[type="submit"]:not(.cfm-ok) { border-radius:9px !important; background:linear-gradient(135deg,#1d4ed8,#2563eb) !important; box-shadow:0 7px 15px rgba(37,99,235,.18) !important; }
+  #adm-main .teachers-table, #adm-main .students-table, #adm-main .employees-table, #adm-main .finance-table, #adm-main .medical-table, #adm-main .attendance-table, #adm-main .table-card, #adm-main .report-section, #adm-main .info-card, #adm-main .form-container, #adm-main .profile-card, #adm-main .card { border:1px solid var(--border) !important; border-radius:14px !important; background:var(--card) !important; box-shadow:var(--shadow) !important; }
+  #adm-main table { width:100%; border-collapse:separate !important; border-spacing:0; overflow:hidden; } #adm-main table thead { background:#f8fafc !important; } #adm-main table th { padding:13px 15px !important; border-bottom:1px solid var(--border) !important; color:#475569 !important; font-size:.72rem !important; font-weight:800 !important; } #adm-main table td { padding:13px 15px !important; border-bottom:1px solid var(--border) !important; color:var(--text) !important; font-size:.8rem !important; } #adm-main table tbody tr:hover { background:#f8fbff !important; }
+  #adm-main input:not([type="checkbox"]):not([type="radio"]), #adm-main select, #adm-main textarea { border:1px solid var(--border) !important; border-radius:9px !important; color:var(--text) !important; background:var(--card) !important; box-shadow:none !important; } #adm-main input:focus, #adm-main select:focus, #adm-main textarea:focus { border-color:#2563eb !important; box-shadow:0 0 0 3px rgba(37,99,235,.12) !important; }
+  #adm-main .form-header { padding-bottom:16px !important; border-bottom:1px solid var(--border) !important; } #adm-main .form-header h2 { color:var(--text) !important; }
+  .dark #adm-main .teachers-header, .dark #adm-main .students-header, .dark #adm-main .employees-header, .dark #adm-main .finance-header, .dark #adm-main .medical-header, .dark #adm-main .attendance-header, .dark #adm-main .page-header, .dark #adm-main table thead { background:var(--card) !important; }.dark #adm-main table th { color:var(--text2) !important; }.dark #adm-main table tbody tr:hover { background:rgba(255,255,255,.04) !important; }.dark #adm-main .btn-back:hover, .dark #adm-main .btn-back-form:hover, .dark #adm-main .btn-cancel:hover { background:#172554 !important; }
+</style>
+
 <script>
 /* CLOCK */
 function tick(){

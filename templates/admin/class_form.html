@@ -1,145 +1,28 @@
 {% extends 'admin_base.html' %}
-{% block title %}{% if edit_mode %}ویرایش{% else %}افزودن{% endif %} کلاس - GAAM{% endblock %}
-{% block page_title %}{% if edit_mode %}ویرایش کلاس{% else %}افزودن کلاس جدید{% endif %}{% endblock %}
-{% block sb_role %}ادمین{% endblock %}
+
+{% block title %}{% if edit_mode %}ویرایش{% else %}ایجاد{% endif %} کلاس | کودکستان گام{% endblock %}
+{% block page_title %}{% if edit_mode %}ویرایش کلاس{% else %}ایجاد کلاس{% endif %}{% endblock %}
 
 {% block content %}
 <style>
-/* ══ NUM-FIELD ══ */
-.num-field{
-  width:100%;padding:12px 15px;
-  border:1.5px solid var(--border);border-radius:9px;
-  font-size:14px;font-family:'Vazirmatn',sans-serif;
-  background:var(--bg);color:var(--text);transition:.2s;
-  direction:ltr;text-align:left;letter-spacing:1px;
-}
-.num-field:focus{border-color:var(--pri);box-shadow:0 0 0 3px rgba(79,70,229,.1);outline:none}
-.num-field::placeholder{direction:rtl;text-align:right;color:#aaa;font-size:12px;letter-spacing:0}
-.dark .num-field{background:#0f172a!important;color:var(--text)!important;border-color:var(--border)!important}
-
-/* ══ FORM ══ */
-.form-container{max-width:650px;margin:0 auto;background:var(--card);
-  border-radius:14px;padding:30px;box-shadow:var(--shadow);border:1px solid var(--border)}
-.form-header{display:flex;justify-content:space-between;align-items:center;
-  margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px}
-.form-header h2{font-size:18px;font-weight:900;color:var(--text);margin:0}
-.form-group{margin-bottom:18px}
-.form-group label{display:block;margin-bottom:6px;color:var(--text2);
-  font-weight:700;font-size:12px;text-align:right}
-.form-group input,.form-group select{
-  width:100%;padding:12px 15px;border:1.5px solid var(--border);border-radius:9px;
-  font-size:13px;transition:.2s;direction:rtl;font-family:'Vazirmatn',sans-serif;
-  background:var(--bg);color:var(--text)}
-.form-group input:focus,.form-group select:focus{
-  border-color:var(--pri);box-shadow:0 0 0 3px rgba(79,70,229,.1);outline:none}
-.form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.form-actions{display:flex;gap:12px;margin-top:24px}
-.btn-submit{flex:1;padding:13px;background:linear-gradient(135deg,#312e81,#4f46e5);
-  color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:700;
-  cursor:pointer;font-family:'Vazirmatn',sans-serif;transition:.2s}
-.btn-submit:hover{opacity:.9;transform:translateY(-1px)}
-.btn-cancel{padding:13px 24px;background:var(--border);color:var(--text);border:none;
-  border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;
-  font-family:'Vazirmatn',sans-serif;display:inline-flex;align-items:center;gap:6px;transition:.2s}
-.btn-cancel:hover{background:#94a3b8;color:#fff}
-@media(max-width:768px){.form-row{grid-template-columns:1fr}.form-actions{flex-direction:column}}
+  .class-form-page{max-width:850px;margin:0 auto}.form-intro{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:18px;padding:22px 24px;border:1px solid var(--border);border-radius:14px;background:var(--card);box-shadow:var(--shadow)}.intro-copy{display:flex;align-items:center;gap:12px}.intro-icon{display:grid;flex:0 0 auto;width:43px;height:43px;place-items:center;border-radius:11px;color:#2563eb;background:#eff6ff}.intro-icon svg{width:22px;height:22px}.intro-copy h1{margin:0;color:var(--text);font-size:1.2rem}.intro-copy p{margin:4px 0 0;color:var(--text2);font-size:.77rem}.back-link{display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;padding:8px 12px;border:1px solid var(--border);border-radius:9px;color:var(--text2);background:var(--card);font-size:.78rem;font-weight:700;text-decoration:none;transition:.18s}.back-link:hover{border-color:#93c5fd;color:#1d4ed8;background:#eff6ff}.back-link svg{width:15px;height:15px}
+  .class-form{overflow:hidden;border:1px solid var(--border);border-radius:14px;background:var(--card);box-shadow:var(--shadow)}.form-section{padding:25px}.form-section+.form-section{border-top:1px solid var(--border)}.section-title{display:flex;align-items:center;gap:8px;margin:0 0 18px;color:var(--text);font-size:.9rem;font-weight:800}.section-title span{display:grid;width:25px;height:25px;place-items:center;border-radius:7px;color:#2563eb;background:#eff6ff;font-size:.72rem}.field-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.field{min-width:0}.field.full{grid-column:1/-1}.field label:not(.toggle){display:block;margin-bottom:7px;color:var(--text);font-size:.78rem;font-weight:700}.field label .hint{color:var(--text2);font-weight:400}.field input,.field select{width:100%;height:44px;padding:9px 11px;border:1px solid var(--border);border-radius:9px;color:var(--text);background:var(--card);font:inherit;font-size:.82rem;outline:0;transition:.18s}.field input:focus,.field select:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.12)}.field-help{display:block;margin-top:5px;color:var(--text2);font-size:.68rem}.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:13px 14px;border:1px solid var(--border);border-radius:10px;background:#fafcff}.toggle-title{color:var(--text);font-size:.8rem;font-weight:800}.toggle-copy{margin:2px 0 0;color:var(--text2);font-size:.69rem}.toggle{position:relative;display:inline-flex;flex:0 0 auto;width:42px;height:24px;cursor:pointer}.toggle input{position:absolute;opacity:0}.toggle span{width:100%;height:100%;border-radius:999px;background:#cbd5e1;transition:.18s}.toggle span::after{content:"";position:absolute;width:18px;height:18px;top:3px;right:3px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(15,23,42,.25);transition:.18s}.toggle input:checked+span{background:#2563eb}.toggle input:checked+span::after{transform:translateX(-18px)}.form-actions{display:flex;align-items:center;justify-content:flex-end;gap:10px;padding:18px 25px;border-top:1px solid var(--border);background:#fafcff}.cancel,.save{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:43px;border-radius:9px;font:inherit;font-size:.8rem;font-weight:800;text-decoration:none;cursor:pointer;transition:.18s}.cancel{padding:9px 15px;border:1px solid var(--border);color:var(--text2);background:var(--card)}.cancel:hover{border-color:#93c5fd;color:#1d4ed8;background:#eff6ff}.save{padding:9px 18px;border:0;color:#fff;background:linear-gradient(135deg,#1d4ed8,#2563eb);box-shadow:0 7px 15px rgba(37,99,235,.2)}.save:hover{transform:translateY(-1px);box-shadow:0 10px 19px rgba(37,99,235,.27)}.cancel svg,.save svg{width:15px;height:15px}.dark .form-intro,.dark .class-form{background:var(--card)!important}.dark .intro-icon,.dark .section-title span{background:#172554}.dark .toggle-row,.dark .form-actions{background:rgba(15,23,42,.35)}@media(max-width:620px){.form-intro{padding:18px}.form-intro h1{font-size:1.03rem}.back-link span{display:none}.field-grid{grid-template-columns:1fr}.form-section{padding:20px 17px}.form-actions{padding:15px 17px;flex-direction:column-reverse}.cancel,.save{width:100%}}
 </style>
 
-<div class="form-container">
-  <div class="form-header">
-    <h2>{% if edit_mode %}✏️ ویرایش کلاس{% else %}🏫 افزودن کلاس جدید{% endif %}</h2>
-    <a href="{% url 'classes_list' %}" class="btn-cancel">← بازگشت</a>
-  </div>
-
-  {% if messages %}
-  {% for m in messages %}
-  <div style="padding:10px 14px;border-radius:8px;margin-bottom:14px;font-size:13px;font-weight:600;
-    {% if '❌' in m.message or 'خطا' in m.message %}background:#fee2e2;color:#991b1b{% else %}background:#dcfce7;color:#166534{% endif %}">
-    {{ m }}</div>
-  {% endfor %}
-  {% endif %}
-
-  <form method="POST">{% csrf_token %}
-
-    <!-- نام کلاس -->
-    <div class="form-group">
-      <label>🏫 نام کلاس *</label>
-      <input type="text" name="class_name"
-        value="{% if class %}{{ class.class_name }}{% endif %}"
-        placeholder="مثال: صنف اول" required>
-    </div>
-
-    <!-- معلم -->
-    <div class="form-group">
-      <label>👨‍🏫 معلم مسئول</label>
-      <select name="teacher">
-        <option value="">-- انتخاب معلم --</option>
-        {% for t in teachers %}
-        <option value="{{ t.id }}" {% if class.teacher.id == t.id %}selected{% endif %}>
-          {{ t.user.first_name }} {{ t.user.last_name }}
-        </option>
-        {% endfor %}
-      </select>
-    </div>
-
-    <!-- اتاق و ظرفیت — num-field -->
-    <div class="form-row">
-      <div class="form-group">
-        <label>🚪 شماره اتاق *</label>
-        <input type="text" class="num-field" name="room_number"
-          value="{% if class %}{{ class.room_number }}{% endif %}"
-          placeholder="مثال: 101" autocomplete="off" required>
-      </div>
-      <div class="form-group">
-        <label>👥 ظرفیت *</label>
-        <input type="text" class="num-field" name="capacity"
-          value="{% if class %}{{ class.capacity }}{% endif %}"
-          placeholder="مثال: 30" autocomplete="off" required>
-      </div>
-    </div>
-
-    <!-- سطح -->
-    <div class="form-group">
-      <label>📚 سطح / Grade *</label>
-      <select name="level" required>
-        <option value="">-- انتخاب سطح --</option>
-        <option value="اول"    {% if class.level == 'اول'    %}selected{% endif %}>اول</option>
-        <option value="دوم"    {% if class.level == 'دوم'    %}selected{% endif %}>دوم</option>
-        <option value="سوم"    {% if class.level == 'سوم'    %}selected{% endif %}>سوم</option>
-        <option value="چهارم"  {% if class.level == 'چهارم'  %}selected{% endif %}>چهارم</option>
-        <option value="پنجم"   {% if class.level == 'پنجم'   %}selected{% endif %}>پنجم</option>
-        <option value="ششم"    {% if class.level == 'ششم'    %}selected{% endif %}>ششم</option>
-        <option value="primary"{% if class.level == 'primary'%}selected{% endif %}>ابتدایی</option>
-        <option value="middle" {% if class.level == 'middle' %}selected{% endif %}>متوسطه</option>
-        <option value="high"   {% if class.level == 'high'   %}selected{% endif %}>عالی</option>
-      </select>
-    </div>
-
-    <div class="form-actions">
-      <button type="submit" class="btn-submit">
-        {% if edit_mode %}💾 بروزرسانی کلاس{% else %}💾 ذخیره کلاس{% endif %}
-      </button>
-      <a href="{% url 'classes_list' %}" class="btn-cancel">← لغو</a>
-    </div>
+<div class="class-form-page">
+  <header class="form-intro"><div class="intro-copy"><span class="intro-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 4l9 6.5"/><path d="M5.5 9.5V20h13V9.5"/><path d="M9 20v-5h6v5"/></svg></span><div><h1>{% if edit_mode %}ویرایش اطلاعات کلاس{% else %}ایجاد کلاس جدید{% endif %}</h1><p>{% if edit_mode %}اطلاعات آموزشی و ظرفیت این کلاس را به‌روزرسانی کنید.{% else %}برای شروع، مشخصات اصلی کلاس را وارد کنید.{% endif %}</p></div></div><a href="{% url 'classes_list' %}" class="back-link"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 18l-6-6 6-6"/></svg><span>لیست کلاس‌ها</span></a></header>
+  <form method="POST" class="class-form">{% csrf_token %}
+    <section class="form-section"><h2 class="section-title"><span>۱</span>مشخصات کلاس</h2><div class="field-grid">
+      <div class="field"><label for="class-name">نام کلاس</label><input id="class-name" type="text" name="class_name" value="{% if class %}{{ class.class_name }}{% endif %}" placeholder="مثلاً صنف اول الف" required></div>
+      <div class="field"><label for="level">سطح یا پایه</label><input id="level" type="text" name="level" value="{% if class %}{{ class.level }}{% endif %}" placeholder="مثلاً ابتدایی یا اول" required></div>
+      <div class="field"><label for="room-number">شماره اتاق</label><input id="room-number" type="text" name="room_number" value="{% if class %}{{ class.room_number }}{% endif %}" placeholder="مثلاً ۱۰۱" required></div>
+      <div class="field"><label for="capacity">ظرفیت</label><input id="capacity" type="number" name="capacity" min="1" step="1" value="{% if class %}{{ class.capacity }}{% else %}30{% endif %}" placeholder="مثلاً ۳۰" required><span class="field-help">تعداد شاگردانی که این کلاس می‌تواند بپذیرد.</span></div>
+    </div></section>
+    <section class="form-section"><h2 class="section-title"><span>۲</span>معلم و وضعیت</h2><div class="field-grid">
+      <div class="field full"><label for="teacher">معلم مسئول <span class="hint">(اختیاری)</span></label><select id="teacher" name="teacher"><option value="">بدون معلم مسئول</option>{% for t in teachers %}<option value="{{ t.id }}" {% if class.teacher.id == t.id %}selected{% endif %}>{{ t.user.first_name }} {{ t.user.last_name }}{% if t.subject %} — {{ t.subject }}{% endif %}</option>{% endfor %}</select></div>
+      <div class="field full"><div class="toggle-row"><div><div class="toggle-title">کلاس فعال است</div><p class="toggle-copy">کلاس‌های غیرفعال در فهرست باقی می‌مانند، اما برای استفاده روزمره در دسترس نیستند.</p></div><label class="toggle" aria-label="وضعیت فعال بودن کلاس"><input type="checkbox" name="is_active" {% if not class or class.is_active %}checked{% endif %}><span></span></label></div></div>
+    </div></section>
+    <footer class="form-actions"><a href="{% url 'classes_list' %}" class="cancel"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 12H5M11 18l-6-6 6-6"/></svg>انصراف</a><button type="submit" class="save">{% if edit_mode %}ذخیره تغییرات{% else %}ایجاد کلاس{% endif %}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg></button></footer>
   </form>
 </div>
-
-<script>
-/* ══ NUMERIC INPUT HANDLER ══ */
-document.addEventListener('DOMContentLoaded', function(){
-  document.querySelectorAll('.num-field').forEach(function(inp){
-    inp.addEventListener('keydown', function(e){
-      if([8,9,27,13,46,37,38,39,40,35,36].indexOf(e.keyCode) !== -1) return;
-      if((e.ctrlKey||e.metaKey) && [65,67,86,88].indexOf(e.keyCode) !== -1) return;
-      if(e.keyCode >= 48 && e.keyCode <= 57) return;
-      if(e.keyCode >= 96 && e.keyCode <= 105) return;
-      if(e.keyCode === 190 || e.keyCode === 110) return;
-      e.preventDefault();
-    });
-    inp.addEventListener('paste', function(){
-      setTimeout(function(){ inp.value = inp.value.replace(/[^0-9.]/g, ''); }, 0);
-    });
-  });
-});
-</script>
 {% endblock %}
