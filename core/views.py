@@ -4,10 +4,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
 from datetime import datetime
-from django.db.models import Sum, Count, Q
+from django.db.models import Sum, Count, Q, Avg
 from django.db import transaction
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
-from accounts.roles import assign_role
+from accounts.roles import assign_role, ROLE_GROUPS
 from django.utils import timezone
 from .models import StudentPresence, DoctorPresence
 from .models import Teacher, Student, Employee, Medical, Class, Transaction, StudentPayment, Attendance, TeacherPlan, TeacherPresence, StudentPresence, StudentHealthReport, TeacherTimetable, UserProfile
@@ -210,9 +211,34 @@ def teachers_list(request):
     - دکمه افزودن معلم جدید
     """
     teachers = Teacher.objects.all().select_related('user').order_by('-id')
-    context = {'teachers': teachers}
+    context = {
+        'teachers': teachers,
+        'total_teachers': teachers.count(),
+        'active_teachers': teachers.filter(is_active=True).count(),
+        'subjects_count': teachers.values('subject').distinct().count(),
+    }
     context.update(_get_profile_context(request.user))
     return render(request, 'admin/teachers.html', context)
+
+
+@login_required(login_url='login_chat')
+def _teacher_payload(request, teacher=None):
+    """Validate and normalize teacher data before it is saved."""
+    user_fields = ('first_name', 'last_name')
+    teacher_fields = ('email', 'phone', 'subject', 'employee_id', 'hire_date')
+    payload = {field: request.POST.get(field, '').strip() for field in (*user_fields, *teacher_fields)}
+
+    if any(not payload[field] for field in payload):
+        raise ValidationError('لطفاً تمام فیلدهای الزامی را تکمیل کنید.')
+
+    payload['email'] = payload['email'].lower()
+    payload['is_active'] = request.POST.get('is_active') == 'on'
+    candidate = Teacher(**{field: payload[field] for field in teacher_fields}, is_active=payload['is_active'])
+    if teacher:
+        candidate.pk = teacher.pk
+        candidate.user = teacher.user
+    candidate.full_clean()
+    return payload
 
 
 @login_required(login_url='login_chat')
@@ -223,31 +249,34 @@ def teacher_add(request):
     """
     if request.method == 'POST':
         try:
-            # ایجاد User جدید
-            username = request.POST.get('email').split('@')[0]
-            user = User.objects.create_user(
-                username=username,
-                email=request.POST.get('email'),
-                first_name=request.POST.get('first_name'),
-                last_name=request.POST.get('last_name'),
-                password='defaultpass123'
-            )
-            
-            # ایجاد Teacher
-            teacher = Teacher.objects.create(
-                user=user,
-                email=request.POST.get('email'),
-                phone=request.POST.get('phone'),
-                subject=request.POST.get('subject'),
-                employee_id=request.POST.get('employee_id'),
-                hire_date=request.POST.get('hire_date')
-            )
-            assign_role(user, 'teacher')
+            username = request.POST.get('username', '').strip()
+            password = request.POST.get('password', '')
+            if not username:
+                raise ValidationError({'username': 'نام کاربری برای حساب معلم الزامی است.'})
+            if User.objects.filter(username__iexact=username).exists():
+                raise ValidationError({'username': 'این نام کاربری قبلاً استفاده شده است.'})
+            if len(password) < 8:
+                raise ValidationError({'password': 'رمز عبور باید حداقل ۸ نویسه داشته باشد.'})
+
+            with transaction.atomic():
+                payload = _teacher_payload(request)
+                user = User.objects.create_user(
+                    username=username,
+                    email=payload['email'],
+                    first_name=payload['first_name'],
+                    last_name=payload['last_name'],
+                    password=password,
+                )
+                teacher = Teacher.objects.create(
+                    user=user,
+                    **{field: payload[field] for field in ('email', 'phone', 'subject', 'employee_id', 'hire_date', 'is_active')},
+                )
+                assign_role(user, 'teacher')
             
             messages.success(request, f'✅ معلم {user.first_name} با موفقیت اضافه شد')
             return redirect('teachers_list')
-        except Exception as e:
-            messages.error(request, f'❌ خطا: {str(e)}')
+        except ValidationError as error:
+            messages.error(request, f'خطا: {error.messages[0]}')
     
     return render(request, 'admin/teacher_form.html')
 
@@ -261,22 +290,27 @@ def teacher_edit(request, pk):
     
     if request.method == 'POST':
         try:
-            teacher.user.first_name = request.POST.get('first_name')
-            teacher.user.last_name = request.POST.get('last_name')
-            teacher.user.email = request.POST.get('email')
-            teacher.user.save()
-            
-            teacher.email = request.POST.get('email')
-            teacher.phone = request.POST.get('phone')
-            teacher.subject = request.POST.get('subject')
-            teacher.employee_id = request.POST.get('employee_id')
-            teacher.hire_date = request.POST.get('hire_date')
-            teacher.save()
+            with transaction.atomic():
+                payload = _teacher_payload(request, teacher)
+                for field in ('email', 'phone', 'subject', 'employee_id', 'hire_date', 'is_active'):
+                    setattr(teacher, field, payload[field])
+                if teacher.user:
+                    teacher.user.first_name = payload['first_name']
+                    teacher.user.last_name = payload['last_name']
+                    teacher.user.email = payload['email']
+                    new_password = request.POST.get('password', '')
+                    if new_password:
+                        if len(new_password) < 8:
+                            raise ValidationError({'password': 'رمز عبور باید حداقل ۸ نویسه داشته باشد.'})
+                        teacher.user.set_password(new_password)
+                    teacher.user.save()
+                    assign_role(teacher.user, 'teacher')
+                teacher.save()
             
             messages.success(request, '✅ معلم با موفقیت بروزرسانی شد')
             return redirect('teachers_list')
-        except Exception as e:
-            messages.error(request, f'❌ خطا: {str(e)}')
+        except ValidationError as error:
+            messages.error(request, f'خطا: {error.messages[0]}')
     
     context = {'teacher': teacher, 'edit_mode': True}
     return render(request, 'admin/teacher_form.html', context)
@@ -291,10 +325,11 @@ def teacher_delete(request, pk):
     
     if request.method == 'POST':
         try:
-            teacher_name = teacher.user.first_name
+            teacher_name = str(teacher)
             user = teacher.user
             teacher.delete()
-            user.delete()
+            if user:
+                user.groups.remove(*user.groups.filter(name=ROLE_GROUPS['teacher']))
             messages.success(request, f'✅ معلم {teacher_name} با موفقیت حذف شد')
         except Exception as e:
             messages.error(request, f'❌ خطا: {str(e)}')
@@ -313,10 +348,38 @@ def students_list(request):
     - دکمه‌های ویرایش و حذف
     - دکمه افزودن شاگرد جدید
     """
-    students = Student.objects.all().order_by('-id')
-    context = {'students': students}
+    students = Student.objects.select_related('user').all().order_by('-id')
+    context = {
+        'students': students,
+        'total_students': students.count(),
+        'active_students': students.filter(is_active=True).count(),
+        'classes_count': students.values('class_field').distinct().count(),
+    }
     context.update(_get_profile_context(request.user))
     return render(request, 'admin/students.html', context)
+
+
+@login_required(login_url='login_chat')
+def _student_payload(request, student=None):
+    """Validate and normalize student profile data before saving it."""
+    fields = ('first_name', 'last_name', 'father_name', 'phone', 'email', 'address', 'student_id', 'class_field', 'enrollment_date')
+    payload = {field: request.POST.get(field, '').strip() for field in fields}
+
+    if any(not payload[field] for field in fields):
+        raise ValidationError('لطفاً تمام فیلدهای الزامی را تکمیل کنید.')
+
+    payload['email'] = payload['email'].lower()
+    payload['is_active'] = request.POST.get('is_active') == 'on'
+
+    if not Class.objects.filter(class_name=payload['class_field'], is_active=True).exists():
+        raise ValidationError({'class_field': 'کلاس انتخاب‌شده معتبر یا فعال نیست.'})
+
+    candidate = Student(**payload)
+    if student:
+        candidate.pk = student.pk
+        candidate.user = student.user
+    candidate.full_clean()
+    return {field: getattr(candidate, field) for field in (*fields, 'is_active')}
 
 
 @login_required(login_url='login_chat')
@@ -326,68 +389,35 @@ def student_add(request):
     """
     if request.method == 'POST':
         try:
-            fname = request.POST.get('first_name','').strip()
-            lname = request.POST.get('last_name','').strip()
-            email = request.POST.get('email','').strip()
-            
-            # ══════════════════════════════════════════
-            # ✅ ساختن User account برای شاگرد
-            # ══════════════════════════════════════════
             username = request.POST.get('username','').strip()
-            password = request.POST.get('password','').strip()
-            
-            # اگر username خالی بود، اتوماتیک بساز
+            password = request.POST.get('password', '')
             if not username:
-                base = fname.lower().replace(' ','') or 'student'
-                username = base
-                counter = 1
-                while User.objects.filter(username=username).exists():
-                    username = f"{base}{counter}"
-                    counter += 1
-            
-            # اگر password خالی بود، password پیش‌فرض
-            if not password:
-                password = '12345678'
-            
-            # User را بساز یا موجود را پیدا کن
-            if User.objects.filter(username=username).exists():
-                user = User.objects.get(username=username)
-                user.first_name = fname
-                user.last_name = lname
-                if email: user.email = email
-                user.save()
-            else:
+                raise ValidationError({'username': 'نام کاربری برای حساب شاگرد الزامی است.'})
+            if User.objects.filter(username__iexact=username).exists():
+                raise ValidationError({'username': 'این نام کاربری قبلاً استفاده شده است.'})
+            if len(password) < 8:
+                raise ValidationError({'password': 'رمز عبور باید حداقل ۸ نویسه داشته باشد.'})
+
+            with transaction.atomic():
+                payload = _student_payload(request)
                 user = User.objects.create_user(
                     username=username,
                     password=password,
-                    first_name=fname,
-                    last_name=lname,
-                    email=email or f"{username}@gaam.edu"
+                    first_name=payload['first_name'],
+                    last_name=payload['last_name'],
+                    email=payload['email'],
                 )
+                student = Student.objects.create(user=user, **payload)
+                assign_role(user, 'student')
             
-            # ══════════════════════════════════════════
-            # ✅ ساختن Student record و وصل به User
-            # ══════════════════════════════════════════
-            student = Student.objects.create(
-                user=user,
-                first_name=fname,
-                last_name=lname,
-                father_name=request.POST.get('father_name',''),
-                email=email or user.email,
-                phone=request.POST.get('phone',''),
-                address=request.POST.get('address',''),
-                student_id=request.POST.get('student_id', f'S{user.id}'),
-                class_field=request.POST.get('class_field',''),
-                enrollment_date=request.POST.get('enrollment_date') or datetime.today().date(),
-            )
-            assign_role(user, 'student')
-            
-            messages.success(request, f'✅ شاگرد {student.first_name} اضافه شد | نام کاربری: {username} | پسورد: {password}')
+            messages.success(request, f'✅ شاگرد {student.first_name} اضافه شد | نام کاربری: {username}')
             return redirect('students_list')
-        except Exception as e:
-            messages.error(request, f'❌ خطا: {str(e)}')
+        except ValidationError as error:
+            messages.error(request, f'خطا: {error.messages[0]}')
     
-    return render(request, 'admin/student_form.html')
+    return render(request, 'admin/student_form.html', {
+        'classes': Class.objects.filter(is_active=True).order_by('level', 'class_name'),
+    })
 
 @login_required(login_url='login_chat')
 def student_edit(request, pk):
@@ -398,58 +428,30 @@ def student_edit(request, pk):
     
     if request.method == 'POST':
         try:
-            fname = request.POST.get('first_name','').strip()
-            lname = request.POST.get('last_name','').strip()
-            
-            student.first_name = fname
-            student.last_name = lname
-            student.father_name = request.POST.get('father_name','')
-            student.email = request.POST.get('email','')
-            student.phone = request.POST.get('phone','')
-            student.address = request.POST.get('address','')
-            student.student_id = request.POST.get('student_id', student.student_id)
-            student.class_field = request.POST.get('class_field','')
-            student.enrollment_date = request.POST.get('enrollment_date') or student.enrollment_date
-            
-            # ✅ آپدیت User هم اگر وصل باشد
-            try:
+            with transaction.atomic():
+                for field, value in _student_payload(request, student).items():
+                    setattr(student, field, value)
                 if student.user:
-                    student.user.first_name = fname
-                    student.user.last_name = lname
-                    if request.POST.get('email'):
-                        student.user.email = request.POST.get('email')
-                    # تغییر پسورد اگر وارد شده
-                    new_pass = request.POST.get('new_password','').strip()
-                    if new_pass and len(new_pass) >= 6:
-                        student.user.set_password(new_pass)
+                    student.user.first_name = student.first_name
+                    student.user.last_name = student.last_name
+                    student.user.email = student.email
+                    new_password = request.POST.get('password', '')
+                    if new_password:
+                        if len(new_password) < 8:
+                            raise ValidationError({'password': 'رمز عبور باید حداقل ۸ نویسه داشته باشد.'})
+                        student.user.set_password(new_password)
                     student.user.save()
-                else:
-                    # ✅ اگر user نداشت، الان بساز
-                    username = fname.lower().replace(' ','') or f'student{student.id}'
-                    base = username
-                    counter = 1
-                    while User.objects.filter(username=username).exclude(id=0).exists():
-                        username = f"{base}{counter}"
-                        counter += 1
-                    user = User.objects.create_user(
-                        username=username,
-                        password='12345678',
-                        first_name=fname,
-                        last_name=lname,
-                        email=student.email or f"{username}@gaam.edu"
-                    )
-                    student.user = user
-                    messages.info(request, f'✅ User جدید ساخته شد: {username} / 12345678')
-            except Exception as ue:
-                pass  # user linking optional
-            
-            student.save()
+                student.save()
             messages.success(request, '✅ شاگرد بروزرسانی شد')
             return redirect('students_list')
-        except Exception as e:
-            messages.error(request, f'❌ خطا: {str(e)}')
+        except ValidationError as error:
+            messages.error(request, f'خطا: {error.messages[0]}')
     
-    context = {'student': student, 'edit_mode': True}
+    context = {
+        'student': student,
+        'edit_mode': True,
+        'classes': Class.objects.filter(is_active=True).order_by('level', 'class_name'),
+    }
     return render(request, 'admin/student_form.html', context)
 
 
@@ -482,19 +484,17 @@ def finance_list(request):
     - جدول تمام تراکنش‌ها
     - دکمه‌های Edit و Delete
     """
-    transactions = Transaction.objects.all().order_by('-transaction_date')
-    
-    # محاسبه آمار
-    total_income = Transaction.objects.filter(
-        transaction_type='income'
-    ).aggregate(Sum('amount'))['amount__sum'] or 0
-    
-    total_expense = Transaction.objects.filter(
-        transaction_type='expense'
-    ).aggregate(Sum('amount'))['amount__sum'] or 0
+    transactions = Transaction.objects.select_related('student').all().order_by('-transaction_date', '-id')
+    completed_transactions = transactions.filter(status='completed')
+
+    # Only completed transactions are counted in realised financial totals.
+    total_income = completed_transactions.filter(transaction_type='income').aggregate(Sum('amount'))['amount__sum'] or 0
+    total_expense = completed_transactions.filter(transaction_type='expense').aggregate(Sum('amount'))['amount__sum'] or 0
     
     net_income = total_income - total_expense
-    total_payments = transactions.filter(student__isnull=False).aggregate(Sum('amount'))['amount__sum'] or 0
+    total_payments = completed_transactions.filter(
+        transaction_type='income', student__isnull=False
+    ).aggregate(Sum('amount'))['amount__sum'] or 0
     
     context = {
         'transactions': transactions,
@@ -502,9 +502,44 @@ def finance_list(request):
         'total_expense': total_expense,
         'net_income': net_income,
         'total_payments': total_payments,
+        'pending_transactions': transactions.filter(status='pending').count(),
     }
     context.update(_get_profile_context(request.user))
     return render(request, 'admin/finance.html', context)
+
+
+@login_required(login_url='login_chat')
+def _transaction_payload(request, transaction=None):
+    """Validate and normalize transaction values before they affect financial records."""
+    fields = ('transaction_type', 'amount', 'transaction_date', 'description', 'category', 'status')
+    payload = {field: request.POST.get(field, '').strip() for field in fields}
+
+    if any(not payload[field] for field in fields):
+        raise ValidationError('لطفاً تمام فیلدهای الزامی تراکنش را تکمیل کنید.')
+    if payload['transaction_type'] not in {'income', 'expense'}:
+        raise ValidationError({'transaction_type': 'نوع تراکنش معتبر نیست.'})
+    if payload['status'] not in {'completed', 'pending'}:
+        raise ValidationError({'status': 'وضعیت تراکنش معتبر نیست.'})
+
+    student_id = request.POST.get('student', '').strip()
+    if student_id:
+        student = Student.objects.filter(pk=student_id, is_active=True).first()
+        if not student:
+            raise ValidationError({'student': 'شاگرد انتخاب‌شده معتبر یا فعال نیست.'})
+        payload['student_id'] = student.pk
+    else:
+        payload['student_id'] = None
+
+    candidate = Transaction(
+        transaction_id=transaction.transaction_id if transaction else 'VALIDATION-ONLY',
+        **payload,
+    )
+    if transaction:
+        candidate.pk = transaction.pk
+    candidate.full_clean(exclude=['transaction_id'])
+    if candidate.amount <= 0:
+        raise ValidationError({'amount': 'مبلغ باید بزرگ‌تر از صفر باشد.'})
+    return {field: getattr(candidate, field) for field in (*fields, 'student_id')}
 
 
 @login_required(login_url='login_chat')
@@ -517,37 +552,23 @@ def transaction_add(request):
             import uuid
             from datetime import date as _date
 
-            # auto-generate unique transaction_id
-            provided_id = request.POST.get('transaction_id', '').strip()
-            if provided_id and not Transaction.objects.filter(transaction_id=provided_id).exists():
-                trx_id = provided_id
-            else:
+            with transaction.atomic():
+                # Use a generated immutable ID, avoiding user-supplied collisions.
                 trx_id = f"TRX-{_date.today().strftime('%Y%m%d')}-{uuid.uuid4().hex[:6].upper()}"
-
-            student_id = request.POST.get('student') or None
-            Transaction.objects.create(
-                transaction_id=trx_id,
-                transaction_type=request.POST.get('transaction_type'),
-                amount=request.POST.get('amount'),
-                transaction_date=request.POST.get('transaction_date'),
-                description=request.POST.get('description', ''),
-                category=request.POST.get('category', ''),
-                status=request.POST.get('status', 'completed'),
-                student_id=student_id if student_id else None
-            )
+                Transaction.objects.create(transaction_id=trx_id, **_transaction_payload(request))
             messages.success(request, '✅ تراکنش با موفقیت اضافه شد')
             # redirect back to correct dashboard
             referer = request.META.get('HTTP_REFERER', '')
             if 'finance' in referer and '/admin/' not in referer:
                 return redirect('finance_dashboard')
             return redirect('finance_list')
-        except Exception as e:
-            messages.error(request, f'❌ خطا: {str(e)}')
+        except ValidationError as error:
+            messages.error(request, f'خطا: {error.messages[0]}')
             referer = request.META.get('HTTP_REFERER', '')
             if 'finance' in referer and '/admin/' not in referer:
                 return redirect('finance_dashboard')
 
-    students = Student.objects.all()
+    students = Student.objects.filter(is_active=True).order_by('first_name', 'last_name')
     return render(request, 'admin/transaction_form.html', {'students': students})
 
 
@@ -560,16 +581,8 @@ def transaction_edit(request, pk):
     
     if request.method == 'POST':
         try:
-            transaction.transaction_type = request.POST.get('transaction_type')
-            transaction.amount = request.POST.get('amount')
-            transaction.transaction_date = request.POST.get('transaction_date')
-            transaction.description = request.POST.get('description', '')
-            transaction.category = request.POST.get('category', '')
-            transaction.status = request.POST.get('status', 'completed')
-            
-            student_id = request.POST.get('student') or None
-            transaction.student_id = student_id if student_id else None
-            
+            for field, value in _transaction_payload(request, transaction).items():
+                setattr(transaction, field, value)
             transaction.save()
             
             messages.success(request, '✅ تراکنش با موفقیت بروزرسانی شد')
@@ -577,10 +590,10 @@ def transaction_edit(request, pk):
             if 'finance' in referer and '/admin/' not in referer:
                 return redirect('finance_dashboard')
             return redirect('finance_list')
-        except Exception as e:
-            messages.error(request, f'❌ خطا: {str(e)}')
+        except ValidationError as error:
+            messages.error(request, f'خطا: {error.messages[0]}')
     
-    students = Student.objects.all()
+    students = Student.objects.filter(is_active=True).order_by('first_name', 'last_name')
     return render(request, 'admin/transaction_form.html', {
         'transaction': transaction,
         'students': students,
@@ -621,8 +634,9 @@ def employees_list(request):
     # محاسبه آمار
     total_employees = employees.count()
     active_employees = employees.filter(is_active=True).count()
-    total_salary = employees.aggregate(Sum('salary'))['salary__sum'] or 0
-    avg_salary = employees.aggregate(Sum('salary'))['salary__sum'] / total_employees if total_employees > 0 else 0
+    salary_summary = employees.aggregate(total=Sum('salary'), average=Avg('salary'))
+    total_salary = salary_summary['total'] or 0
+    avg_salary = salary_summary['average'] or 0
     
     context = {
         'employees': employees,
@@ -636,27 +650,42 @@ def employees_list(request):
 
 
 @login_required(login_url='login_chat')
+def _employee_payload(request, employee=None):
+    """Validate and normalize employee data before it is saved."""
+    fields = ('first_name', 'last_name', 'position', 'phone', 'email', 'employee_id', 'salary', 'hire_date')
+    payload = {field: request.POST.get(field, '').strip() for field in fields}
+
+    if any(not payload[field] for field in fields):
+        raise ValidationError('لطفاً تمام فیلدهای الزامی را تکمیل کنید.')
+
+    payload['email'] = payload['email'].lower()
+    payload['is_active'] = request.POST.get('is_active') == 'on'
+
+    candidate = Employee(**payload)
+    if employee:
+        candidate.pk = employee.pk
+        candidate.user = employee.user
+    candidate.full_clean()
+
+    if candidate.salary <= 0:
+        raise ValidationError({'salary': 'حقوق باید بزرگ‌تر از صفر باشد.'})
+
+    return {field: getattr(candidate, field) for field in (*fields, 'is_active')}
+
+
+@login_required(login_url='login_chat')
 def employee_add(request):
     """
     افزودن کارمند جدید
     """
     if request.method == 'POST':
         try:
-            employee = Employee.objects.create(
-                first_name=request.POST.get('first_name'),
-                last_name=request.POST.get('last_name'),
-                position=request.POST.get('position'),
-                phone=request.POST.get('phone'),
-                email=request.POST.get('email'),
-                employee_id=request.POST.get('employee_id'),
-                salary=request.POST.get('salary'),
-                hire_date=request.POST.get('hire_date')
-            )
+            employee = Employee.objects.create(**_employee_payload(request))
             
             messages.success(request, f'✅ کارمند {employee.first_name} با موفقیت اضافه شد')
             return redirect('employees_list')
-        except Exception as e:
-            messages.error(request, f'❌ خطا: {str(e)}')
+        except ValidationError as error:
+            messages.error(request, f'خطا: {error.messages[0]}')
     
     ctx = {}
     ctx.update(_get_profile_context(request.user))
@@ -672,20 +701,14 @@ def employee_edit(request, pk):
     
     if request.method == 'POST':
         try:
-            employee.first_name = request.POST.get('first_name')
-            employee.last_name = request.POST.get('last_name')
-            employee.position = request.POST.get('position')
-            employee.phone = request.POST.get('phone')
-            employee.email = request.POST.get('email')
-            employee.employee_id = request.POST.get('employee_id')
-            employee.salary = request.POST.get('salary')
-            employee.hire_date = request.POST.get('hire_date')
+            for field, value in _employee_payload(request, employee).items():
+                setattr(employee, field, value)
             employee.save()
             
             messages.success(request, '✅ کارمند با موفقیت بروزرسانی شد')
             return redirect('employees_list')
-        except Exception as e:
-            messages.error(request, f'❌ خطا: {str(e)}')
+        except ValidationError as error:
+            messages.error(request, f'خطا: {error.messages[0]}')
     
     ctx = {'employee': employee, 'edit_mode': True}
     ctx.update(_get_profile_context(request.user))
@@ -721,7 +744,7 @@ def medical_list(request):
     - آمار: کل معاینات، شاگردان تحت مراقبت
     - دکمه‌های Edit و Delete
     """
-    medical_records = Medical.objects.all().order_by('-checkup_date')
+    medical_records = Medical.objects.select_related('student').all().order_by('-checkup_date')
     
     # محاسبه آمار
     total_checkups = medical_records.count()
@@ -743,30 +766,67 @@ def medical_list(request):
 
 
 @login_required(login_url='login_chat')
+def _medical_payload(request, medical=None):
+    """Validate and normalize the current health record for a student."""
+    student_id = request.POST.get('student', '').strip()
+    student = Student.objects.filter(pk=student_id).first()
+    if not student or (not student.is_active and (not medical or medical.student_id != student.pk)):
+        raise ValidationError({'student': 'شاگرد انتخاب‌شده معتبر یا فعال نیست.'})
+
+    payload = {
+        'student': student,
+        'checkup_date': request.POST.get('checkup_date', '').strip(),
+        'height': request.POST.get('height', '').strip() or None,
+        'weight': request.POST.get('weight', '').strip() or None,
+        'blood_pressure': request.POST.get('blood_pressure', '').strip(),
+        'temperature': request.POST.get('temperature', '').strip() or None,
+        'diagnosis': request.POST.get('diagnosis', '').strip(),
+        'recommendations': request.POST.get('recommendations', '').strip(),
+        'health_status': request.POST.get('health_status', '').strip(),
+    }
+    if not payload['checkup_date'] or not payload['health_status']:
+        raise ValidationError('تاریخ معاینه و وضعیت سلامتی الزامی هستند.')
+
+    candidate = Medical(**payload)
+    if medical:
+        candidate.pk = medical.pk
+    candidate.full_clean()
+
+    if candidate.height is not None and not 0 < candidate.height <= 300:
+        raise ValidationError({'height': 'قد باید بین ۰ تا ۳۰۰ سانتی‌متر باشد.'})
+    if candidate.weight is not None and not 0 < candidate.weight <= 300:
+        raise ValidationError({'weight': 'وزن باید بین ۰ تا ۳۰۰ کیلوگرم باشد.'})
+    if candidate.temperature is not None and not 25 <= candidate.temperature <= 45:
+        raise ValidationError({'temperature': 'دما باید بین ۲۵ تا ۴۵ درجه سلسیوس باشد.'})
+
+    return {
+        'student_id': candidate.student_id,
+        'checkup_date': candidate.checkup_date,
+        'height': candidate.height,
+        'weight': candidate.weight,
+        'blood_pressure': candidate.blood_pressure,
+        'temperature': candidate.temperature,
+        'diagnosis': candidate.diagnosis,
+        'recommendations': candidate.recommendations,
+        'health_status': candidate.health_status,
+    }
+
+
+@login_required(login_url='login_chat')
 def medical_add(request):
     """
     افزودن معاینه جدید
     """
     if request.method == 'POST':
         try:
-            medical = Medical.objects.create(
-                student_id=request.POST.get('student'),
-                checkup_date=request.POST.get('checkup_date'),
-                height=request.POST.get('height') or None,
-                weight=request.POST.get('weight') or None,
-                blood_pressure=request.POST.get('blood_pressure'),
-                temperature=request.POST.get('temperature') or None,
-                diagnosis=request.POST.get('diagnosis'),
-                recommendations=request.POST.get('recommendations'),
-                health_status=request.POST.get('health_status')
-            )
+            Medical.objects.create(**_medical_payload(request))
             
             messages.success(request, '✅ معاینه با موفقیت اضافه شد')
             return redirect('medical_list')
-        except Exception as e:
-            messages.error(request, f'❌ خطا: {str(e)}')
+        except ValidationError as error:
+            messages.error(request, f'خطا: {error.messages[0]}')
     
-    students = Student.objects.all()
+    students = Student.objects.filter(is_active=True).order_by('first_name', 'last_name')
     return render(request, 'admin/medical_form.html', {'students': students})
 
 
@@ -779,23 +839,16 @@ def medical_edit(request, pk):
     
     if request.method == 'POST':
         try:
-            medical.student_id = request.POST.get('student')
-            medical.checkup_date = request.POST.get('checkup_date')
-            medical.height = request.POST.get('height') or None
-            medical.weight = request.POST.get('weight') or None
-            medical.blood_pressure = request.POST.get('blood_pressure')
-            medical.temperature = request.POST.get('temperature') or None
-            medical.diagnosis = request.POST.get('diagnosis')
-            medical.recommendations = request.POST.get('recommendations')
-            medical.health_status = request.POST.get('health_status')
+            for field, value in _medical_payload(request, medical).items():
+                setattr(medical, field, value)
             medical.save()
             
             messages.success(request, '✅ معاینه با موفقیت بروزرسانی شد')
             return redirect('medical_list')
-        except Exception as e:
-            messages.error(request, f'❌ خطا: {str(e)}')
+        except ValidationError as error:
+            messages.error(request, f'خطا: {error.messages[0]}')
     
-    students = Student.objects.all()
+    students = Student.objects.filter(Q(is_active=True) | Q(pk=medical.student_id)).order_by('first_name', 'last_name')
     return render(request, 'admin/medical_form.html', {
         'medical': medical,
         'students': students,
@@ -826,47 +879,73 @@ def medical_delete(request, pk):
 
 @login_required(login_url='login_chat')
 def reports(request):
-    try:
-        total_income = float(Transaction.objects.filter(transaction_type='income').aggregate(s=Sum('amount'))['s'] or 0)
-    except:
-        total_income = 0
-    try:
-        total_expenses = float(Transaction.objects.filter(transaction_type='expense').aggregate(s=Sum('amount'))['s'] or 0)
-    except:
-        total_expenses = 0
+    student_summary = Student.objects.aggregate(
+        total=Count('id'), active=Count('id', filter=Q(is_active=True)),
+    )
+    teacher_summary = Teacher.objects.aggregate(
+        total=Count('id'), active=Count('id', filter=Q(is_active=True)),
+    )
+    employee_summary = Employee.objects.aggregate(
+        total=Count('id'), active=Count('id', filter=Q(is_active=True)),
+        active_salary=Sum('salary', filter=Q(is_active=True)),
+    )
+    attendance_summary = Attendance.objects.aggregate(
+        total=Count('id'), present=Count('id', filter=Q(status='present')),
+        absent=Count('id', filter=Q(status='absent')), leave=Count('id', filter=Q(status='leave')),
+    )
+    finance_summary = Transaction.objects.filter(status='completed').aggregate(
+        income=Sum('amount', filter=Q(transaction_type='income')),
+        expenses=Sum('amount', filter=Q(transaction_type='expense')),
+        income_count=Count('id', filter=Q(transaction_type='income')),
+        expense_count=Count('id', filter=Q(transaction_type='expense')),
+    )
+    medical_summary = Medical.objects.aggregate(
+        total=Count('id'), excellent=Count('id', filter=Q(health_status='excellent')),
+        needs_care=Count('id', filter=Q(health_status='needs_care')),
+    )
+    class_summary = Class.objects.aggregate(
+        total=Count('id'), active=Count('id', filter=Q(is_active=True)),
+        active_capacity=Sum('capacity', filter=Q(is_active=True)),
+    )
+    total_income = finance_summary['income'] or 0
+    total_expenses = finance_summary['expenses'] or 0
+    active_students = student_summary['active'] or 0
+    active_capacity = class_summary['active_capacity'] or 0
 
     context = {
         # Students
-        'total_students': Student.objects.count(),
-        'active_students': Student.objects.filter(is_active=True).count(),
-        'inactive_students': Student.objects.filter(is_active=False).count(),
+        'total_students': student_summary['total'],
+        'active_students': active_students,
+        'inactive_students': student_summary['total'] - active_students,
         # Teachers
-        'total_teachers': Teacher.objects.count(),
-        'active_teachers': Teacher.objects.filter(is_active=True).count(),
-        'inactive_teachers': Teacher.objects.filter(is_active=False).count(),
+        'total_teachers': teacher_summary['total'],
+        'active_teachers': teacher_summary['active'],
+        'inactive_teachers': teacher_summary['total'] - teacher_summary['active'],
         # Employees
-        'total_employees': Employee.objects.count(),
-        'active_employees': Employee.objects.filter(is_active=True).count(),
-        'total_salary': float(Employee.objects.filter(is_active=True).aggregate(s=Sum('salary'))['s'] or 0),
+        'total_employees': employee_summary['total'],
+        'active_employees': employee_summary['active'],
+        'total_salary': employee_summary['active_salary'] or 0,
         # Attendance
-        'total_attendance': Attendance.objects.count(),
-        'present_count': Attendance.objects.filter(status='present').count(),
-        'absent_count': Attendance.objects.filter(status='absent').count(),
-        'leave_count': Attendance.objects.filter(status='leave').count(),
+        'total_attendance': attendance_summary['total'],
+        'present_count': attendance_summary['present'],
+        'absent_count': attendance_summary['absent'],
+        'leave_count': attendance_summary['leave'],
         # Finance
         'total_income': total_income,
         'total_expenses': total_expenses,
         'net_balance': total_income - total_expenses,
-        'total_income_count': Transaction.objects.filter(transaction_type='income').count(),
-        'total_expense_count': Transaction.objects.filter(transaction_type='expense').count(),
+        'total_income_count': finance_summary['income_count'],
+        'total_expense_count': finance_summary['expense_count'],
         # Medical
-        'total_medical': Medical.objects.count(),
-        'excellent_health': Medical.objects.filter(health_status='excellent').count(),
-        'needs_care': Medical.objects.filter(health_status='needs_care').count(),
+        'total_medical': medical_summary['total'],
+        'excellent_health': medical_summary['excellent'],
+        'needs_care': medical_summary['needs_care'],
         # Classes
-        'total_classes': Class.objects.count(),
-        'active_classes': Class.objects.filter(is_active=True).count(),
-        'total_capacity': int(Class.objects.aggregate(s=Sum('capacity'))['s'] or 0),
+        'total_classes': class_summary['total'],
+        'active_classes': class_summary['active'],
+        'total_capacity': active_capacity,
+        'capacity_usage': round((active_students / active_capacity) * 100) if active_capacity else 0,
+        'report_date': timezone.localdate(),
     }
     context.update(_get_profile_context(request.user))
     return render(request, 'admin/reports.html', context)
@@ -1030,21 +1109,25 @@ def profile_update(request):
 
         if form_type == 'info':
             try:
-                user.first_name = request.POST.get('first_name', user.first_name)
-                user.last_name = request.POST.get('last_name', user.last_name)
-                user.email = request.POST.get('email', user.email)
+                user.first_name = request.POST.get('first_name', '').strip()
+                user.last_name = request.POST.get('last_name', '').strip()
+                user.email = request.POST.get('email', '').strip().lower()
+                if not user.first_name or not user.last_name or not user.email:
+                    raise ValidationError('نام، نام خانوادگی و ایمیل الزامی هستند.')
+                user.full_clean()
                 user.save()
 
                 profile = _get_or_create_profile(user)
                 if profile:
-                    profile.phone = request.POST.get('phone', '')
-                    profile.department = request.POST.get('department', '')
-                    profile.bio = request.POST.get('bio', '')
+                    profile.phone = request.POST.get('phone', '').strip()
+                    profile.department = request.POST.get('department', '').strip() or 'Administration'
+                    profile.bio = request.POST.get('bio', '').strip()
+                    profile.full_clean(exclude=['profile_picture'])
                     profile.save()
 
                 messages.success(request, '✅ معلومات شخصی با موفقیت ذخیره شد')
-            except Exception as e:
-                messages.error(request, f'❌ خطا: {str(e)}')
+            except ValidationError as error:
+                messages.error(request, f'خطا: {error.messages[0]}')
 
         elif form_type == 'password':
             current_password = request.POST.get('current_password', '')
@@ -1073,25 +1156,21 @@ def profile_update(request):
 def profile_upload_picture(request):
     if request.method == 'POST' and request.FILES.get('profile_picture'):
         try:
-            from django.conf import settings
-            import os
-            # اطمینان از وجود MEDIA_ROOT
-            media_root = getattr(settings, 'MEDIA_ROOT', None)
-            if not media_root:
-                messages.error(request, '❌ MEDIA_ROOT در settings.py تنظیم نشده است')
-                return redirect('profile')
-            profiles_dir = os.path.join(media_root, 'profiles')
-            os.makedirs(profiles_dir, exist_ok=True)
-
+            uploaded_picture = request.FILES['profile_picture']
+            if uploaded_picture.size > 5 * 1024 * 1024:
+                raise ValidationError('حجم عکس نباید بیشتر از ۵ مگابایت باشد.')
+            if uploaded_picture.content_type not in {'image/jpeg', 'image/png', 'image/webp'}:
+                raise ValidationError('فقط فایل‌های JPEG، PNG یا WebP قابل قبول هستند.')
             profile = _get_or_create_profile(request.user)
             if profile:
-                profile.profile_picture = request.FILES['profile_picture']
+                profile.profile_picture = uploaded_picture
+                profile.full_clean()
                 profile.save()
                 messages.success(request, '✅ عکس پروفایل با موفقیت تغییر کرد')
             else:
                 messages.error(request, '❌ پروفایل کاربر پیدا نشد')
-        except Exception as e:
-            messages.error(request, f'❌ خطا در آپلود: {str(e)}')
+        except ValidationError as error:
+            messages.error(request, f'خطا در آپلود: {error.messages[0]}')
     return redirect('profile')
 
 
@@ -1099,78 +1178,59 @@ def profile_upload_picture(request):
 # teacher_dashboard
 # ════════════════════════════════════════════════════════════════
 
+def _linked_teacher_for_user(user):
+    """Return the teacher owned by this account, repairing only safe legacy links."""
+    teacher = Teacher.objects.filter(user=user).first()
+    if not teacher and user.email:
+        teacher = Teacher.objects.filter(email__iexact=user.email, user__isnull=True).first()
+        if teacher:
+            teacher.user = user
+            teacher.save(update_fields=['user'])
+    return teacher
+
+
+def _teacher_students_queryset(user):
+    teacher = _linked_teacher_for_user(user)
+    if not teacher:
+        return teacher, Student.objects.none()
+    class_names = Class.objects.filter(teacher=teacher, is_active=True).values_list('class_name', flat=True)
+    return teacher, Student.objects.filter(class_field__in=class_names)
+
+
 @login_required(login_url='login_chat')
 def teacher_dashboard(request):
-    """داشبورد معلم - کامل با همه داده‌ها"""
-    # ── پیدا کردن Teacher با چند روش ──
-    teacher = None
+    """Teacher dashboard limited to the logged-in teacher's assigned classes."""
+    teacher = _linked_teacher_for_user(request.user)
 
-    # روش 1: از طریق user FK
-    try:
-        teacher = Teacher.objects.get(user=request.user)
-    except Teacher.DoesNotExist:
-        pass
-    except Exception:
-        pass
+    today = timezone.localdate()
+    assigned_classes = Class.objects.filter(teacher=teacher, is_active=True) if teacher else Class.objects.none()
+    class_names = assigned_classes.values_list('class_name', flat=True)
+    all_students = Student.objects.filter(class_field__in=class_names).order_by('-created_at')
+    student_names = [f'{student.first_name} {student.last_name}'.strip() for student in all_students]
+    student_presence = StudentPresence.objects.filter(student_name__in=student_names).order_by('-date')
+    health_reports = StudentHealthReport.objects.filter(student_name__in=student_names).order_by('-date')
+    teacher_presence = TeacherPresence.objects.filter(teacher=teacher).order_by('-date') if teacher else TeacherPresence.objects.none()
+    plans = TeacherPlan.objects.filter(teacher=teacher).order_by('-date') if teacher else TeacherPlan.objects.none()
+    timetable = TeacherTimetable.objects.filter(teacher=teacher).order_by('day', 'time_slot') if teacher else TeacherTimetable.objects.none()
 
-    # روش 2: از طریق email
-    if not teacher and request.user.email:
-        try:
-            t = Teacher.objects.get(email=request.user.email)
-            t.user = request.user
-            t.save()
-            teacher = t
-        except Exception:
-            pass
-
-    # روش 3: از طریق نام
-    if not teacher and request.user.first_name:
-        try:
-            fn = request.user.first_name.strip()
-            qs = Teacher.objects.filter(first_name__iexact=fn)
-            if qs.count() == 1:
-                teacher = qs.first()
-                teacher.user = request.user
-                teacher.save()
-        except Exception:
-            pass
-
-    today = datetime.today().date()
-
-    def safe(fn):
-        try: return fn()
-        except Exception: return 0
-
-    def safe_qs(fn):
-        try: return fn()
-        except Exception: return []
-
-    # Stats
-    total_students   = safe(lambda: Student.objects.count())
-    active_students  = safe(lambda: Student.objects.filter(is_active=True).count())
-    inactive_students= safe(lambda: Student.objects.filter(is_active=False).count())
-    present_today    = safe(lambda: StudentPresence.objects.filter(date=today, status='present').count())
-    absent_today     = safe(lambda: StudentPresence.objects.filter(date=today, status='absent').count())
-    total_plans      = safe(lambda: TeacherPlan.objects.filter(teacher=teacher).count() if teacher else TeacherPlan.objects.filter(teacher__isnull=True).count())
-    sp_present       = safe(lambda: StudentPresence.objects.filter(status='present').count())
-    sp_absent        = safe(lambda: StudentPresence.objects.filter(status='absent').count())
-    sp_leave         = safe(lambda: StudentPresence.objects.filter(status='leave').count())
-    tp_present       = safe(lambda: TeacherPresence.objects.filter(teacher=teacher, status='present').count() if teacher else TeacherPresence.objects.filter(teacher__isnull=True, status='present').count())
-    tp_absent        = safe(lambda: TeacherPresence.objects.filter(teacher=teacher, status='absent').count() if teacher else TeacherPresence.objects.filter(teacher__isnull=True, status='absent').count())
+    # Stats only for this teacher and their students.
+    total_students = all_students.count()
+    active_students = all_students.filter(is_active=True).count()
+    inactive_students = total_students - active_students
+    present_today = student_presence.filter(date=today, status='present').count()
+    absent_today = student_presence.filter(date=today, status='absent').count()
+    total_plans = plans.count()
+    sp_present = student_presence.filter(status='present').count()
+    sp_absent = student_presence.filter(status='absent').count()
+    sp_leave = student_presence.filter(status='leave').count()
+    tp_present = teacher_presence.filter(status='present').count()
+    tp_absent = teacher_presence.filter(status='absent').count()
     tp_total         = tp_present + tp_absent
     tp_rate          = round(tp_present / tp_total * 100) if tp_total else 0
-    h_excellent      = safe(lambda: StudentHealthReport.objects.filter(health_status='excellent').count())
-    h_good           = safe(lambda: StudentHealthReport.objects.filter(health_status='good').count())
-    h_care           = safe(lambda: StudentHealthReport.objects.filter(health_status='needs_care').count())
-
-    # Querysets
-    all_students     = safe_qs(lambda: Student.objects.all().order_by('-created_at'))
-    student_presence = safe_qs(lambda: StudentPresence.objects.all().order_by('-date'))
-    teacher_presence = safe_qs(lambda: TeacherPresence.objects.filter(teacher=teacher).order_by('-date') if teacher else TeacherPresence.objects.filter(teacher__isnull=True).order_by('-date'))
-    health_reports   = safe_qs(lambda: StudentHealthReport.objects.all().order_by('-date'))
-    plans            = safe_qs(lambda: TeacherPlan.objects.filter(teacher=teacher).order_by('-date') if teacher else TeacherPlan.objects.filter(teacher__isnull=True).order_by('-date'))
-    timetable        = safe_qs(lambda: TeacherTimetable.objects.filter(teacher=teacher).order_by('day','time_slot') if teacher else TeacherTimetable.objects.filter(teacher__isnull=True).order_by('day','time_slot'))
-    all_classes      = safe_qs(lambda: Class.objects.filter(is_active=True))
+    h_excellent = health_reports.filter(health_status='excellent').count()
+    h_good = health_reports.filter(health_status='good').count()
+    h_care = health_reports.filter(health_status='needs_care').count()
+    all_classes = assigned_classes
 
     # Profile
     try:
@@ -1195,6 +1255,7 @@ def teacher_dashboard(request):
         'present_today': present_today,
         'absent_today': absent_today,
         'total_plans': total_plans,
+        'assigned_class_count': assigned_classes.count(),
         'sp_present': sp_present,
         'sp_absent': sp_absent,
         'sp_leave': sp_leave,
@@ -1230,7 +1291,8 @@ def teacher_dashboard(request):
 
 @login_required(login_url='login_chat')
 def teacher_students(request):
-    students = Student.objects.all().order_by('-created_at')
+    _, students = _teacher_students_queryset(request.user)
+    students = students.order_by('-created_at')
     context = {
         'students': students,
         'total': students.count(),
@@ -1244,46 +1306,58 @@ def teacher_students(request):
 def teacher_student_add(request):
     if request.method == 'POST':
         try:
-            from django.utils import timezone
-            Student.objects.create(
-                first_name=request.POST.get('fname',''),
-                last_name=request.POST.get('lname',''),
-                father_name=request.POST.get('father',''),
-                phone=request.POST.get('phone',''),
-                email=request.POST.get('email', f"s{timezone.now().timestamp()}@gaam.edu"),
-                address=request.POST.get('address',''),
-                student_id=f"S{int(datetime.now().timestamp())}",
-                class_field=request.POST.get('cls',''),
-                enrollment_date=datetime.today().date(),
-                is_active=request.POST.get('status','active')=='active',
+            import uuid
+            teacher = _linked_teacher_for_user(request.user)
+            class_name = request.POST.get('cls', '').strip()
+            if not teacher or not Class.objects.filter(teacher=teacher, is_active=True, class_name=class_name).exists():
+                raise ValidationError('فقط کلاس‌های فعالِ اختصاص‌یافته به شما قابل انتخاب هستند.')
+            student = Student(
+                first_name=request.POST.get('fname', '').strip(),
+                last_name=request.POST.get('lname', '').strip(),
+                father_name=request.POST.get('father', '').strip(),
+                phone=request.POST.get('phone', '').strip(),
+                email=request.POST.get('email', '').strip().lower(),
+                address=request.POST.get('address', '').strip(),
+                student_id=f"STU-{uuid.uuid4().hex[:10].upper()}",
+                class_field=class_name,
+                enrollment_date=timezone.localdate(),
+                is_active=request.POST.get('status', 'active') == 'active',
             )
+            student.full_clean()
+            student.save()
             messages.success(request, '✅ شاگرد اضافه شد')
-        except Exception as e:
-            messages.error(request, f'❌ خطا: {str(e)}')
+        except ValidationError as error:
+            messages.error(request, f'خطا: {error.messages[0]}')
     return redirect('teacher_dashboard')
 
 
 @login_required(login_url='login_chat')
 def teacher_student_edit(request, pk):
-    student = get_object_or_404(Student, pk=pk)
+    teacher, students = _teacher_students_queryset(request.user)
+    student = get_object_or_404(students, pk=pk)
     if request.method == 'POST':
         try:
+            class_name = request.POST.get('cls', '').strip()
+            if not Class.objects.filter(teacher=teacher, is_active=True, class_name=class_name).exists():
+                raise ValidationError('کلاس انتخاب‌شده برای شما معتبر نیست.')
             student.first_name = request.POST.get('fname', student.first_name)
             student.last_name = request.POST.get('lname', student.last_name)
             student.father_name = request.POST.get('father', student.father_name)
             student.phone = request.POST.get('phone', student.phone)
-            student.class_field = request.POST.get('cls', student.class_field)
+            student.class_field = class_name
             student.is_active = request.POST.get('status', 'active') == 'active'
+            student.full_clean()
             student.save()
             messages.success(request, '✅ شاگرد ویرایش شد')
-        except Exception as e:
-            messages.error(request, f'❌ خطا: {str(e)}')
+        except ValidationError as error:
+            messages.error(request, f'خطا: {error.messages[0]}')
     return redirect('teacher_dashboard')
 
 
 @login_required(login_url='login_chat')
 def teacher_student_delete(request, pk):
-    student = get_object_or_404(Student, pk=pk)
+    _, students = _teacher_students_queryset(request.user)
+    student = get_object_or_404(students, pk=pk)
     if request.method == 'POST':
         student.delete()
         messages.success(request, '✅ شاگرد حذف شد')
@@ -1298,51 +1372,36 @@ def teacher_student_delete(request, pk):
 def teacher_student_presence_add(request):
     if request.method == 'POST':
         try:
-            # ✅ student_id از form می‌آید - نام هم ذخیره می‌شود برای نمایش
-            student_id = request.POST.get('student_id','')
-            student_name = request.POST.get('name','')
-            
-            # اگر student_id داشت، نام را از دیتابیس بگیر
-            if student_id:
-                try:
-                    st = Student.objects.get(id=student_id)
-                    student_name = f"{st.first_name} {st.last_name}".strip()
-                except Student.DoesNotExist:
-                    pass
-            
-            StudentPresence.objects.create(
-                student_name=student_name,
-                student_id_fk=int(student_id) if student_id else None,
-                date=request.POST.get('date', datetime.today().date()),
-                status=request.POST.get('status','present'),
-                note=request.POST.get('note',''),
+            _, students = _teacher_students_queryset(request.user)
+            student = students.filter(pk=request.POST.get('student_id', '')).first()
+            if not student:
+                raise ValidationError({'student_id': 'شاگرد انتخاب‌شده در کلاس‌های شما نیست.'})
+            candidate = StudentPresence(
+                student_name=f'{student.first_name} {student.last_name}'.strip(),
+                date=request.POST.get('date', '').strip(),
+                status=request.POST.get('status', '').strip(),
+                note=request.POST.get('note', '').strip(),
             )
-            messages.success(request, '✅ حضوری ثبت شد')
-        except Exception as e:
-            # Fallback: save without FK if column doesn't exist yet
-            try:
-                student_name = request.POST.get('name','')
-                student_id = request.POST.get('student_id','')
-                if student_id:
-                    try:
-                        st = Student.objects.get(id=student_id)
-                        student_name = f"{st.first_name} {st.last_name}".strip()
-                    except: pass
-                StudentPresence.objects.create(
-                    student_name=student_name,
-                    date=request.POST.get('date', datetime.today().date()),
-                    status=request.POST.get('status','present'),
-                    note=request.POST.get('note',''),
-                )
-                messages.success(request, '✅ حضوری ثبت شد')
-            except Exception as e2:
-                messages.error(request, f'❌ خطا: {str(e2)}')
+            candidate.full_clean()
+            if candidate.date > timezone.localdate():
+                raise ValidationError({'date': 'ثبت حضور برای تاریخ آینده مجاز نیست.'})
+
+            _, created = StudentPresence.objects.update_or_create(
+                student_name=candidate.student_name,
+                date=candidate.date,
+                defaults={'status': candidate.status, 'note': candidate.note},
+            )
+            messages.success(request, '✅ حضوری ثبت شد' if created else '✅ حضوری همان روز بروزرسانی شد')
+        except ValidationError as error:
+            messages.error(request, f'خطا: {error.messages[0]}')
     return redirect('teacher_dashboard')
 
 
 @login_required(login_url='login_chat')
 def teacher_student_presence_delete(request, pk):
-    obj = get_object_or_404(StudentPresence, pk=pk)
+    _, students = _teacher_students_queryset(request.user)
+    student_names = [f'{student.first_name} {student.last_name}'.strip() for student in students]
+    obj = get_object_or_404(StudentPresence.objects.filter(student_name__in=student_names), pk=pk)
     if request.method == 'POST':
         obj.delete()
         messages.success(request, '✅ حذف شد')

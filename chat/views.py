@@ -5,6 +5,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
+from django.core.exceptions import ValidationError
+from django.db.models import Count, Q
 from .models import ChatUserProfile, DirectMessage
 from accounts.roles import dashboard_for_user
 
@@ -118,25 +120,30 @@ def chat_dashboard(request):
     profile.is_online = True
     profile.save()
 
-    all_users = User.objects.exclude(id=me.id).order_by('first_name', 'last_name', 'username')
+    all_users = list(
+        User.objects.exclude(id=me.id).select_related('chat_profile').order_by('first_name', 'last_name', 'username')
+    )
+    user_ids = [user.id for user in all_users]
+    recent_messages = DirectMessage.objects.filter(
+        Q(sender=me, receiver_id__in=user_ids) | Q(receiver=me, sender_id__in=user_ids)
+    ).order_by('-created_at')
+    latest_by_contact = {}
+    for message in recent_messages:
+        contact_id = message.receiver_id if message.sender_id == me.id else message.sender_id
+        latest_by_contact.setdefault(contact_id, message)
+    unread_by_sender = {
+        row['sender_id']: row['count'] for row in DirectMessage.objects.filter(
+            receiver=me, is_read=False
+        ).values('sender_id').annotate(count=Count('id'))
+    }
 
     contacts = []
     for u in all_users:
-        try:
-            up = u.chat_profile
-            pic = up.profile_picture.url if up.profile_picture else None
-            online = up.is_online
-        except Exception:
-            pic = None
-            online = False
-
-        last_msg = DirectMessage.objects.filter(
-            sender__in=[me, u], receiver__in=[me, u]
-        ).order_by('-created_at').first()
-
-        unread = DirectMessage.objects.filter(
-            sender=u, receiver=me, is_read=False
-        ).count()
+        profile = getattr(u, 'chat_profile', None)
+        pic = profile.profile_picture.url if profile and profile.profile_picture else None
+        online = profile.is_online if profile else False
+        last_msg = latest_by_contact.get(u.id)
+        unread = unread_by_sender.get(u.id, 0)
 
         contacts.append({
             'user':     u,
@@ -228,6 +235,10 @@ def send_message(request, user_id):
 
     if not content:
         return JsonResponse({'ok': False, 'error': 'Empty message'})
+    if len(content) > 4000:
+        return JsonResponse({'ok': False, 'error': 'Message is too long.'}, status=400)
+    if other.id == me.id:
+        return JsonResponse({'ok': False, 'error': 'You cannot message yourself.'}, status=400)
 
     msg = DirectMessage.objects.create(sender=me, receiver=other, content=content)
 
@@ -241,7 +252,6 @@ def send_message(request, user_id):
 @login_required(login_url='login_chat')
 def get_unread_counts(request):
     """GET — تعداد پیام‌های خوانده‌نشده برای هر فرستنده"""
-    from django.db.models import Count
     counts = DirectMessage.objects.filter(
         receiver=request.user, is_read=False
     ).values('sender_id').annotate(count=Count('id'))
@@ -252,14 +262,11 @@ def get_unread_counts(request):
 @login_required(login_url='login_chat')
 def get_online_status(request):
     """GET — وضعیت آنلاین همه کاربران"""
-    users = User.objects.exclude(id=request.user.id)
-    data  = []
-    for u in users:
-        try:
-            online = u.chat_profile.is_online
-        except Exception:
-            online = False
-        data.append({'id': u.id, 'online': online})
+    users = User.objects.exclude(id=request.user.id).select_related('chat_profile')
+    data = [
+        {'id': user.id, 'online': getattr(user, 'chat_profile', None) and user.chat_profile.is_online}
+        for user in users
+    ]
     return JsonResponse({'users': data})
 
 
@@ -267,7 +274,16 @@ def get_online_status(request):
 def upload_picture(request):
     """POST — آپلود عکس پروفایل"""
     if request.method == 'POST' and request.FILES.get('profile_picture'):
-        profile = get_or_create_profile(request.user)
-        profile.profile_picture = request.FILES['profile_picture']
-        profile.save()
+        try:
+            uploaded_picture = request.FILES['profile_picture']
+            if uploaded_picture.size > 5 * 1024 * 1024:
+                raise ValidationError('Image must be 5 MB or smaller.')
+            if uploaded_picture.content_type not in {'image/jpeg', 'image/png', 'image/webp'}:
+                raise ValidationError('Only JPEG, PNG, or WebP images are allowed.')
+            profile = get_or_create_profile(request.user)
+            profile.profile_picture = uploaded_picture
+            profile.full_clean()
+            profile.save()
+        except ValidationError:
+            pass
     return redirect('chat_dashboard')

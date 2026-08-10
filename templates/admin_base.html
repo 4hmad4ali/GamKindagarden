@@ -73,6 +73,7 @@ body{font-family:'Vazirmatn',sans-serif;background:var(--bg);color:var(--text);m
 .tb-av{width:34px;height:34px;border-radius:50%;border:2px solid var(--pri);overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--pri-l);font-size:14px;text-decoration:none;flex-shrink:0;transition:.15s}
 .tb-av:hover{border-width:3px}
 .tb-av img{width:100%;height:100%;object-fit:cover}
+.tb-chat{position:relative}.tb-chat .chat-dot{position:absolute;top:-4px;left:-4px;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:#dc2626;color:#fff;font-size:9px;font-weight:800;display:none;align-items:center;justify-content:center;border:2px solid var(--card)}
 
 /* ══ MAIN ══ */
 #adm-main{
@@ -145,20 +146,23 @@ body{font-family:'Vazirmatn',sans-serif;background:var(--bg);color:var(--text);m
 <!-- SIDEBAR -->
 <aside id="adm-sb">
   <div class="sb-head">
-    <div class="sb-logo">🏫</div>
-    <div><div class="sb-t1">GAAM Kindergarten</div><div class="sb-t2">سیستم مدیریت</div></div>
+    <a class="sb-brand" href="{% url 'admin_dashboard' %}" aria-label="داشبورد GAAM">
+      <span class="sb-logo">G</span>
+      <span><span class="sb-t1">GAAM Kindergarten</span><span class="sb-t2">سامانه مدیریت مهدکودک</span></span>
+    </a>
   </div>
 
   {% if user.is_authenticated %}
-  <div class="sb-me">
+  <a class="sb-me" href="{% url 'profile' %}">
     <div class="sb-av">
       {% if profile_picture %}<img src="{{ profile_picture }}" alt="">{% else %}👤{% endif %}
     </div>
     <div>
       <div class="sb-uname">{{ username|default:user.first_name|default:user.username }}</div>
-      <div class="sb-urole">{% block sb_role %}ادمین{% endblock %}</div>
+      <div class="sb-urole"><span class="sb-online-dot"></span>{% block sb_role %}مدیر سیستم{% endblock %}</div>
     </div>
-  </div>
+    <span class="sb-profile-arrow">‹</span>
+  </a>
   {% endif %}
 
   <nav class="sb-nav">
@@ -176,12 +180,13 @@ body{font-family:'Vazirmatn',sans-serif;background:var(--bg);color:var(--text);m
     <a href="{% url 'medical_list' %}" class="sb-a {% if 'medical' in request.resolver_match.url_name|default:'' %}on{% endif %}"><span class="ic">⚕️</span> پزشکی</a>
     <a href="{% url 'reports' %}" class="sb-a {% if 'report' in request.resolver_match.url_name|default:'' %}on{% endif %}"><span class="ic">📊</span> گزارشات</a>
     <div class="sb-cat">حساب</div>
+    <a href="{% url 'chat_dashboard' %}" class="sb-a"><span class="ic">💬</span> پیام‌ها <span class="sb-chat-badge" id="sb-chat-count"></span></a>
     <a href="{% url 'profile' %}" class="sb-a {% if 'profile' in request.resolver_match.url_name|default:'' %}on{% endif %}"><span class="ic">👤</span> پروفایل</a>
     {% endblock %}
   </nav>
 
   <div class="sb-foot">
-    <a href="{% url 'logout_chat' %}" class="sb-out"><span>🚪</span> خروج</a>
+    <a href="{% url 'logout_chat' %}" class="sb-out"><span>🚪</span> خروج از حساب</a>
   </div>
 </aside>
 
@@ -193,6 +198,9 @@ body{font-family:'Vazirmatn',sans-serif;background:var(--bg);color:var(--text);m
   </div>
   <div class="tb-l">
     <span class="tb-clk" id="adm-clk">⏰ --:--:--</span>
+    {% if user.is_authenticated %}
+    <a href="{% url 'chat_dashboard' %}" class="tb-btn tb-chat" title="پیام‌ها" aria-label="پیام‌ها">💬<span class="chat-dot" id="adm-chat-count"></span></a>
+    {% endif %}
     <button class="tb-btn" onclick="darkToggle()" id="dk-btn">🌙</button>
     {% if user.is_authenticated %}
     <a href="{% url 'profile' %}" class="tb-av">
@@ -214,9 +222,10 @@ body{font-family:'Vazirmatn',sans-serif;background:var(--bg);color:var(--text);m
 
 <!-- Shared design layer for all custom administration pages. -->
 <style>
-  #adm-sb { background:linear-gradient(165deg,#172554 0%,#1e40af 58%,#2563eb 100%) !important; box-shadow:-4px 0 24px rgba(15,23,42,.17) !important; }
-  .sb-head { padding:18px 16px 14px !important; }.sb-logo { border:1px solid rgba(255,255,255,.16); background:rgba(255,255,255,.11) !important; }.sb-a { border-right-width:2px !important; border-radius:0 8px 8px 0; margin-left:9px; }.sb-a.on { border-right-color:#7dd3fc !important; background:rgba(255,255,255,.14) !important; }.sb-a:hover { background:rgba(255,255,255,.09) !important; }.sb-foot { background:rgba(0,0,0,.13) !important; }
+  #adm-sb { background:linear-gradient(180deg,#0f1d45 0%,#172b62 54%,#1d4ed8 100%) !important; box-shadow:-8px 0 30px rgba(15,23,42,.17) !important; }
+  .sb-head { padding:18px 16px 16px !important; border-bottom-color:rgba(255,255,255,.12) !important; }.sb-brand{display:flex;align-items:center;gap:10px;text-decoration:none;min-width:0}.sb-brand>span:last-child{min-width:0}.sb-logo { width:40px!important;height:40px!important;border:1px solid rgba(255,255,255,.2);background:linear-gradient(135deg,#60a5fa,#2563eb)!important;box-shadow:0 6px 16px rgba(0,0,0,.18);font-size:18px!important;font-weight:900;color:#fff; }.sb-t1,.sb-t2{display:block}.sb-t1{font-size:12px!important;letter-spacing:.2px}.sb-t2{margin-top:2px;font-size:9px!important;color:rgba(255,255,255,.58)!important}.sb-me{margin:10px 10px 6px;padding:9px 10px!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:11px;background:rgba(255,255,255,.07);text-decoration:none;transition:.18s}.sb-me:hover{background:rgba(255,255,255,.13);transform:translateY(-1px)}.sb-av{width:36px!important;height:36px!important}.sb-uname{font-size:11px!important}.sb-urole{display:flex;align-items:center;gap:5px;margin-top:2px}.sb-online-dot{width:6px;height:6px;border-radius:50%;background:#4ade80;box-shadow:0 0 0 3px rgba(74,222,128,.12)}.sb-profile-arrow{margin-right:auto;color:rgba(255,255,255,.65);font-size:22px;line-height:1}.sb-nav{padding:8px 8px 12px!important;scrollbar-width:thin;scrollbar-color:rgba(191,219,254,.72) transparent}.sb-nav::-webkit-scrollbar{width:9px}.sb-nav::-webkit-scrollbar-track{margin:10px 2px;border-radius:99px;background:rgba(255,255,255,.055)}.sb-nav::-webkit-scrollbar-thumb{min-height:42px;border:3px solid transparent;border-radius:99px;background:linear-gradient(180deg,rgba(191,219,254,.88),rgba(96,165,250,.7));background-clip:padding-box}.sb-nav::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,#dbeafe,#93c5fd);background-clip:padding-box}.sb-nav::-webkit-scrollbar-button{display:none}.sb-cat{padding:13px 9px 5px!important;font-size:9px!important;letter-spacing:1px!important}.sb-a { position:relative;min-height:39px;border-right-width:2px!important;border-radius:9px!important;margin:2px 0!important;padding:9px 10px!important; }.sb-a .ic{font-size:14px!important}.sb-a.on { border-right-color:#7dd3fc !important; background:linear-gradient(90deg,rgba(96,165,250,.2),rgba(255,255,255,.1)) !important; }.sb-a:hover { background:rgba(255,255,255,.1) !important; }.sb-chat-badge{display:none;min-width:18px;height:18px;padding:0 5px;margin-right:auto;border-radius:99px;background:#f87171;color:#fff;font-size:9px;font-weight:900;align-items:center;justify-content:center}.sb-foot { padding:12px 10px!important;background:rgba(0,0,0,.16) !important; }.sb-out{font-size:12px!important;padding:10px!important;background:rgba(220,38,38,.9)!important;}
   #adm-tb { box-shadow:0 1px 3px rgba(15,23,42,.04) !important; }.tb-clk { color:#1d4ed8 !important; background:#eff6ff !important; }.tb-av { border-color:#2563eb !important; background:#eff6ff !important; }
+  .tb-chat:hover { background:#1d4ed8 !important; border-color:#1d4ed8 !important; }
   #adm-main { background:var(--bg); }
   #adm-main .teachers-header, #adm-main .students-header, #adm-main .employees-header,
   #adm-main .finance-header, #adm-main .medical-header, #adm-main .attendance-header,
@@ -328,6 +337,20 @@ if(localStorage.getItem('adm_dark')==='true'){
   document.body.classList.add('dark');
   document.getElementById('dk-btn').textContent='☀️';
 }
+
+/* CHAT NOTIFICATIONS */
+function updateChatBadge(){
+  const badges=[document.getElementById('adm-chat-count'),document.getElementById('sb-chat-count')].filter(Boolean);
+  if(!badges.length)return;
+  fetch('{% url "chat_unread" %}',{headers:{'X-Requested-With':'XMLHttpRequest'}})
+    .then(response=>response.ok?response.json():null)
+    .then(data=>{
+      if(!data)return;
+      const total=Object.values(data.counts).reduce((sum,count)=>sum+Number(count),0);
+      badges.forEach(badge=>{badge.textContent=total>99?'99+':total;badge.style.display=total?'flex':'none';});
+    }).catch(()=>{});
+}
+updateChatBadge();setInterval(updateChatBadge,30000);
 
 /* CONFIRM DELETE */
 let _form=null;

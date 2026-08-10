@@ -1,11 +1,11 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GAAM Chat</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<title>پیام‌رسان GAAM</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root {
   --pri:     #7c3aed;
@@ -29,7 +29,7 @@
 
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Vazirmatn', sans-serif;
   background: var(--bg);
   color: var(--text);
   height: 100vh;
@@ -99,7 +99,7 @@ body {
 .search-row:focus-within { border-color: var(--pri); }
 .search-row input {
   background: none; border: none; outline: none;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Vazirmatn', sans-serif;
   font-size: 13px; color: var(--text); width: 100%;
 }
 .search-row input::placeholder { color: var(--text2); }
@@ -405,8 +405,8 @@ body {
     <div class="sb-hdr-row">
       <div class="sb-logo">💬</div>
       <div>
-        <div class="sb-title">GAAM Chat</div>
-        <div class="sb-sub">Staff Messenger</div>
+        <div class="sb-title">پیام‌رسان GAAM</div>
+        <div class="sb-sub">ارتباط داخلی تیم</div>
       </div>
       <button class="ib" style="margin-right:auto" onclick="toggleDark()" id="darkBtn" title="Dark mode">🌙</button>
       <a href="{% url 'logout_chat' %}" class="ib" title="Logout">
@@ -422,14 +422,14 @@ body {
         fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
       </svg>
-      <input type="text" id="searchInp" placeholder="Search colleagues..." oninput="filterContacts()">
+      <input type="text" id="searchInp" placeholder="جستجوی همکاران..." oninput="filterContacts()">
     </div>
   </div>
 
   <!-- Online count -->
   <div class="online-pill" id="onlinePill">
     <div class="online-dot"></div>
-    <span id="onlineCount">0</span> online
+    <span id="onlineCount">0</span> کاربر آنلاین
   </div>
 
   <!-- Contacts -->
@@ -451,7 +451,7 @@ body {
       <div class="ci">
         <div class="cn">{{ c.name }}</div>
         <div class="cl" id="last-{{ c.user.id }}">
-          {% if c.last_msg %}{{ c.last_msg }}{% else %}Start a conversation{% endif %}
+          {% if c.last_msg %}{{ c.last_msg }}{% else %}شروع گفتگو{% endif %}
         </div>
       </div>
 
@@ -465,7 +465,7 @@ body {
     </div>
     {% empty %}
       <div style="padding:30px 16px;text-align:center;color:var(--text2);font-size:13px">
-        No other users yet
+        کاربر دیگری برای گفتگو وجود ندارد
       </div>
     {% endfor %}
   </div>
@@ -476,8 +476,8 @@ body {
     <form method="POST" action="{% url 'chat_picture' %}" enctype="multipart/form-data" id="picForm">
       {% csrf_token %}
       <input type="file" id="picFileInp" name="profile_picture"
-        accept="image/*" style="display:none"
-        onchange="document.getElementById('picForm').submit()">
+        accept="image/jpeg,image/png,image/webp" style="display:none"
+        onchange="validateChatPicture(this)">
     </form>
 
     <div onclick="document.getElementById('picFileInp').click()" title="Change photo">
@@ -490,7 +490,7 @@ body {
 
     <div class="my-info">
       <div class="my-name">{{ my_name }}</div>
-      <div class="my-status" id="myStatus">● Active now</div>
+      <div class="my-status" id="myStatus">● اکنون آنلاین</div>
     </div>
   </div>
 
@@ -510,15 +510,15 @@ body {
         <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
       </svg>
     </button>
-    <div class="tb-title">💬 GAAM Chat</div>
+    <div class="tb-title">💬 پیام‌رسان GAAM</div>
     <button class="ib" onclick="toggleDark()">🌙</button>
   </div>
 
   <!-- Empty state -->
   <div class="empty-state" id="emptyState">
     <div class="empty-icon">💬</div>
-    <div class="empty-title">GAAM Members Chat</div>
-    <div class="empty-sub">Select a colleague from the list to start chatting in real time</div>
+    <div class="empty-title">گفتگوی داخلی GAAM</div>
+    <div class="empty-sub">برای شروع گفتگو، یک همکار را از فهرست انتخاب کنید.</div>
   </div>
 
   <!-- Active chat window -->
@@ -535,10 +535,10 @@ body {
       <div class="av" id="chatAv" style="background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff">?</div>
       <div class="chat-hdr-info">
         <div class="chat-hdr-name"   id="chatHdrName">...</div>
-        <div class="chat-hdr-status" id="chatHdrStatus" style="color:#10b981">● Active now</div>
+        <div class="chat-hdr-status" id="chatHdrStatus" style="color:#10b981">● اکنون آنلاین</div>
       </div>
       <div class="chat-hdr-btns">
-        <button class="ib" onclick="loadMessages(true)" title="Refresh">
+        <button class="ib" onclick="loadMessages(true)" title="به‌روزرسانی">
           <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24"
             fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/>
@@ -555,11 +555,11 @@ body {
     <div class="input-area">
       <div class="input-row">
         <textarea class="msg-inp" id="msgInp"
-          placeholder="Type a message... (Enter to send)"
+          placeholder="پیام خود را بنویسید... (Enter برای ارسال)"
           onkeydown="handleKey(event)"
           oninput="autoResize(this)"
-          rows="1"></textarea>
-        <button class="send-btn" id="sendBtn" onclick="sendMsg()" title="Send">
+          rows="1" maxlength="4000"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendMsg()" title="ارسال">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
             fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
@@ -591,6 +591,18 @@ let pollTimer   = null;   // message polling interval
 let unreadTimer = null;   // unread-count polling
 let onlineTimer = null;   // online-status polling
 let lastMsgLen  = 0;      // for detecting new messages
+
+function validateChatPicture(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  const accepted = ['image/jpeg', 'image/png', 'image/webp'];
+  if (!accepted.includes(file.type) || file.size > 5 * 1024 * 1024) {
+    alert('فقط تصویر JPEG، PNG یا WebP تا ۵ مگابایت مجاز است.');
+    input.value = '';
+    return;
+  }
+  document.getElementById('picForm').submit();
+}
 
 // ─────────────────────────────────────
 // Open a conversation
@@ -648,7 +660,7 @@ function loadMessages(forceScroll) {
     const online = data.other_online;
     document.getElementById('chatHdrName').textContent = data.other_name;
     const statusEl = document.getElementById('chatHdrStatus');
-    statusEl.textContent = online ? '● Active now' : '○ Last seen recently';
+    statusEl.textContent = online ? '● اکنون آنلاین' : '○ اخیراً آنلاین بوده است';
     statusEl.style.color  = online ? '#10b981' : '#9ca3af';
 
     // Update avatar
@@ -673,7 +685,7 @@ function loadMessages(forceScroll) {
         const last = data.messages[newLen - 1];
         const lastEl = document.getElementById('last-' + currentUID);
         const timeEl = document.getElementById('time-' + currentUID);
-        if (lastEl) lastEl.textContent = (last.mine ? 'You: ' : '') + last.text.slice(0, 40);
+        if (lastEl) lastEl.textContent = (last.mine ? 'شما: ' : '') + last.text.slice(0, 40);
         if (timeEl) timeEl.textContent = last.time;
       }
     }
@@ -843,8 +855,8 @@ function pollOnline() {
 function fmtDate(d) {
   const today     = new Date().toISOString().slice(0, 10);
   const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
-  if (d === today)     return 'Today';
-  if (d === yesterday) return 'Yesterday';
+  if (d === today)     return 'امروز';
+  if (d === yesterday) return 'دیروز';
   return d;
 }
 
