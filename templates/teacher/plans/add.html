@@ -1,0 +1,90 @@
+{% extends 'teacher/base.html' %}
+
+{% block title %}افزودن پلان درسی - GAAM{% endblock %}
+{% block page_title %}افزودن پلان درسی{% endblock %}
+{% block nav_plans %}active{% endblock %}
+
+{% block content %}
+
+<div class="section-header">
+
+    <div class="section-heading">
+        <div class="section-icon">
+            <i class="fa-solid fa-book-medical"></i>
+        </div>
+
+        <div>
+            <h1>افزودن پلان درسی</h1>
+            <p>پلان جدید درسی را ثبت کنید</p>
+        </div>
+    </div>
+
+    <a class="back-btn" href="{% url 'teacher_plans' %}">
+        <i class="fa-solid fa-arrow-right"></i>
+        بازگشت
+    </a>
+
+</div>
+
+
+<section class="card form-card">
+
+    <form method="POST" action="/core/teacher/plan/add/">
+        {% csrf_token %}
+
+        <div class="fg2">
+
+            <div class="fg">
+                <label class="fl">موضوع (Subject) *</label>
+                <input class="fi" name="subject" required placeholder="مثال: ریاضی">
+            </div>
+
+            <div class="fg">
+                <label class="fl">عنوان درس (Topic)</label>
+                <input class="fi" name="topic" placeholder="مثال: جمع و تفریق">
+            </div>
+
+            <div class="fg">
+                <label class="fl">کلاس</label>
+                <input class="fi" name="cls" placeholder="مثال: کلاس اول">
+            </div>
+
+            <div class="fg">
+                <label class="fl">تاریخ</label>
+                <input class="fi" name="date" type="date" value="{{ today }}">
+            </div>
+
+            <div class="fg fg-full">
+                <label class="fl">هدف درس (Goal)</label>
+                <textarea class="ft" name="goal" placeholder="هدف این درس..."></textarea>
+            </div>
+
+            <div class="fg fg-full">
+                <label class="fl">مواد درسی (Material)</label>
+                <textarea class="ft" name="material" placeholder="کتاب، تخته، رنگ..."></textarea>
+            </div>
+
+            <div class="fg fg-full">
+                <label class="fl">فعالیت‌های صنفی (Class Activities)</label>
+                <textarea class="ft" name="activities" placeholder="فعالیت‌ها..."></textarea>
+            </div>
+
+            <div class="fg fg-full">
+                <label class="fl">ارزیابی (Evaluation)</label>
+                <textarea class="ft" name="evaluation" placeholder="روش ارزیابی..."></textarea>
+            </div>
+
+        </div>
+
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit">
+                <i class="fa-solid fa-floppy-disk"></i>
+                ذخیره پلان
+            </button>
+        </div>
+
+    </form>
+
+</section>
+
+{% endblock %}

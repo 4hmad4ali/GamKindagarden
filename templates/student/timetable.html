@@ -1,0 +1,112 @@
+{% extends 'student/base.html' %}
+
+{% block title %}جدول وقت کلاس - GAAM{% endblock %}
+{% block page_title %}جدول وقت کلاس{% endblock %}
+{% block nav_timetable %}active{% endblock %}
+
+{% block content %}
+
+<div class="section-header">
+
+    <div class="section-heading">
+
+        <div class="section-icon">
+            <i class="fa-solid fa-calendar-days"></i>
+        </div>
+
+        <div>
+            <h1>جدول وقت کلاس</h1>
+            <p>برنامه هفتگی دروس و صنف شما</p>
+        </div>
+
+    </div>
+
+</div>
+
+
+<section class="card">
+
+    {% if timetable %}
+
+    <div class="table-wrap">
+
+        <table class="tt-table">
+
+            <thead>
+                <tr>
+                    <th>وقت</th>
+                    <th>شنبه</th>
+                    <th>یکشنبه</th>
+                    <th>دوشنبه</th>
+                    <th>سه‌شنبه</th>
+                    <th>چهارشنبه</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for slot in time_slots %}
+
+                <tr>
+
+                    <td>{{ slot }}</td>
+
+                    {% for day in days_list %}
+
+                    <td>
+
+                        {% for tt in timetable %}
+
+                            {% if tt.day == day and tt.time_slot == slot %}
+
+                                <div class="tt-cell">
+
+                                    <i class="fa-solid fa-book-open"></i>
+
+                                    <strong>{{ tt.subject }}</strong>
+
+                                    {% if tt.note %}
+                                        <small>{{ tt.note }}</small>
+                                    {% endif %}
+
+                                </div>
+
+                            {% endif %}
+
+                        {% endfor %}
+
+                    </td>
+
+                    {% endfor %}
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    {% else %}
+
+    <div class="empty">
+        <div class="empty-icon">
+            <i class="fa-regular fa-calendar-xmark"></i>
+        </div>
+
+        <strong>هنوز جدول وقت تنظیم نشده</strong>
+
+        <p>
+            بعد از تنظیم جدول توسط معلم،
+            برنامه درسی شما اینجا نمایش داده می‌شود.
+        </p>
+    </div>
+
+    {% endif %}
+
+</section>
+
+{% endblock %}

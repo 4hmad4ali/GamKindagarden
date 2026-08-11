@@ -1,0 +1,252 @@
+{% extends 'doctor/base.html' %}
+
+{% block title %}{% if record %}ویرایش گزارش صحی{% else %}گزارش صحی جدید{% endif %} - GAAM{% endblock %}
+{% block page_title %}{% if record %}ویرایش گزارش صحی{% else %}گزارش صحی جدید{% endif %}{% endblock %}
+{% block nav_health_add %}active{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div class="page-heading">
+        <span class="page-icon">
+            <i class="fa-solid {% if record %}fa-file-pen{% else %}fa-file-circle-plus{% endif %}"></i>
+        </span>
+
+        <div>
+            <h2>
+                {% if record %}
+                    ویرایش گزارش صحی
+                {% else %}
+                    گزارش صحی جدید
+                {% endif %}
+            </h2>
+
+            <p>معلومات معاینه و وضعیت صحی شاگرد را ثبت کنید</p>
+        </div>
+    </div>
+
+    <a class="btn btn-secondary" href="{% url 'doctor_health_list' %}">
+        <i class="fa-solid fa-arrow-right"></i>
+        بازگشت
+    </a>
+
+</div>
+
+
+<section class="form-card">
+
+    <form method="POST" action="{% url 'doctor_dashboard' %}" id="reportForm">
+
+        {% csrf_token %}
+
+        <input
+            type="hidden"
+            name="action"
+            value="{% if record %}edit_report{% else %}add_report{% endif %}"
+        >
+
+        <input
+            type="hidden"
+            name="record_id"
+            value="{% if record %}{{ record.id }}{% endif %}"
+        >
+
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label for="rf_student">
+                    <i class="fa-solid fa-user-graduate"></i>
+                    شاگرد *
+                </label>
+
+                <select name="student" id="rf_student" required>
+
+                    <option value="">-- شاگرد را انتخاب کنید --</option>
+
+                    {% for s in students %}
+                    <option
+                        value="{{ s.id }}"
+                        {% if record and record.student.id == s.id %}selected{% endif %}
+                    >
+                        {{ s.first_name }} {{ s.last_name }}
+                    </option>
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="rf_date">
+                    <i class="fa-regular fa-calendar"></i>
+                    تاریخ معاینه *
+                </label>
+
+                <input
+                    type="date"
+                    name="checkup_date"
+                    id="rf_date"
+                    value="{% if record %}{{ record.checkup_date|date:'Y-m-d' }}{% endif %}"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="rf_height">
+                    <i class="fa-solid fa-ruler-vertical"></i>
+                    قد (سانتی‌متر)
+                </label>
+
+                <input
+                    type="text"
+                    class="num-field"
+                    name="height"
+                    id="rf_height"
+                    value="{% if record %}{{ record.height|default:'' }}{% endif %}"
+                    placeholder="مثال: 120"
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="rf_weight">
+                    <i class="fa-solid fa-weight-scale"></i>
+                    وزن (کیلوگرم)
+                </label>
+
+                <input
+                    type="text"
+                    class="num-field"
+                    name="weight"
+                    id="rf_weight"
+                    value="{% if record %}{{ record.weight|default:'' }}{% endif %}"
+                    placeholder="مثال: 25"
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="rf_bp">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                    فشار خون
+                </label>
+
+                <input
+                    type="text"
+                    name="blood_pressure"
+                    id="rf_bp"
+                    value="{% if record %}{{ record.blood_pressure|default:'' }}{% endif %}"
+                    placeholder="مثال: 120/80"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="rf_temp">
+                    <i class="fa-solid fa-temperature-half"></i>
+                    دما (°C)
+                </label>
+
+                <input
+                    type="text"
+                    class="num-field"
+                    name="temperature"
+                    id="rf_temp"
+                    value="{% if record %}{{ record.temperature|default:'' }}{% endif %}"
+                    placeholder="مثال: 36.5"
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <div class="form-group full-width">
+
+                <label for="rf_status">
+                    <i class="fa-solid fa-heart"></i>
+                    وضعیت سلامتی *
+                </label>
+
+                <select name="health_status" id="rf_status" required>
+                    <option value="excellent" {% if record and record.health_status == 'excellent' %}selected{% endif %}>عالی</option>
+                    <option value="good" {% if record and record.health_status == 'good' %}selected{% endif %}>خوب</option>
+                    <option value="normal" {% if record and record.health_status == 'normal' %}selected{% endif %}>معمولی</option>
+                    <option value="needs_care" {% if record and record.health_status == 'needs_care' %}selected{% endif %}>نیاز به مراقبت</option>
+                </select>
+
+            </div>
+
+
+            <div class="form-group full-width">
+
+                <label for="rf_diagnosis">
+                    <i class="fa-solid fa-clipboard-list"></i>
+                    تشخیص
+                </label>
+
+                <textarea
+                    name="diagnosis"
+                    id="rf_diagnosis"
+                    placeholder="تشخیص پزشکی..."
+                >{% if record %}{{ record.diagnosis|default:'' }}{% endif %}</textarea>
+
+            </div>
+
+
+            <div class="form-group full-width">
+
+                <label for="rf_recommend">
+                    <i class="fa-solid fa-pills"></i>
+                    توصیه‌ها
+                </label>
+
+                <textarea
+                    name="recommendations"
+                    id="rf_recommend"
+                    placeholder="توصیه‌های پزشکی..."
+                >{% if record %}{{ record.recommendations|default:'' }}{% endif %}</textarea>
+
+            </div>
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk"></i>
+                {% if record %}
+                    بروزرسانی گزارش
+                {% else %}
+                    ذخیره گزارش
+                {% endif %}
+            </button>
+
+            <button type="reset" class="btn btn-secondary">
+                <i class="fa-solid fa-rotate-left"></i>
+                پاک کردن
+            </button>
+
+        </div>
+
+    </form>
+
+</section>
+
+{% endblock %}

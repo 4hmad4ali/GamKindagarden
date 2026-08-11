@@ -1,0 +1,285 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}سیستم معلم - GAAM{% endblock %}</title>
+
+    <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800&display=swap"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'vendor/fontawesome-free-6.7.2-web/css/all.min.css' %}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/teacher.css' %}"
+    >
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+<aside class="sidebar" id="sidebar">
+
+    <div class="sb-logo">
+        <div class="icon">
+            <i class="fa-solid fa-school"></i>
+        </div>
+
+        <div>
+            <span>GAAM Kindergarten</span><br>
+            <small>سیستم معلم</small>
+        </div>
+    </div>
+
+    <nav class="sb-nav">
+
+        <div class="nav-sec">منوی اصلی</div>
+
+        <a class="nav-item {% block nav_dashboard %}{% endblock %}" href="{% url 'teacher_dashboard' %}">
+            <span class="ico"><i class="fa-solid fa-house"></i></span>
+            داشبورد
+        </a>
+
+        <a class="nav-item {% block nav_students %}{% endblock %}" href="{% url 'teacher_students' %}">
+            <span class="ico"><i class="fa-solid fa-graduation-cap"></i></span>
+            معلومات شاگردان
+        </a>
+
+        <a class="nav-item {% block nav_student_attendance %}{% endblock %}" href="{% url 'teacher_student_attendance' %}">
+            <span class="ico"><i class="fa-solid fa-user-check"></i></span>
+            حضوری شاگردان
+        </a>
+
+        <a class="nav-item {% block nav_health %}{% endblock %}" href="{% url 'teacher_health' %}">
+            <span class="ico"><i class="fa-solid fa-heart-pulse"></i></span>
+            گزارش صحی شاگرد
+        </a>
+
+        <a class="nav-item {% block nav_teacher_attendance %}{% endblock %}" href="{% url 'teacher_attendance' %}">
+            <span class="ico"><i class="fa-solid fa-clipboard-user"></i></span>
+            حضوری معلم
+        </a>
+
+        <a class="nav-item {% block nav_plans %}{% endblock %}" href="{% url 'teacher_plans' %}">
+            <span class="ico"><i class="fa-solid fa-book-open"></i></span>
+            پلان بوک
+        </a>
+
+        <a class="nav-item {% block nav_timetable %}{% endblock %}" href="{% url 'teacher_timetable' %}">
+            <span class="ico"><i class="fa-solid fa-calendar-days"></i></span>
+            جدول وقت
+        </a>
+
+        <div class="nav-sec">حساب</div>
+
+        <a class="nav-item {% block nav_profile %}{% endblock %}" href="{% url 'teacher_profile' %}">
+            <span class="ico"><i class="fa-solid fa-user"></i></span>
+            پروفایل
+        </a>
+
+        <a class="nav-item" href="/logout/">
+            <span class="ico"><i class="fa-solid fa-right-from-bracket"></i></span>
+            خروج
+        </a>
+
+    </nav>
+
+    <div class="sb-footer">
+        <div class="user-mini">
+
+            <div class="ua">
+                {% if profile_picture %}
+                    <img src="{{ profile_picture }}" alt="{{ username }}">
+                {% else %}
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                {% endif %}
+            </div>
+
+            <div>
+                <span class="user-mini-name">{{ username }}</span><br>
+                <small>معلم</small>
+            </div>
+
+        </div>
+    </div>
+
+</aside>
+
+
+<div class="main" id="main">
+
+    <header class="topbar">
+
+        <button
+            type="button"
+            class="tb-btn"
+            onclick="toggleSidebar()"
+            aria-label="باز و بسته کردن منو"
+        >
+            <i class="fa-solid fa-bars"></i>
+        </button>
+
+        <div class="tb-title">
+            {% block page_title %}سیستم معلم{% endblock %}
+        </div>
+
+        <div class="clock" id="clock">
+            <i class="fa-regular fa-clock"></i>
+            <span>...</span>
+        </div>
+
+        <button
+            type="button"
+            class="tb-btn"
+            onclick="toggleDark()"
+            id="dark-btn"
+            aria-label="حالت تاریک"
+        >
+            <i class="fa-solid fa-moon"></i>
+        </button>
+
+        <a
+            class="tb-btn chat-btn"
+            href="{% url 'chat_dashboard' %}"
+            title="پیام‌ها"
+            aria-label="پیام‌ها"
+        >
+            <i class="fa-regular fa-message"></i>
+            <span class="chat-badge" id="teacher-chat-count"></span>
+        </a>
+
+        <a
+            class="tb-btn"
+            href="{% url 'teacher_profile' %}"
+            aria-label="پروفایل"
+        >
+            <i class="fa-solid fa-user"></i>
+        </a>
+
+    </header>
+
+
+    {% if messages %}
+    <div class="message-wrap">
+        {% for m in messages %}
+            <div class="{% if 'خطا' in m.message or '❌' in m.message %}msg-err{% else %}msg-ok{% endif %}">
+                {{ m }}
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+
+    <main class="page-content">
+        {% block content %}{% endblock %}
+    </main>
+
+</div>
+
+
+<script>
+function updateClock() {
+    const now = new Date();
+    const af = new Date(now.getTime() + (4.5 * 60 - now.getTimezoneOffset()) * 60000);
+
+    const h = String(af.getUTCHours()).padStart(2, '0');
+    const m = String(af.getUTCMinutes()).padStart(2, '0');
+    const s = String(af.getUTCSeconds()).padStart(2, '0');
+
+    const clock = document.getElementById('clock');
+
+    if (clock) {
+        clock.innerHTML =
+            '<i class="fa-regular fa-clock"></i><span>' +
+            h + ':' + m + ':' + s +
+            '</span>';
+    }
+}
+
+setInterval(updateClock, 1000);
+updateClock();
+
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const main = document.getElementById('main');
+
+    if (window.innerWidth <= 900) {
+        sidebar.classList.toggle('mobile-open');
+        return;
+    }
+
+    sidebar.classList.toggle('closed');
+    main.classList.toggle('expanded');
+}
+
+
+function toggleDark() {
+    const root = document.documentElement;
+    const isDark = root.getAttribute('data-dark') === 'true';
+
+    root.setAttribute('data-dark', String(!isDark));
+    localStorage.setItem('teacher-dark-mode', String(!isDark));
+
+    updateDarkIcon();
+}
+
+
+function updateDarkIcon() {
+    const button = document.getElementById('dark-btn');
+    if (!button) return;
+
+    const isDark = document.documentElement.getAttribute('data-dark') === 'true';
+
+    button.innerHTML = isDark
+        ? '<i class="fa-solid fa-sun"></i>'
+        : '<i class="fa-solid fa-moon"></i>';
+}
+
+
+(function initialiseTheme() {
+    const saved = localStorage.getItem('teacher-dark-mode');
+
+    if (saved === 'true') {
+        document.documentElement.setAttribute('data-dark', 'true');
+    }
+
+    updateDarkIcon();
+})();
+
+
+function updateChatBadge() {
+    const badge = document.getElementById('teacher-chat-count');
+    if (!badge) return;
+
+    fetch('{% url "chat_unread" %}', {
+        headers: {'X-Requested-With': 'XMLHttpRequest'}
+    })
+    .then(response => response.ok ? response.json() : null)
+    .then(data => {
+        if (!data) return;
+        const total = Object.values(data.counts)
+            .reduce((sum, count) => sum + Number(count), 0);
+        badge.textContent = total > 99 ? '99+' : total;
+        badge.style.display = total ? 'flex' : 'none';
+    })
+    .catch(() => {});
+}
+
+updateChatBadge();
+setInterval(updateChatBadge, 30000);
+</script>
+
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

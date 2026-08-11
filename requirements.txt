@@ -1,5 +1,5 @@
 Django==4.2.0
-mysqlclient==2.2.0
+PyMySQL==1.1.1
 Pillow==10.0.0
 python-dotenv==1.0.0
 Markdown==3.4.1

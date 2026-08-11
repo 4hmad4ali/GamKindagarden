@@ -1,0 +1,124 @@
+{% extends 'teacher/base.html' %}
+
+{% block title %}ثبت حضوری شاگرد - GAAM{% endblock %}
+{% block page_title %}ثبت حضوری شاگرد{% endblock %}
+{% block nav_student_attendance %}active{% endblock %}
+
+{% block content %}
+
+<div class="section-header">
+    <div class="section-heading">
+        <div class="section-icon">
+            <i class="fa-solid fa-calendar-check"></i>
+        </div>
+
+        <div>
+            <h1>ثبت حضوری شاگرد</h1>
+            <p>وضعیت حضور شاگرد را ثبت کنید</p>
+        </div>
+    </div>
+
+    <a class="back-btn" href="{% url 'teacher_student_attendance' %}">
+        <i class="fa-solid fa-arrow-right"></i>
+        بازگشت
+    </a>
+</div>
+
+
+<section class="card form-card">
+
+    <form method="POST" action="/core/teacher/student-presence/add/">
+        {% csrf_token %}
+
+        <div class="fg2">
+
+            <div class="fg">
+                <label class="fl">انتخاب شاگرد *</label>
+
+                <select
+                    class="fs"
+                    name="student_id"
+                    required
+                    onchange="autoFillName(this, 'sp-name')"
+                >
+                    <option value="">-- شاگرد انتخاب کنید --</option>
+
+                    {% for s in all_students %}
+                        <option
+                            value="{{ s.id }}"
+                            data-name="{{ s.first_name }} {{ s.last_name }}"
+                        >
+                            {{ s.first_name }} {{ s.last_name }}
+                            {% if s.class_field %}
+                                — {{ s.class_field }}
+                            {% endif %}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <input type="hidden" name="name" id="sp-name">
+            </div>
+
+
+            <div class="fg">
+                <label class="fl">تاریخ *</label>
+
+                <input
+                    class="fi"
+                    name="date"
+                    type="date"
+                    required
+                    value="{{ today }}"
+                >
+            </div>
+
+
+            <div class="fg">
+                <label class="fl">وضعیت</label>
+
+                <select class="fs" name="status">
+                    <option value="present">حاضر</option>
+                    <option value="absent">غایب</option>
+                    <option value="leave">مرخصی</option>
+                </select>
+            </div>
+
+
+            <div class="fg fg-full">
+                <label class="fl">یادداشت</label>
+
+                <textarea
+                    class="ft"
+                    name="note"
+                    placeholder="یادداشت..."
+                ></textarea>
+            </div>
+
+        </div>
+
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit">
+                <i class="fa-solid fa-floppy-disk"></i>
+                ذخیره
+            </button>
+        </div>
+
+    </form>
+
+</section>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function autoFillName(select, targetId) {
+    const option = select.options[select.selectedIndex];
+    const name = option ? (option.getAttribute('data-name') || '') : '';
+    const input = document.getElementById(targetId);
+
+    if (input) {
+        input.value = name;
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,101 @@
+{% extends 'teacher/base.html' %}
+
+{% block title %}افزودن شاگرد - GAAM{% endblock %}
+{% block page_title %}افزودن شاگرد{% endblock %}
+{% block nav_students %}active{% endblock %}
+
+{% block content %}
+
+<div class="section-header">
+    <div class="section-heading">
+        <div class="section-icon">
+            <i class="fa-solid fa-user-plus"></i>
+        </div>
+
+        <div>
+            <h1>افزودن شاگرد</h1>
+            <p>معلومات شاگرد جدید را ثبت کنید</p>
+        </div>
+    </div>
+
+    <a class="back-btn" href="{% url 'teacher_students' %}">
+        <i class="fa-solid fa-arrow-right"></i>
+        بازگشت
+    </a>
+</div>
+
+
+<section class="card form-card">
+
+    <form method="POST" action="/core/teacher/students/add/">
+        {% csrf_token %}
+
+        <div class="fg2">
+
+            <div class="fg">
+                <label class="fl">نام *</label>
+                <input class="fi" name="fname" required placeholder="نام...">
+            </div>
+
+            <div class="fg">
+                <label class="fl">تخلص</label>
+                <input class="fi" name="lname" required placeholder="تخلص...">
+            </div>
+
+            <div class="fg">
+                <label class="fl">نام پدر</label>
+                <input class="fi" name="father" required placeholder="نام پدر...">
+            </div>
+
+            <div class="fg">
+                <label class="fl">شماره تلفون</label>
+                <input class="fi" name="phone" required placeholder="شماره...">
+            </div>
+
+            <div class="fg">
+                <label class="fl">ایمیل</label>
+                <input class="fi" name="email" type="email" required placeholder="ایمیل...">
+            </div>
+
+            <div class="fg">
+                <label class="fl">کلاس</label>
+
+                <select class="fs" name="cls" required>
+                    <option value="">انتخاب...</option>
+
+                    {% for c in all_classes %}
+                        <option value="{{ c.class_name }}">
+                            {{ c.class_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="fg fg-full">
+                <label class="fl">آدرس</label>
+                <input class="fi" name="address" required placeholder="آدرس...">
+            </div>
+
+            <div class="fg">
+                <label class="fl">وضعیت</label>
+
+                <select class="fs" name="status">
+                    <option value="active">فعال</option>
+                    <option value="inactive">غیرفعال</option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit">
+                <i class="fa-solid fa-floppy-disk"></i>
+                ذخیره
+            </button>
+        </div>
+
+    </form>
+
+</section>
+
+{% endblock %}

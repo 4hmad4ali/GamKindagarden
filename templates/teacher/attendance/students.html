@@ -1,0 +1,148 @@
+{% extends 'teacher/base.html' %}
+
+{% block title %}حضوری شاگردان - GAAM{% endblock %}
+{% block page_title %}حضوری شاگردان{% endblock %}
+{% block nav_student_attendance %}active{% endblock %}
+
+{% block content %}
+
+<div class="section-header">
+
+    <div class="section-heading">
+        <div class="section-icon">
+            <i class="fa-solid fa-user-check"></i>
+        </div>
+
+        <div>
+            <h1>حضوری شاگردان</h1>
+            <p>ثبت و بررسی حضور، غیابت و مرخصی شاگردان</p>
+        </div>
+    </div>
+
+    <a class="btn btn-primary" href="{% url 'teacher_student_attendance_add' %}">
+        <i class="fa-solid fa-plus"></i>
+        ثبت حضوری
+    </a>
+
+</div>
+
+
+<div class="stats">
+
+    <article class="sc">
+        <div class="si stat-success">
+            <i class="fa-solid fa-user-check"></i>
+        </div>
+        <div>
+            <div class="sv">{{ sp_present }}</div>
+            <div class="sl">حاضر</div>
+        </div>
+    </article>
+
+    <article class="sc">
+        <div class="si stat-danger">
+            <i class="fa-solid fa-user-xmark"></i>
+        </div>
+        <div>
+            <div class="sv">{{ sp_absent }}</div>
+            <div class="sl">غایب</div>
+        </div>
+    </article>
+
+    <article class="sc">
+        <div class="si stat-warning">
+            <i class="fa-solid fa-calendar-minus"></i>
+        </div>
+        <div>
+            <div class="sv">{{ sp_leave }}</div>
+            <div class="sl">مرخصی</div>
+        </div>
+    </article>
+
+</div>
+
+
+<section class="card card-table">
+
+    <div class="tw">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>نام شاگرد</th>
+                    <th>تاریخ</th>
+                    <th>وضعیت</th>
+                    <th>یادداشت</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for r in student_presence %}
+
+                <tr>
+
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ r.student_name }}</td>
+                    <td>{{ r.date }}</td>
+
+                    <td>
+                        <span class="badge {% if r.status == 'present' %}bs{% elif r.status == 'absent' %}bd{% else %}bw{% endif %}">
+                            {% if r.status == 'present' %}
+                                <i class="fa-solid fa-check"></i>
+                                حاضر
+                            {% elif r.status == 'absent' %}
+                                <i class="fa-solid fa-xmark"></i>
+                                غایب
+                            {% else %}
+                                <i class="fa-solid fa-calendar-minus"></i>
+                                مرخصی
+                            {% endif %}
+                        </span>
+                    </td>
+
+                    <td>{{ r.note|default:"—" }}</td>
+
+                    <td>
+                        <form
+                            method="POST"
+                            action="/core/teacher/student-presence/{{ r.id }}/delete/"
+                            onsubmit="return confirm('حذف شود؟')"
+                        >
+                            {% csrf_token %}
+
+                            <button class="icon-btn delete" type="submit">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="6">
+                        <div class="empty">
+                            <div class="ei">
+                                <i class="fa-regular fa-calendar-xmark"></i>
+                            </div>
+                            <strong>هنوز حضوری ثبت نشده</strong>
+                        </div>
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+{% endblock %}

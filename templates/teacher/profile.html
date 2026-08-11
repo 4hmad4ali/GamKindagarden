@@ -1,0 +1,225 @@
+{% extends 'teacher/base.html' %}
+
+{% block title %}پروفایل من - GAAM{% endblock %}
+{% block page_title %}پروفایل من{% endblock %}
+{% block nav_profile %}active{% endblock %}
+
+{% block content %}
+
+<div class="section-header">
+
+    <div class="section-heading">
+        <div class="section-icon">
+            <i class="fa-solid fa-user"></i>
+        </div>
+
+        <div>
+            <h1>پروفایل من</h1>
+            <p>معلومات شخصی و تنظیمات امنیتی حساب</p>
+        </div>
+    </div>
+
+</div>
+
+
+<section class="profile-hero">
+
+    <div class="avw">
+
+        {% if profile_picture %}
+            <img src="{{ profile_picture }}" id="pav" alt="{{ username }}">
+        {% else %}
+            <div class="av-ph" id="pav">
+                <i class="fa-solid fa-chalkboard-user"></i>
+            </div>
+        {% endif %}
+
+        <label class="av-edit" for="pic-inp">
+            <i class="fa-solid fa-camera"></i>
+        </label>
+
+        <form
+            method="POST"
+            action="/core/teacher/profile/picture/"
+            id="pic-form"
+            enctype="multipart/form-data"
+        >
+            {% csrf_token %}
+
+            <input
+                type="file"
+                id="pic-inp"
+                name="profile_picture"
+                accept="image/*"
+                hidden
+                onchange="document.getElementById('pic-form').submit()"
+            >
+        </form>
+
+    </div>
+
+    <h2>{{ username }}</h2>
+    <p>معلم | GAAM Kindergarten</p>
+
+</section>
+
+
+<div class="profile-grid">
+
+    <section class="card">
+
+        <div class="card-header">
+            <div>
+                <h2>
+                    <i class="fa-solid fa-address-card"></i>
+                    معلومات شخصی
+                </h2>
+                <p>اطلاعات حساب و تماس خود را به‌روزرسانی کنید</p>
+            </div>
+        </div>
+
+        <form method="POST" action="/core/teacher/profile/update/">
+            {% csrf_token %}
+
+            <input type="hidden" name="form_type" value="info">
+
+            <div class="fg2">
+
+                <div class="fg">
+                    <label class="fl">نام</label>
+                    <input class="fi" name="first_name" value="{{ request.user.first_name }}">
+                </div>
+
+                <div class="fg">
+                    <label class="fl">تخلص</label>
+                    <input class="fi" name="last_name" value="{{ request.user.last_name }}">
+                </div>
+
+                <div class="fg">
+                    <label class="fl">ایمیل</label>
+                    <input class="fi" name="email" type="email" value="{{ request.user.email }}">
+                </div>
+
+                <div class="fg">
+                    <label class="fl">شماره تلفون</label>
+                    <input class="fi" name="phone" value="{{ profile_phone }}">
+                </div>
+
+                <div class="fg">
+                    <label class="fl">بخش</label>
+                    <input class="fi" name="department" value="{{ profile_department }}">
+                </div>
+
+                <div class="fg fg-full">
+                    <label class="fl">معرفی</label>
+                    <textarea class="ft" name="bio">{{ profile_bio }}</textarea>
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+                <button class="btn btn-success" type="submit">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    ذخیره معلومات
+                </button>
+            </div>
+
+        </form>
+
+    </section>
+
+
+    <section class="card">
+
+        <div class="card-header">
+            <div>
+                <h2>
+                    <i class="fa-solid fa-shield-halved"></i>
+                    امنیت حساب
+                </h2>
+
+                <p>پسورد حساب خود را تغییر دهید</p>
+            </div>
+        </div>
+
+        <form method="POST" action="/core/teacher/profile/update/">
+            {% csrf_token %}
+
+            <input type="hidden" name="form_type" value="password">
+
+            <div class="fg">
+                <label class="fl">پسورد فعلی</label>
+                <input class="fi" name="current_password" type="password">
+            </div>
+
+            <div class="fg">
+                <label class="fl">پسورد جدید</label>
+
+                <input
+                    class="fi"
+                    name="new_password"
+                    type="password"
+                    oninput="checkStrength(this.value)"
+                >
+
+                <div class="sb-bar">
+                    <div class="sb-fill" id="str-fill"></div>
+                </div>
+
+                <small id="str-txt" class="strength-text"></small>
+            </div>
+
+            <div class="fg">
+                <label class="fl">تأیید پسورد جدید</label>
+                <input class="fi" name="confirm_password" type="password">
+            </div>
+
+            <div class="form-actions">
+                <button class="btn btn-primary" type="submit">
+                    <i class="fa-solid fa-lock"></i>
+                    تغییر پسورد
+                </button>
+            </div>
+
+        </form>
+
+    </section>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+function checkStrength(value) {
+    const fill = document.getElementById('str-fill');
+    const text = document.getElementById('str-txt');
+
+    let score = 0;
+
+    if (value.length >= 8) score++;
+    if (/[A-Z]/.test(value)) score++;
+    if (/[0-9]/.test(value)) score++;
+    if (/[^a-zA-Z0-9]/.test(value)) score++;
+
+    const colours = [
+        '#ef4444',
+        '#f59e0b',
+        '#10b981',
+        '#059669'
+    ];
+
+    const labels = [
+        'ضعیف',
+        'متوسط',
+        'خوب',
+        'عالی'
+    ];
+
+    fill.style.width = (score * 25) + '%';
+    fill.style.background = colours[score - 1] || '#e5e7eb';
+    text.textContent = value ? (labels[score - 1] || '') : '';
+}
+</script>
+{% endblock %}

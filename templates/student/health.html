@@ -1,0 +1,131 @@
+{% extends 'student/base.html' %}
+
+{% block title %}گزارش صحی من - GAAM{% endblock %}
+{% block page_title %}گزارش صحی من{% endblock %}
+{% block nav_health %}active{% endblock %}
+
+{% block content %}
+
+<div class="section-header">
+
+    <div class="section-heading">
+
+        <div class="section-icon">
+            <i class="fa-solid fa-heart-pulse"></i>
+        </div>
+
+        <div>
+            <h1>گزارش صحی من</h1>
+            <p>سوابق وضعیت صحی ثبت‌شده شما</p>
+        </div>
+
+    </div>
+
+</div>
+
+
+<section class="card card-table">
+
+    <div class="card-header table-heading">
+        <div>
+            <h2>
+                <i class="fa-solid fa-notes-medical"></i>
+                تاریخچه صحی
+            </h2>
+
+            <p>قد، وزن، وضعیت و تشخیص‌های ثبت‌شده</p>
+        </div>
+    </div>
+
+
+    <div class="table-wrap">
+
+        <table class="wide-table">
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>تاریخ</th>
+                    <th>قد (cm)</th>
+                    <th>وزن (kg)</th>
+                    <th>وضعیت صحی</th>
+                    <th>تشخیص</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for r in my_health %}
+
+                <tr>
+
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ r.date }}</td>
+                    <td>{{ r.height|default:"—" }}</td>
+                    <td>{{ r.weight|default:"—" }}</td>
+
+                    <td>
+
+                        {% if r.health_status == 'excellent' %}
+
+                            <span class="badge bs">
+                                <i class="fa-solid fa-heart-circle-check"></i>
+                                عالی
+                            </span>
+
+                        {% elif r.health_status == 'good' %}
+
+                            <span class="badge bb">
+                                <i class="fa-solid fa-heart"></i>
+                                خوب
+                            </span>
+
+                        {% elif r.health_status == 'normal' %}
+
+                            <span class="badge bw">
+                                <i class="fa-solid fa-circle-minus"></i>
+                                معمولی
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bd">
+                                <i class="fa-solid fa-heart-circle-exclamation"></i>
+                                نیاز به مراقبت
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td class="muted-cell">
+                        {{ r.diagnosis|default:"—"|truncatechars:40 }}
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="6">
+                        <div class="empty">
+                            <div class="empty-icon">
+                                <i class="fa-solid fa-notes-medical"></i>
+                            </div>
+
+                            <strong>هنوز گزارش صحی ثبت نشده</strong>
+                        </div>
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+{% endblock %}

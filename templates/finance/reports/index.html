@@ -1,0 +1,152 @@
+{% extends 'finance/base.html' %}
+
+{% block title %}گزارش مالی - GAAM{% endblock %}
+{% block page_title %}گزارش مالی{% endblock %}
+{% block nav_reports %}active{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div class="page-heading">
+
+        <span class="page-icon">
+            <i class="fa-solid fa-chart-column"></i>
+        </span>
+
+        <div>
+            <h2>گزارش مالی</h2>
+            <p>گزارش کامل درآمد و هزینه</p>
+        </div>
+
+    </div>
+
+</div>
+
+<section class="panel-card report-filter-card">
+    <form method="get" class="report-filter-form">
+        <div>
+            <span class="report-filter-kicker">گزارش انتخاب‌شده</span>
+            <h3>{{ report_month_name }} {{ selected_year }}</h3>
+            <p>تراکنش‌های تکمیل‌شده برای محاسبه درآمد و هزینه استفاده می‌شوند.</p>
+        </div>
+        <label>ماه
+            <select name="month">
+                {% for month_number, month_name in report_months %}
+                    <option value="{{ month_number }}" {% if month_number == selected_month %}selected{% endif %}>{{ month_name }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>سال
+            <select name="year">
+                {% for year in report_years %}
+                    <option value="{{ year }}" {% if year == selected_year %}selected{% endif %}>{{ year }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <button class="btn btn-secondary" type="submit"><i class="fa-solid fa-filter"></i> نمایش گزارش</button>
+        <a class="btn btn-primary" href="{% url 'finance_report_pdf' %}?month={{ selected_month }}&year={{ selected_year }}"><i class="fa-solid fa-file-pdf"></i> دانلود PDF</a>
+    </form>
+</section>
+
+
+<section class="stats-grid">
+
+    <article class="stat-card">
+        <span class="stat-icon stat-green">
+            <i class="fa-solid fa-arrow-trend-up"></i>
+        </span>
+        <div>
+            <strong>{{ total_income|default:0 }}</strong>
+            <span>مجموع درآمد ؋</span>
+        </div>
+    </article>
+
+    <article class="stat-card">
+        <span class="stat-icon stat-red">
+            <i class="fa-solid fa-arrow-trend-down"></i>
+        </span>
+        <div>
+            <strong>{{ total_expense|default:0 }}</strong>
+            <span>مجموع هزینه ؋</span>
+        </div>
+    </article>
+
+    <article class="stat-card">
+        <span class="stat-icon stat-blue">
+            <i class="fa-solid fa-scale-balanced"></i>
+        </span>
+        <div>
+            <strong>{{ net_balance|default:0 }}</strong>
+            <span>سود خالص ؋</span>
+        </div>
+    </article>
+
+    <article class="stat-card">
+        <span class="stat-icon stat-orange">
+            <i class="fa-solid fa-list-ol"></i>
+        </span>
+        <div>
+            <strong>{{ total_transactions|default:0 }}</strong>
+            <span>تعداد تراکنش</span>
+        </div>
+    </article>
+
+</section>
+
+
+<section class="panel-card report-list">
+
+    <div class="panel-header">
+        <div>
+            <h3>
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                جزئیات تمام تراکنش‌ها
+            </h3>
+            <p>مرور سریع جریان درآمد و هزینه</p>
+        </div>
+    </div>
+
+
+    {% for t in all_transactions %}
+
+    <div class="report-row">
+
+        <div class="report-main">
+
+            <span class="report-icon {% if t.transaction_type == 'income' %}income{% else %}expense{% endif %}">
+                <i class="fa-solid {% if t.transaction_type == 'income' %}fa-arrow-trend-up{% else %}fa-arrow-trend-down{% endif %}"></i>
+            </span>
+
+            <div>
+                <strong>{{ t.category }}</strong>
+
+                <span>
+                    {{ t.description|truncatechars:40 }}
+                    •
+                    {{ t.transaction_date }}
+                </span>
+            </div>
+
+        </div>
+
+
+        <div class="report-amount {% if t.transaction_type == 'income' %}income{% else %}expense{% endif %}">
+            {% if t.transaction_type == 'income' %}+{% else %}-{% endif %}
+            {{ t.amount }} ؋
+        </div>
+
+    </div>
+
+    {% empty %}
+
+    <div class="empty-state">
+        <i class="fa-solid fa-chart-column"></i>
+        <strong>گزارشی موجود نیست</strong>
+    </div>
+
+    {% endfor %}
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,229 @@
+{% extends 'finance/base.html' %}
+
+{% block title %}پروفایل مالی - GAAM{% endblock %}
+{% block page_title %}پروفایل من{% endblock %}
+{% block nav_profile %}active{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div class="page-heading">
+        <span class="page-icon">
+            <i class="fa-solid fa-user-tie"></i>
+        </span>
+
+        <div>
+            <h2>پروفایل من</h2>
+            <p>معلومات حساب و تنظیمات امنیتی</p>
+        </div>
+    </div>
+
+</div>
+
+
+<section class="profile-hero">
+
+    <div class="profile-avatar-wrap">
+
+        {% if profile_picture %}
+            <img
+                src="{{ profile_picture }}"
+                class="profile-avatar"
+                alt="{{ username }}"
+            >
+        {% else %}
+            <div class="profile-avatar-placeholder">
+                <i class="fa-solid fa-user-tie"></i>
+            </div>
+        {% endif %}
+
+
+        <form
+            method="POST"
+            action="{% url 'finance_profile_picture' %}"
+            enctype="multipart/form-data"
+            id="picForm"
+        >
+            {% csrf_token %}
+
+            <input
+                type="file"
+                name="profile_picture"
+                id="picInput"
+                accept="image/*"
+                hidden
+                onchange="document.getElementById('picForm').submit()"
+            >
+
+            <button
+                type="button"
+                class="avatar-edit"
+                onclick="document.getElementById('picInput').click()"
+                title="تغییر عکس"
+            >
+                <i class="fa-solid fa-camera"></i>
+            </button>
+        </form>
+
+    </div>
+
+    <h2>{{ username }}</h2>
+    <p>مسئول مالی | GAAM Kindergarten</p>
+
+</section>
+
+
+<section class="profile-summary">
+
+    <div class="profile-info-item">
+        <span><i class="fa-solid fa-user"></i> نام کاربری</span>
+        <strong>{{ user.username }}</strong>
+    </div>
+
+    <div class="profile-info-item">
+        <span><i class="fa-solid fa-envelope"></i> ایمیل</span>
+        <strong>{{ user.email|default:"—" }}</strong>
+    </div>
+
+    <div class="profile-info-item">
+        <span><i class="fa-solid fa-id-card"></i> نام کامل</span>
+        <strong>{{ user.first_name }} {{ user.last_name }}</strong>
+    </div>
+
+    <div class="profile-info-item">
+        <span><i class="fa-solid fa-user-tag"></i> نقش</span>
+        <strong>مسئول مالی</strong>
+    </div>
+
+    <div class="profile-info-item">
+        <span><i class="fa-regular fa-calendar"></i> تاریخ عضویت</span>
+        <strong>{{ user.date_joined|date:"Y/m/d" }}</strong>
+    </div>
+
+    <div class="profile-info-item">
+        <span><i class="fa-regular fa-clock"></i> آخرین ورود</span>
+        <strong>{{ user.last_login|date:"Y/m/d H:i"|default:"—" }}</strong>
+    </div>
+
+</section>
+
+
+<div class="profile-grid">
+
+    <section class="form-card">
+
+        <div class="form-section-title">
+            <i class="fa-solid fa-user-pen"></i>
+            ویرایش معلومات شخصی
+        </div>
+
+        <form method="POST" action="{% url 'finance_profile_update' %}">
+
+            {% csrf_token %}
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label>نام</label>
+                    <input
+                        type="text"
+                        name="first_name"
+                        value="{{ user.first_name }}"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label>نام خانوادگی</label>
+                    <input
+                        type="text"
+                        name="last_name"
+                        value="{{ user.last_name }}"
+                    >
+                </div>
+
+                <div class="form-group full-width">
+                    <label>ایمیل</label>
+                    <input
+                        type="email"
+                        name="email"
+                        value="{{ user.email }}"
+                    >
+                </div>
+
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    ذخیره تغییرات
+                </button>
+            </div>
+
+        </form>
+
+    </section>
+
+
+    <section class="form-card">
+
+        <div class="form-section-title">
+            <i class="fa-solid fa-shield-halved"></i>
+            تغییر پسورد
+        </div>
+
+        <form method="POST" action="{% url 'finance_profile_update' %}">
+
+            {% csrf_token %}
+
+            <input type="hidden" name="change_password" value="1">
+
+            <div class="form-group">
+                <label>پسورد فعلی</label>
+                <input
+                    type="password"
+                    name="old_password"
+                    placeholder="پسورد فعلی را وارد کنید"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label>پسورد جدید</label>
+                <input
+                    type="password"
+                    name="new_password"
+                    placeholder="حداقل ۸ کاراکتر"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label>تکرار پسورد</label>
+                <input
+                    type="password"
+                    name="confirm_password"
+                    placeholder="پسورد جدید را تکرار کنید"
+                    required
+                >
+            </div>
+
+            <div class="security-note">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                بعد از تغییر پسورد، دوباره وارد سیستم شوید.
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-danger">
+                    <i class="fa-solid fa-lock"></i>
+                    تغییر پسورد
+                </button>
+            </div>
+
+        </form>
+
+    </section>
+
+</div>
+
+{% endblock %}

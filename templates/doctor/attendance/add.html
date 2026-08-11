@@ -1,0 +1,114 @@
+{% extends 'doctor/base.html' %}
+
+{% block title %}ثبت حضور داکتر - GAAM{% endblock %}
+{% block page_title %}ثبت حضور داکتر{% endblock %}
+{% block nav_attendance_add %}active{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div class="page-heading">
+        <span class="page-icon">
+            <i class="fa-solid fa-calendar-plus"></i>
+        </span>
+
+        <div>
+            <h2>ثبت حضور داکتر</h2>
+            <p>وضعیت حضور روزانه خود را ثبت کنید</p>
+        </div>
+    </div>
+
+    <a class="btn btn-secondary" href="{% url 'doctor_attendance' %}">
+        <i class="fa-solid fa-arrow-right"></i>
+        بازگشت
+    </a>
+
+</div>
+
+
+<section class="form-card">
+
+    <form method="POST" action="{% url 'doctor_dashboard' %}">
+
+        {% csrf_token %}
+
+        <input type="hidden" name="action" value="add_presence">
+
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label for="presence_date">
+                    <i class="fa-regular fa-calendar"></i>
+                    تاریخ *
+                </label>
+
+                <input
+                    type="date"
+                    name="date"
+                    id="presence_date"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="presence_status">
+                    <i class="fa-solid fa-chart-simple"></i>
+                    وضعیت *
+                </label>
+
+                <select
+                    name="status"
+                    id="presence_status"
+                    required
+                >
+                    <option value="present">حاضر</option>
+                    <option value="absent">غایب</option>
+                    <option value="late">دیر</option>
+                </select>
+
+            </div>
+
+
+            <div class="form-group full-width">
+
+                <label for="presence_note">
+                    <i class="fa-regular fa-note-sticky"></i>
+                    یادداشت
+                </label>
+
+                <textarea
+                    name="note"
+                    id="presence_note"
+                    placeholder="یادداشت اختیاری..."
+                ></textarea>
+
+            </div>
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk"></i>
+                ثبت حضور
+            </button>
+
+            <a class="btn btn-secondary" href="{% url 'doctor_attendance' %}">
+                <i class="fa-solid fa-xmark"></i>
+                لغو
+            </a>
+
+        </div>
+
+    </form>
+
+</section>
+
+{% endblock %}

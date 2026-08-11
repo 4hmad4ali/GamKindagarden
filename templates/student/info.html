@@ -1,0 +1,215 @@
+{% extends 'student/base.html' %}
+
+{% block title %}معلومات شخصی من - GAAM{% endblock %}
+{% block page_title %}معلومات شخصی من{% endblock %}
+{% block nav_info %}active{% endblock %}
+
+{% block content %}
+
+<div class="section-header">
+
+    <div class="section-heading">
+
+        <div class="section-icon">
+            <i class="fa-solid fa-id-card"></i>
+        </div>
+
+        <div>
+            <h1>معلومات شخصی من</h1>
+            <p>معلومات ثبت‌شده شما در سیستم</p>
+        </div>
+
+    </div>
+
+</div>
+
+
+{% if student %}
+
+<section class="student-overview">
+
+    <div class="student-overview-avatar">
+
+        {% if profile_picture %}
+            <img src="{{ profile_picture }}" alt="{{ student.first_name }}">
+        {% else %}
+            <div class="student-avatar-placeholder">
+                <i class="fa-solid fa-user-graduate"></i>
+            </div>
+        {% endif %}
+
+    </div>
+
+
+    <div class="student-overview-content">
+
+        <div class="student-name-row">
+
+            <div>
+                <h2>
+                    {{ student.first_name }}
+                    {{ student.last_name }}
+                </h2>
+
+                <p>
+                    <i class="fa-solid fa-graduation-cap"></i>
+                    {{ student.class_field|default:"—" }}
+                </p>
+            </div>
+
+
+            <span class="status-pill {% if student.is_active %}status-active{% else %}status-inactive{% endif %}">
+                <span class="status-dot"></span>
+
+                {% if student.is_active %}
+                    فعال
+                {% else %}
+                    غیرفعال
+                {% endif %}
+            </span>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="card">
+
+    <div class="card-header">
+        <div>
+            <h2>
+                <i class="fa-solid fa-address-card"></i>
+                جزئیات شاگرد
+            </h2>
+
+            <p>معلومات هویتی، تماس و ثبت‌نام</p>
+        </div>
+    </div>
+
+
+    <div class="student-info-grid">
+
+        <div class="student-info-item">
+            <div class="student-info-icon">
+                <i class="fa-solid fa-user"></i>
+            </div>
+            <div>
+                <span>نام</span>
+                <strong>{{ student.first_name|default:"—" }}</strong>
+            </div>
+        </div>
+
+
+        <div class="student-info-item">
+            <div class="student-info-icon">
+                <i class="fa-regular fa-user"></i>
+            </div>
+            <div>
+                <span>تخلص</span>
+                <strong>{{ student.last_name|default:"—" }}</strong>
+            </div>
+        </div>
+
+
+        <div class="student-info-item">
+            <div class="student-info-icon">
+                <i class="fa-solid fa-user-tie"></i>
+            </div>
+            <div>
+                <span>نام پدر</span>
+                <strong>{{ student.father_name|default:"—" }}</strong>
+            </div>
+        </div>
+
+
+        <div class="student-info-item">
+            <div class="student-info-icon">
+                <i class="fa-solid fa-id-badge"></i>
+            </div>
+            <div>
+                <span>شماره شاگرد</span>
+                <strong>{{ student.student_id|default:"—" }}</strong>
+            </div>
+        </div>
+
+
+        <div class="student-info-item">
+            <div class="student-info-icon">
+                <i class="fa-solid fa-phone"></i>
+            </div>
+            <div>
+                <span>شماره تلفون</span>
+                <strong dir="ltr">{{ student.phone|default:"—" }}</strong>
+            </div>
+        </div>
+
+
+        <div class="student-info-item">
+            <div class="student-info-icon">
+                <i class="fa-solid fa-envelope"></i>
+            </div>
+            <div>
+                <span>ایمیل</span>
+                <strong dir="ltr">{{ student.email|default:"—" }}</strong>
+            </div>
+        </div>
+
+
+        <div class="student-info-item">
+            <div class="student-info-icon">
+                <i class="fa-solid fa-school"></i>
+            </div>
+            <div>
+                <span>کلاس</span>
+                <strong>{{ student.class_field|default:"—" }}</strong>
+            </div>
+        </div>
+
+
+        <div class="student-info-item">
+            <div class="student-info-icon">
+                <i class="fa-regular fa-calendar"></i>
+            </div>
+            <div>
+                <span>تاریخ ثبت نام</span>
+                <strong>{{ student.enrollment_date|default:"—" }}</strong>
+            </div>
+        </div>
+
+
+        <div class="student-info-item student-info-full">
+            <div class="student-info-icon">
+                <i class="fa-solid fa-location-dot"></i>
+            </div>
+            <div>
+                <span>آدرس</span>
+                <strong>{{ student.address|default:"—" }}</strong>
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+
+{% else %}
+
+<section class="card">
+    <div class="empty">
+        <div class="empty-icon">
+            <i class="fa-solid fa-user-slash"></i>
+        </div>
+
+        <strong>معلومات شاگرد یافت نشد</strong>
+
+        <p>
+            لطفاً برای بررسی حساب با مدیریت تماس بگیرید.
+        </p>
+    </div>
+</section>
+
+{% endif %}
+
+{% endblock %}

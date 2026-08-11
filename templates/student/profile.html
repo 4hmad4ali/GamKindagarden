@@ -1,0 +1,309 @@
+{% extends 'student/base.html' %}
+
+{% block title %}پروفایل من - GAAM{% endblock %}
+{% block page_title %}پروفایل من{% endblock %}
+{% block nav_profile %}active{% endblock %}
+
+{% block content %}
+
+<div class="section-header">
+
+    <div class="section-heading">
+
+        <div class="section-icon">
+            <i class="fa-solid fa-user"></i>
+        </div>
+
+        <div>
+            <h1>پروفایل من</h1>
+            <p>معلومات حساب و تنظیمات امنیتی</p>
+        </div>
+
+    </div>
+
+</div>
+
+
+<section class="profile-hero">
+
+    <div class="profile-avatar">
+
+        {% if profile_picture %}
+
+            <img
+                src="{{ profile_picture }}"
+                id="pav"
+                alt="{{ username }}"
+            >
+
+        {% else %}
+
+            <div class="profile-avatar-placeholder" id="pav">
+                <i class="fa-solid fa-user-graduate"></i>
+            </div>
+
+        {% endif %}
+
+
+        <label class="avatar-edit" for="pic-inp">
+            <i class="fa-solid fa-camera"></i>
+        </label>
+
+
+        <form
+            method="POST"
+            action="/core/student/profile/picture/"
+            id="pic-form"
+            enctype="multipart/form-data"
+        >
+            {% csrf_token %}
+
+            <input
+                type="file"
+                id="pic-inp"
+                name="profile_picture"
+                accept="image/*"
+                hidden
+                onchange="document.getElementById('pic-form').submit()"
+            >
+        </form>
+
+    </div>
+
+
+    <h2>{{ username }}</h2>
+
+    <p>شاگرد | GAAM Kindergarten</p>
+
+    {% if student %}
+        <small>
+            <i class="fa-solid fa-graduation-cap"></i>
+            کلاس: {{ student.class_field }}
+        </small>
+    {% endif %}
+
+</section>
+
+
+<div class="profile-grid">
+
+    <section class="card">
+
+        <div class="card-header">
+            <div>
+                <h2>
+                    <i class="fa-solid fa-address-card"></i>
+                    معلومات شخصی
+                </h2>
+
+                <p>معلومات تماس خود را به‌روزرسانی کنید</p>
+            </div>
+        </div>
+
+
+        <form method="POST" action="/core/student/profile/update/">
+            {% csrf_token %}
+
+            <input
+                type="hidden"
+                name="form_type"
+                value="info"
+            >
+
+
+            <div class="form-grid">
+
+                <div class="form-group">
+                    <label>نام</label>
+
+                    <input
+                        name="first_name"
+                        value="{{ request.user.first_name }}"
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <label>تخلص</label>
+
+                    <input
+                        name="last_name"
+                        value="{{ request.user.last_name }}"
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <label>ایمیل</label>
+
+                    <input
+                        name="email"
+                        type="email"
+                        value="{{ request.user.email }}"
+                    >
+                </div>
+
+
+                <div class="form-group">
+                    <label>شماره تلفون</label>
+
+                    <input
+                        name="phone"
+                        value="{{ profile_phone }}"
+                    >
+                </div>
+
+            </div>
+
+
+            <div class="form-actions">
+
+                <button class="btn btn-success" type="submit">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    ذخیره معلومات
+                </button>
+
+            </div>
+
+        </form>
+
+    </section>
+
+
+    <section class="card">
+
+        <div class="card-header">
+            <div>
+                <h2>
+                    <i class="fa-solid fa-shield-halved"></i>
+                    امنیت حساب
+                </h2>
+
+                <p>پسورد حساب خود را مدیریت کنید</p>
+            </div>
+        </div>
+
+
+        <form method="POST" action="/core/student/profile/update/">
+            {% csrf_token %}
+
+            <input
+                type="hidden"
+                name="form_type"
+                value="password"
+            >
+
+
+            <div class="form-group">
+                <label>پسورد فعلی</label>
+                <input name="current_password" type="password">
+            </div>
+
+
+            <div class="form-group">
+                <label>پسورد جدید</label>
+
+                <input
+                    name="new_password"
+                    type="password"
+                    oninput="checkStrength(this.value)"
+                >
+
+                <div class="progress-bar password-bar">
+                    <div
+                        class="progress-fill"
+                        id="str-fill"
+                    ></div>
+                </div>
+
+                <small
+                    class="strength-text"
+                    id="str-txt"
+                ></small>
+            </div>
+
+
+            <div class="form-group">
+                <label>تأیید پسورد جدید</label>
+                <input name="confirm_password" type="password">
+            </div>
+
+
+            <div class="form-actions">
+
+                <button class="btn btn-primary" type="submit">
+                    <i class="fa-solid fa-lock"></i>
+                    تغییر پسورد
+                </button>
+
+            </div>
+
+        </form>
+
+
+        <div class="security-summary">
+
+            <div>
+                <span>وضعیت حساب</span>
+
+                <strong class="security-ok">
+                    <i class="fa-solid fa-circle-check"></i>
+                    فعال
+                </strong>
+            </div>
+
+
+            <div>
+                <span>نوع کاربر</span>
+
+                <strong>
+                    <i class="fa-solid fa-user-graduate"></i>
+                    شاگرد
+                </strong>
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+function checkStrength(value) {
+    const fill = document.getElementById('str-fill');
+    const text = document.getElementById('str-txt');
+
+    let score = 0;
+
+    if (value.length >= 8) score++;
+    if (/[A-Z]/.test(value)) score++;
+    if (/[0-9]/.test(value)) score++;
+    if (/[^a-zA-Z0-9]/.test(value)) score++;
+
+    const colours = [
+        '#ef4444',
+        '#f59e0b',
+        '#10b981',
+        '#059669'
+    ];
+
+    const labels = [
+        'ضعیف',
+        'متوسط',
+        'خوب',
+        'عالی'
+    ];
+
+    fill.style.width = (score * 25) + '%';
+    fill.style.background =
+        colours[score - 1] || '#e5e7eb';
+
+    text.textContent =
+        value ? (labels[score - 1] || '') : '';
+}
+</script>
+{% endblock %}

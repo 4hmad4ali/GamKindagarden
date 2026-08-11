@@ -13,6 +13,13 @@ urlpatterns = [
     # ════════════════════════════════════════════════════════════
     
     path('admin/', views.admin_dashboard, name='admin_dashboard'),
+    path('admin/accounts/', views.privileged_accounts, name='privileged_accounts'),
+    path('admin/accounts/<int:pk>/edit/', views.privileged_account_edit, name='privileged_account_edit'),
+    path('admin/accounts/<int:pk>/delete/', views.privileged_account_delete, name='privileged_account_delete'),
+    path('admin/student-payments/', views.admin_student_payments, name='admin_student_payments'),
+    path('admin/student-payments/add/', views.admin_student_payment_add, name='admin_student_payment_add'),
+    path('admin/student-payments/<int:pk>/mark/', views.admin_student_payment_mark, name='admin_student_payment_mark'),
+    path('admin/student-payments/<int:pk>/delete/', views.admin_student_payment_delete, name='admin_student_payment_delete'),
     
     # ════════════════════════════════════════════════════════════
     # Attendance - حضوری
@@ -73,6 +80,7 @@ urlpatterns = [
     # ════════════════════════════════════════════════════════════
     
     path('admin/reports/', views.reports, name='reports'),
+    path('admin/reports/pdf/', views.admin_report_pdf, name='admin_report_pdf'),
     
     # ════════════════════════════════════════════════════════════
     # Classes - کلاس‌ها
@@ -96,6 +104,7 @@ urlpatterns = [
     # Teacher Dashboard  ✅ NEW
     # ════════════════════════════════════════════════════════════
     path('teacher/', views.teacher_dashboard, name='teacher_dashboard'),
+    path('teacher/students/', views.teacher_students, name='teacher_students'),
 
     # Students (teacher)
     path('teacher/students/add/', views.teacher_student_add, name='teacher_student_add'),
@@ -103,18 +112,22 @@ urlpatterns = [
     path('teacher/students/<int:pk>/delete/', views.teacher_student_delete, name='teacher_student_delete'),
 
     # Student Presence
-    path('teacher/student-presence/add/', views.teacher_student_presence_add, name='teacher_student_presence_add'),
+    path('teacher/student-attendance/', views.teacher_student_attendance, name='teacher_student_attendance'),
+    path('teacher/student-presence/add/', views.teacher_student_presence_add, name='teacher_student_attendance_add'),
     path('teacher/student-presence/<int:pk>/delete/', views.teacher_student_presence_delete, name='teacher_student_presence_delete'),
 
     # Student Health
+    path('teacher/health/', views.teacher_health, name='teacher_health'),
     path('teacher/health/add/', views.teacher_health_add, name='teacher_health_add'),
     path('teacher/health/<int:pk>/delete/', views.teacher_health_delete, name='teacher_health_delete'),
 
     # Teacher Presence
-    path('teacher/presence/add/', views.teacher_presence_add, name='teacher_presence_add'),
+    path('teacher/attendance/', views.teacher_attendance, name='teacher_attendance'),
+    path('teacher/presence/add/', views.teacher_presence_add, name='teacher_attendance_add'),
     path('teacher/presence/<int:pk>/delete/', views.teacher_presence_delete, name='teacher_presence_delete'),
 
     # Plans
+    path('teacher/plans/', views.teacher_plans, name='teacher_plans'),
     path('teacher/plan/add/', views.teacher_plan_add, name='teacher_plan_add'),
     path('teacher/plan/<int:pk>/edit/', views.teacher_plan_edit, name='teacher_plan_edit'),
     path('teacher/plan/<int:pk>/delete/', views.teacher_plan_delete, name='teacher_plan_delete'),
@@ -126,10 +139,12 @@ urlpatterns = [
     path('teacher/timetable/<int:pk>/edit/', views.teacher_timetable_edit, name='teacher_timetable_edit'),
 
     # Timetable
+    path('teacher/timetable/', views.teacher_timetable, name='teacher_timetable'),
     path('teacher/timetable/add/', views.teacher_timetable_add, name='teacher_timetable_add'),
     path('teacher/timetable/<int:pk>/delete/', views.teacher_timetable_delete, name='teacher_timetable_delete'),
 
     # Teacher Profile
+    path('teacher/profile/', views.teacher_profile, name='teacher_profile'),
     path('teacher/profile/update/', views.teacher_profile_update, name='teacher_profile_update'),
     path('teacher/profile/picture/', views.teacher_profile_picture, name='teacher_profile_picture'),
 
@@ -139,6 +154,12 @@ urlpatterns = [
     # ════════════════════════════════════════════════════════════
     
     path('student/', views.student_dashboard, name='student_dashboard'),
+    path('student/info/', views.student_info, name='student_info'),
+    path('student/attendance/', views.student_attendance, name='student_attendance'),
+    path('student/fees/', views.student_fees, name='student_fees'),
+    path('student/timetable/', views.student_timetable, name='student_timetable'),
+    path('student/health/', views.student_health, name='student_health'),
+    path('student/profile/', views.student_profile, name='student_profile'),
     path('student/profile/update/', views.student_profile_update, name='student_profile_update'),
     path('student/profile/picture/', views.student_profile_picture, name='student_profile_picture'),
 
@@ -146,6 +167,12 @@ urlpatterns = [
     # Doctor Dashboard - داشبورد داکتر
     # ════════════════════════════════════════════════════════════════
     path('doctor/', views.doctor_dashboard, name='doctor_dashboard'),
+    path('doctor/health/', views.doctor_health_list, name='doctor_health_list'),
+    path('doctor/health/add/', views.doctor_health_add, name='doctor_health_add'),
+    path('doctor/health/<int:pk>/edit/', views.doctor_health_edit, name='doctor_health_edit'),
+    path('doctor/attendance/', views.doctor_attendance, name='doctor_attendance'),
+    path('doctor/attendance/add/', views.doctor_attendance_add, name='doctor_attendance_add'),
+    path('doctor/profile/', views.doctor_profile, name='doctor_profile'),
     path('doctor/record/<int:pk>/delete/', views.doctor_record_delete, name='doctor_record_delete'),
     path('doctor/presence/<int:pk>/delete/', views.doctor_presence_delete,  name='doctor_presence_delete'),
     path('doctor/profile/update/',        views.doctor_profile_update,  name='doctor_profile_update'),
@@ -156,10 +183,19 @@ urlpatterns = [
     # Finance Dashboard - داشبورد مالی
     # ════════════════════════════════════════════════════════════════
     path('finance/', views.finance_dashboard, name='finance_dashboard'),
+    path('finance/transactions/', views.finance_transactions, name='finance_transactions'),
+    path('finance/transactions/add/', views.transaction_add, name='finance_transaction_add'),
+    path('finance/transactions/<int:pk>/edit/', views.transaction_edit, name='finance_transaction_edit'),
+    path('finance/transactions/<int:pk>/delete/', views.transaction_delete, name='finance_transaction_delete'),
+    path('finance/payments/', views.finance_payments, name='finance_payments'),
     path('finance/payment/add/', views.finance_payment_add, name='finance_payment_add'),
     path('finance/payment/<int:pk>/edit/', views.finance_payment_edit, name='finance_payment_edit'),
     path('finance/payment/<int:pk>/mark/', views.finance_payment_mark, name='finance_payment_mark'),
     path('finance/payment/<int:pk>/delete/', views.finance_payment_delete, name='finance_payment_delete'),
     path('finance/profile/update/', views.finance_profile_update, name='finance_profile_update'),
     path('finance/profile/picture/', views.finance_profile_picture, name='finance_profile_picture'),
+    path('finance/reports/', views.finance_reports, name='finance_reports'),
+    path('finance/reports/pdf/', views.finance_report_pdf, name='finance_report_pdf'),
+    path('finance/stats/', views.finance_stats, name='finance_stats'),
+    path('finance/profile/', views.finance_profile, name='finance_profile'),
 ]

@@ -116,9 +116,9 @@ def logout_view(request):
 @login_required(login_url='login_chat')
 def chat_dashboard(request):
     me = request.user
-    profile = get_or_create_profile(me)
-    profile.is_online = True
-    profile.save()
+    my_profile = get_or_create_profile(me)
+    my_profile.is_online = True
+    my_profile.save()
 
     all_users = list(
         User.objects.exclude(id=me.id).select_related('chat_profile').order_by('first_name', 'last_name', 'username')
@@ -139,9 +139,12 @@ def chat_dashboard(request):
 
     contacts = []
     for u in all_users:
-        profile = getattr(u, 'chat_profile', None)
-        pic = profile.profile_picture.url if profile and profile.profile_picture else None
-        online = profile.is_online if profile else False
+        # Some accounts predate the chat feature and have no profile yet.
+        # Create it here instead of allowing a missing related record to break
+        # the chat page for every user.
+        contact_profile = get_or_create_profile(u)
+        pic = contact_profile.profile_picture.url if contact_profile.profile_picture else None
+        online = contact_profile.is_online
         last_msg = latest_by_contact.get(u.id)
         unread = unread_by_sender.get(u.id, 0)
 
@@ -158,13 +161,14 @@ def chat_dashboard(request):
     # Online first, then by name
     contacts.sort(key=lambda x: (not x['online'], x['name']))
 
-    my_pic = profile.profile_picture.url if profile.profile_picture else None
+    my_pic = my_profile.profile_picture.url if my_profile.profile_picture else None
 
     context = {
         'me':         me,
         'my_name':    me.get_full_name() or me.username,
         'my_picture': my_pic,
         'contacts':   contacts,
+        'dashboard_name': dashboard_for_user(me),
     }
     return render(request, 'chat_dashboard.html', context)
 

@@ -222,6 +222,13 @@ class StudentPayment(models.Model):
         ('overdue', 'تاخیر'),
     ]
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='payments')
+    transaction = models.OneToOneField(
+        Transaction,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='student_payment',
+    )
     total_amount = models.DecimalField(max_digits=12, decimal_places=2)
     paid_amount = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     payment_type = models.CharField(max_length=50)

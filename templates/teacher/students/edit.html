@@ -1,0 +1,99 @@
+{% extends 'teacher/base.html' %}
+
+{% block title %}ویرایش شاگرد - GAAM{% endblock %}
+{% block page_title %}ویرایش شاگرد{% endblock %}
+{% block nav_students %}active{% endblock %}
+
+{% block content %}
+
+<div class="section-header">
+    <div class="section-heading">
+        <div class="section-icon">
+            <i class="fa-solid fa-user-pen"></i>
+        </div>
+
+        <div>
+            <h1>ویرایش شاگرد</h1>
+            <p>معلومات شاگرد را به‌روزرسانی کنید</p>
+        </div>
+    </div>
+
+    <a class="back-btn" href="{% url 'teacher_students' %}">
+        <i class="fa-solid fa-arrow-right"></i>
+        بازگشت
+    </a>
+</div>
+
+
+<section class="card form-card">
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="fg2">
+
+            <div class="fg">
+                <label class="fl">نام</label>
+                <input class="fi" name="fname" value="{{ student.first_name }}">
+            </div>
+
+            <div class="fg">
+                <label class="fl">تخلص</label>
+                <input class="fi" name="lname" value="{{ student.last_name }}">
+            </div>
+
+            <div class="fg">
+                <label class="fl">نام پدر</label>
+                <input class="fi" name="father" value="{{ student.father_name }}">
+            </div>
+
+            <div class="fg">
+                <label class="fl">شماره</label>
+                <input class="fi" name="phone" value="{{ student.phone }}">
+            </div>
+
+            <div class="fg">
+                <label class="fl">کلاس</label>
+                <select class="fs" name="cls" required>
+                    {% for c in all_classes %}
+                        <option value="{{ c.class_name }}" {% if c.class_name == student.class_field %}selected{% endif %}>
+                            {{ c.class_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="fg">
+                <label class="fl">وضعیت</label>
+
+                <select class="fs" name="status">
+                    <option
+                        value="active"
+                        {% if student.is_active %}selected{% endif %}
+                    >
+                        فعال
+                    </option>
+
+                    <option
+                        value="inactive"
+                        {% if not student.is_active %}selected{% endif %}
+                    >
+                        غیرفعال
+                    </option>
+                </select>
+            </div>
+
+        </div>
+
+        <div class="form-actions">
+            <button class="btn btn-success" type="submit">
+                <i class="fa-solid fa-floppy-disk"></i>
+                ذخیره تغییرات
+            </button>
+        </div>
+
+    </form>
+
+</section>
+
+{% endblock %}

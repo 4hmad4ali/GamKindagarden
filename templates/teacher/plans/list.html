@@ -1,0 +1,99 @@
+{% extends 'teacher/base.html' %}
+
+{% block title %}پلان‌های درسی - GAAM{% endblock %}
+{% block page_title %}پلان‌های درسی{% endblock %}
+{% block nav_plans %}active{% endblock %}
+
+{% block content %}
+
+<div class="section-header">
+
+    <div class="section-heading">
+        <div class="section-icon">
+            <i class="fa-solid fa-book-open"></i>
+        </div>
+
+        <div>
+            <h1>پلان‌های درسی</h1>
+            <p>مدیریت پلان‌ها و موضوعات درسی</p>
+        </div>
+    </div>
+
+    <a class="btn btn-primary" href="{% url 'teacher_plan_add' %}">
+        <i class="fa-solid fa-plus"></i>
+        پلان جدید
+    </a>
+
+</div>
+
+
+<section class="card card-table">
+
+    <div class="tw">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>موضوع</th>
+                    <th>عنوان</th>
+                    <th>کلاس</th>
+                    <th>تاریخ</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for p in plans %}
+
+                <tr>
+
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ p.subject }}</td>
+                    <td>{{ p.topic|default:"—" }}</td>
+                    <td>{{ p.class_name|default:"—" }}</td>
+                    <td>{{ p.date|default:"—" }}</td>
+
+                    <td>
+                        <form
+                            method="POST"
+                            action="/core/teacher/plan/{{ p.id }}/delete/"
+                            onsubmit="return confirm('حذف شود؟')"
+                        >
+                            {% csrf_token %}
+
+                            <button class="icon-btn delete" type="submit">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="6">
+                        <div class="empty">
+                            <div class="ei">
+                                <i class="fa-solid fa-book-open-reader"></i>
+                            </div>
+
+                            <strong>هنوز پلانی ثبت نشده</strong>
+                        </div>
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,157 @@
+{% extends 'finance/base.html' %}
+
+{% block title %}آمار کلی - GAAM{% endblock %}
+{% block page_title %}آمار کلی{% endblock %}
+{% block nav_stats %}active{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div class="page-heading">
+
+        <span class="page-icon">
+            <i class="fa-solid fa-chart-line"></i>
+        </span>
+
+        <div>
+            <h2>آمار کلی سیستم</h2>
+            <p>تمام آمار ثبت‌شده در دیتابیس</p>
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="section-label">آمار افراد</div>
+
+<section class="stats-grid">
+
+    <article class="stat-card">
+        <span class="stat-icon stat-blue">
+            <i class="fa-solid fa-user-graduate"></i>
+        </span>
+        <div>
+            <strong>{{ total_students|default:0 }}</strong>
+            <span>شاگردان</span>
+        </div>
+    </article>
+
+    <article class="stat-card">
+        <span class="stat-icon stat-purple">
+            <i class="fa-solid fa-chalkboard-user"></i>
+        </span>
+        <div>
+            <strong>{{ total_teachers|default:0 }}</strong>
+            <span>معلمان</span>
+        </div>
+    </article>
+
+    <article class="stat-card">
+        <span class="stat-icon stat-teal">
+            <i class="fa-solid fa-users-gear"></i>
+        </span>
+        <div>
+            <strong>{{ total_employees|default:0 }}</strong>
+            <span>کارمندان</span>
+        </div>
+    </article>
+
+    <article class="stat-card">
+        <span class="stat-icon stat-orange">
+            <i class="fa-solid fa-school"></i>
+        </span>
+        <div>
+            <strong>{{ total_classes|default:0 }}</strong>
+            <span>کلاس‌ها</span>
+        </div>
+    </article>
+
+</section>
+
+
+<div class="section-label">آمار مالی</div>
+
+<section class="stats-grid">
+
+    <article class="stat-card">
+        <span class="stat-icon stat-green">
+            <i class="fa-solid fa-arrow-trend-up"></i>
+        </span>
+        <div>
+            <strong>{{ total_income|default:0 }}</strong>
+            <span>درآمد کل ؋</span>
+        </div>
+    </article>
+
+    <article class="stat-card">
+        <span class="stat-icon stat-red">
+            <i class="fa-solid fa-arrow-trend-down"></i>
+        </span>
+        <div>
+            <strong>{{ total_expense|default:0 }}</strong>
+            <span>هزینه کل ؋</span>
+        </div>
+    </article>
+
+    <article class="stat-card">
+        <span class="stat-icon stat-blue">
+            <i class="fa-solid fa-scale-balanced"></i>
+        </span>
+        <div>
+            <strong>{{ net_balance|default:0 }}</strong>
+            <span>سود خالص ؋</span>
+        </div>
+    </article>
+
+    <article class="stat-card">
+        <span class="stat-icon stat-orange">
+            <i class="fa-solid fa-money-bill-transfer"></i>
+        </span>
+        <div>
+            <strong>{{ total_transactions|default:0 }}</strong>
+            <span>تراکنش‌ها</span>
+        </div>
+    </article>
+
+</section>
+
+
+<div class="section-label">وضعیت فیس</div>
+
+<section class="stats-grid stats-three">
+
+    <article class="stat-card">
+        <span class="stat-icon stat-green">
+            <i class="fa-solid fa-circle-check"></i>
+        </span>
+        <div>
+            <strong>{{ paid_count|default:0 }}</strong>
+            <span>پرداخت شده</span>
+        </div>
+    </article>
+
+    <article class="stat-card">
+        <span class="stat-icon stat-orange">
+            <i class="fa-regular fa-clock"></i>
+        </span>
+        <div>
+            <strong>{{ pending_count|default:0 }}</strong>
+            <span>در انتظار</span>
+        </div>
+    </article>
+
+    <article class="stat-card">
+        <span class="stat-icon stat-red">
+            <i class="fa-solid fa-circle-exclamation"></i>
+        </span>
+        <div>
+            <strong>{{ overdue_count|default:0 }}</strong>
+            <span>تاخیر</span>
+        </div>
+    </article>
+
+</section>
+
+{% endblock %}

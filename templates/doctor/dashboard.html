@@ -1,0 +1,207 @@
+{% extends 'doctor/base.html' %}
+
+{% block title %}داشبورد داکتر - GAAM{% endblock %}
+{% block page_title %}داشبورد داکتر{% endblock %}
+{% block nav_dashboard %}active{% endblock %}
+
+{% block content %}
+
+<section class="welcome-card">
+
+    <div>
+        <span class="welcome-kicker">
+            <i class="fa-solid fa-heart-pulse"></i>
+            مرکز مدیریت صحی
+        </span>
+
+        <h2>خوش آمدید، {{ username }} جان</h2>
+
+        <p>
+            وضعیت صحی شاگردان و فعالیت‌های روزانه خود را از اینجا مدیریت کنید.
+        </p>
+    </div>
+
+    <div class="welcome-time">
+        <span id="afgDate">--/--/----</span>
+        <strong id="afgClockBig">--:--:--</strong>
+        <small>تایم افغانستان (UTC+4:30)</small>
+    </div>
+
+</section>
+
+
+<section class="stats-grid">
+
+    <article class="stat-card">
+        <span class="stat-icon stat-blue">
+            <i class="fa-solid fa-user-graduate"></i>
+        </span>
+        <div>
+            <strong>{{ total_students }}</strong>
+            <span>مجموع شاگردان</span>
+        </div>
+    </article>
+
+    <article class="stat-card">
+        <span class="stat-icon stat-green">
+            <i class="fa-solid fa-stethoscope"></i>
+        </span>
+        <div>
+            <strong>{{ total_examined }}</strong>
+            <span>معاینه شده</span>
+        </div>
+    </article>
+
+    <article class="stat-card">
+        <span class="stat-icon stat-orange">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </span>
+        <div>
+            <strong>{{ needs_care }}</strong>
+            <span>نیاز به مراقبت</span>
+        </div>
+    </article>
+
+    <article class="stat-card">
+        <span class="stat-icon stat-purple">
+            <i class="fa-solid fa-file-medical"></i>
+        </span>
+        <div>
+            <strong>{{ total_records }}</strong>
+            <span>گزارش‌های امروز</span>
+        </div>
+    </article>
+
+</section>
+
+
+<section class="panel-card">
+
+    <div class="panel-header">
+
+        <div>
+            <h2>
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                آخرین معاینات
+            </h2>
+            <p>آخرین گزارش‌های صحی ثبت‌شده</p>
+        </div>
+
+        <a class="btn btn-primary" href="{% url 'doctor_health_add' %}">
+            <i class="fa-solid fa-plus"></i>
+            گزارش جدید
+        </a>
+
+    </div>
+
+
+    <div class="table-wrap">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>شاگرد</th>
+                    <th>تاریخ</th>
+                    <th>قد</th>
+                    <th>وزن</th>
+                    <th>فشار خون</th>
+                    <th>دما</th>
+                    <th>وضعیت</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for r in recent_records %}
+
+                <tr>
+
+                    <td>
+                        <strong>
+                            {{ r.student.first_name }}
+                            {{ r.student.last_name }}
+                        </strong>
+                    </td>
+
+                    <td>{{ r.checkup_date|date:"Y-m-d" }}</td>
+                    <td>{{ r.height|default:"—" }}</td>
+                    <td>{{ r.weight|default:"—" }}</td>
+                    <td>{{ r.blood_pressure|default:"—" }}</td>
+                    <td>{{ r.temperature|default:"—" }}</td>
+
+                    <td>
+                        {% if r.health_status == 'excellent' %}
+                            <span class="badge badge-success">
+                                <i class="fa-solid fa-heart-circle-check"></i>
+                                عالی
+                            </span>
+                        {% elif r.health_status == 'good' %}
+                            <span class="badge badge-info">
+                                <i class="fa-solid fa-heart"></i>
+                                خوب
+                            </span>
+                        {% elif r.health_status == 'normal' %}
+                            <span class="badge badge-warning">
+                                <i class="fa-solid fa-circle-minus"></i>
+                                معمولی
+                            </span>
+                        {% else %}
+                            <span class="badge badge-danger">
+                                <i class="fa-solid fa-heart-circle-exclamation"></i>
+                                مراقبت
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <div class="action-group">
+
+                            <a
+                                class="icon-btn edit"
+                                href="{% url 'doctor_health_edit' r.id %}"
+                                title="ویرایش"
+                            >
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+
+                            <button
+                                type="button"
+                                class="icon-btn delete"
+                                onclick="confirmDelete({{ r.id }}, '{{ r.student.first_name|escapejs }}')"
+                                title="حذف"
+                            >
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+
+                        </div>
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="8">
+                        <div class="empty-state">
+                            <i class="fa-solid fa-notes-medical"></i>
+                            <strong>هنوز رکورد پزشکی ثبت نشده</strong>
+                        </div>
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+{% include 'doctor/partials/delete_record_modal.html' %}
+
+{% endblock %}

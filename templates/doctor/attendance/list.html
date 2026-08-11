@@ -1,0 +1,114 @@
+{% extends 'doctor/base.html' %}
+
+{% block title %}حضور داکتر - GAAM{% endblock %}
+{% block page_title %}حضور داکتر{% endblock %}
+{% block nav_attendance %}active{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div class="page-heading">
+        <span class="page-icon">
+            <i class="fa-solid fa-calendar-check"></i>
+        </span>
+
+        <div>
+            <h2>حضور داکتر</h2>
+            <p>مشاهده سوابق حضور، غیابت و تأخیر</p>
+        </div>
+    </div>
+
+    <a class="btn btn-primary" href="{% url 'doctor_attendance_add' %}">
+        <i class="fa-solid fa-plus"></i>
+        ثبت حضور
+    </a>
+
+</div>
+
+
+<section class="panel-card">
+
+    <div class="table-wrap">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>تاریخ</th>
+                    <th>وضعیت</th>
+                    <th>یادداشت</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for p in presence_list %}
+
+                <tr>
+
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ p.date|date:"Y-m-d" }}</td>
+
+                    <td>
+                        {% if p.status == 'present' %}
+                            <span class="badge badge-success">
+                                <i class="fa-solid fa-check"></i>
+                                حاضر
+                            </span>
+                        {% elif p.status == 'absent' %}
+                            <span class="badge badge-danger">
+                                <i class="fa-solid fa-xmark"></i>
+                                غایب
+                            </span>
+                        {% else %}
+                            <span class="badge badge-warning">
+                                <i class="fa-regular fa-clock"></i>
+                                دیر
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <td class="muted-cell">
+                        {{ p.note|default:"—" }}
+                    </td>
+
+                    <td>
+                        <button
+                            type="button"
+                            class="icon-btn delete"
+                            onclick="confirmDeletePresence({{ p.id }}, '{{ p.date|date:"Y-m-d" }}')"
+                        >
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="5">
+                        <div class="empty-state">
+                            <i class="fa-regular fa-calendar-xmark"></i>
+                            <strong>هیچ رکورد حضور ثبت نشده</strong>
+                        </div>
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+{% include 'doctor/partials/delete_presence_modal.html' %}
+
+{% endblock %}

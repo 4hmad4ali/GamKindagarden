@@ -1,0 +1,185 @@
+{% extends 'finance/base.html' %}
+
+{% block title %}تراکنش‌ها - GAAM{% endblock %}
+{% block page_title %}تراکنش‌ها{% endblock %}
+{% block nav_transactions %}active{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div class="page-heading">
+        <span class="page-icon">
+            <i class="fa-solid fa-money-bill-transfer"></i>
+        </span>
+
+        <div>
+            <h2>لیست تراکنش‌ها</h2>
+            <p>تمام عملیات مالی ثبت‌شده</p>
+        </div>
+    </div>
+
+    <a class="btn btn-primary" href="{% url 'finance_transaction_add' %}">
+        <i class="fa-solid fa-plus"></i>
+        تراکنش جدید
+    </a>
+
+</div>
+
+
+<section class="stats-grid">
+
+    <article class="stat-card">
+        <span class="stat-icon stat-green">
+            <i class="fa-solid fa-arrow-trend-up"></i>
+        </span>
+        <div>
+            <strong>{{ total_income|default:0 }}</strong>
+            <span>درآمد ؋</span>
+        </div>
+    </article>
+
+    <article class="stat-card">
+        <span class="stat-icon stat-red">
+            <i class="fa-solid fa-arrow-trend-down"></i>
+        </span>
+        <div>
+            <strong>{{ total_expense|default:0 }}</strong>
+            <span>هزینه ؋</span>
+        </div>
+    </article>
+
+    <article class="stat-card">
+        <span class="stat-icon stat-blue">
+            <i class="fa-solid fa-scale-balanced"></i>
+        </span>
+        <div>
+            <strong>{{ net_balance|default:0 }}</strong>
+            <span>سود خالص ؋</span>
+        </div>
+    </article>
+
+    <article class="stat-card">
+        <span class="stat-icon stat-orange">
+            <i class="fa-solid fa-list-ol"></i>
+        </span>
+        <div>
+            <strong>{{ total_transactions|default:0 }}</strong>
+            <span>تعداد</span>
+        </div>
+    </article>
+
+</section>
+
+
+<section class="panel-card">
+
+    <div class="table-wrap">
+
+        <table class="wide-table">
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>شناسه</th>
+                    <th>نوع</th>
+                    <th>مبلغ</th>
+                    <th>دسته</th>
+                    <th>توضیحات</th>
+                    <th>تاریخ</th>
+                    <th>وضعیت</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for t in all_transactions %}
+
+                <tr>
+
+                    <td>{{ forloop.counter }}</td>
+
+                    <td>
+                        <strong>{{ t.transaction_id }}</strong>
+                    </td>
+
+                    <td>
+                        {% if t.transaction_type == 'income' %}
+                            <span class="badge badge-success">درآمد</span>
+                        {% else %}
+                            <span class="badge badge-danger">هزینه</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <strong>{{ t.amount }} ؋</strong>
+                    </td>
+
+                    <td>{{ t.category }}</td>
+
+                    <td class="truncate-cell">
+                        {{ t.description }}
+                    </td>
+
+                    <td>{{ t.transaction_date }}</td>
+
+                    <td>
+                        <span class="badge {% if t.status == 'completed' %}badge-success{% else %}badge-warning{% endif %}">
+                            {{ t.status }}
+                        </span>
+                    </td>
+
+                    <td>
+                        <div class="action-group">
+
+                            <a
+                                href="{% url 'finance_transaction_edit' t.pk %}"
+                                class="icon-btn edit"
+                                title="ویرایش"
+                            >
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+
+                            <form
+                                method="POST"
+                                action="{% url 'finance_transaction_delete' t.pk %}"
+                            >
+                                {% csrf_token %}
+
+                                <button
+                                    type="button"
+                                    class="icon-btn delete btn-delete"
+                                    title="حذف"
+                                >
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+
+                        </div>
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="9">
+                        <div class="empty-state">
+                            <i class="fa-solid fa-receipt"></i>
+                            <strong>هیچ تراکنشی ثبت نشده</strong>
+                        </div>
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+{% endblock %}

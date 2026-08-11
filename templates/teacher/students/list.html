@@ -1,0 +1,169 @@
+{% extends 'teacher/base.html' %}
+
+{% block title %}معلومات شاگردان - GAAM{% endblock %}
+{% block page_title %}معلومات شاگردان{% endblock %}
+{% block nav_students %}active{% endblock %}
+
+{% block content %}
+
+<div class="section-header">
+
+    <div class="section-heading">
+        <div class="section-icon">
+            <i class="fa-solid fa-user-graduate"></i>
+        </div>
+
+        <div>
+            <h1>معلومات شاگردان</h1>
+            <p>مدیریت شاگردان ثبت‌شده در سیستم</p>
+        </div>
+    </div>
+
+    <a class="btn btn-primary" href="{% url 'teacher_student_add' %}">
+        <i class="fa-solid fa-plus"></i>
+        افزودن شاگرد
+    </a>
+
+</div>
+
+
+<div class="stats">
+
+    <article class="sc">
+        <div class="si stat-primary">
+            <i class="fa-solid fa-users"></i>
+        </div>
+
+        <div>
+            <div class="sv">{{ total_students }}</div>
+            <div class="sl">کل شاگردان</div>
+        </div>
+    </article>
+
+
+    <article class="sc">
+        <div class="si stat-success">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+
+        <div>
+            <div class="sv">{{ active_students }}</div>
+            <div class="sl">فعال</div>
+        </div>
+    </article>
+
+
+    <article class="sc">
+        <div class="si stat-danger">
+            <i class="fa-solid fa-circle-xmark"></i>
+        </div>
+
+        <div>
+            <div class="sv">{{ inactive_students }}</div>
+            <div class="sl">غیرفعال</div>
+        </div>
+    </article>
+
+</div>
+
+
+<section class="card card-table">
+
+    <div class="card-header">
+        <div>
+            <h2>
+                <i class="fa-solid fa-table-list"></i>
+                لیست شاگردان
+            </h2>
+
+            <p>معلومات و وضعیت تمام شاگردان</p>
+        </div>
+    </div>
+
+    <div class="tw">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>نام</th>
+                    <th>تخلص</th>
+                    <th>نام پدر</th>
+                    <th>شماره</th>
+                    <th>کلاس</th>
+                    <th>وضعیت</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for s in all_students %}
+
+                <tr>
+
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ s.first_name }}</td>
+                    <td>{{ s.last_name }}</td>
+                    <td>{{ s.father_name }}</td>
+                    <td>{{ s.phone }}</td>
+                    <td>{{ s.class_field }}</td>
+
+                    <td>
+                        <span class="badge {% if s.is_active %}bs{% else %}bd{% endif %}">
+                            {% if s.is_active %}
+                                <i class="fa-solid fa-circle-check"></i>
+                                فعال
+                            {% else %}
+                                <i class="fa-solid fa-circle-xmark"></i>
+                                غیرفعال
+                            {% endif %}
+                        </span>
+                    </td>
+
+                    <td>
+                        <div class="acts">
+
+                            <a
+                                class="icon-btn edit"
+                                href="{% url 'teacher_student_edit' s.id %}"
+                                title="ویرایش"
+                            >
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+
+
+                        </div>
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="8">
+
+                        <div class="empty">
+                            <div class="ei">
+                                <i class="fa-regular fa-folder-open"></i>
+                            </div>
+
+                            <strong>هنوز شاگردی ثبت نشده</strong>
+                            <p>برای شروع یک شاگرد جدید اضافه کنید.</p>
+                        </div>
+
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,182 @@
+{% extends 'student/base.html' %}
+
+{% block title %}معلومات فیس - GAAM{% endblock %}
+{% block page_title %}معلومات فیس{% endblock %}
+{% block nav_fees %}active{% endblock %}
+
+{% block content %}
+
+<div class="section-header">
+
+    <div class="section-heading">
+
+        <div class="section-icon">
+            <i class="fa-solid fa-wallet"></i>
+        </div>
+
+        <div>
+            <h1>معلومات فیس</h1>
+            <p>وضعیت پرداخت‌ها و سوابق مالی شما</p>
+        </div>
+
+    </div>
+
+</div>
+
+
+<section class="stats">
+
+    <article class="sc">
+        <div class="si stat-success">
+            <i class="fa-solid fa-circle-check"></i>
+        </div>
+
+        <div>
+            <div class="sv">{{ paid_fees }}</div>
+            <div class="sl">پرداخت شده</div>
+        </div>
+    </article>
+
+
+    <article class="sc">
+        <div class="si stat-warning">
+            <i class="fa-regular fa-clock"></i>
+        </div>
+
+        <div>
+            <div class="sv">{{ pending_fees }}</div>
+            <div class="sl">در انتظار</div>
+        </div>
+    </article>
+
+
+    <article class="sc">
+        <div class="si stat-danger">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+
+        <div>
+            <div class="sv">{{ overdue_fees }}</div>
+            <div class="sl">تاخیر</div>
+        </div>
+    </article>
+
+</section>
+
+
+<section class="card card-table">
+
+    <div class="card-header table-heading">
+        <div>
+            <h2>
+                <i class="fa-solid fa-receipt"></i>
+                سوابق پرداخت
+            </h2>
+
+            <p>جزئیات فیس‌های ثبت‌شده در سیستم</p>
+        </div>
+    </div>
+
+
+    <div class="table-wrap">
+
+        <table class="wide-table">
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>نوع</th>
+                    <th>ماه/سال</th>
+                    <th>مبلغ کل</th>
+                    <th>پرداخت شده</th>
+                    <th>باقیمانده</th>
+                    <th>وضعیت</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for f in my_payments %}
+
+                <tr>
+
+                    <td>{{ forloop.counter }}</td>
+
+                    <td>
+                        <strong>{{ f.payment_type }}</strong>
+                    </td>
+
+                    <td>
+                        {{ f.year }}/{{ f.month }}
+                    </td>
+
+                    <td class="money-cell">
+                        {{ f.total_amount }}
+                    </td>
+
+                    <td class="money-cell success-text">
+                        {{ f.paid_amount }}
+                    </td>
+
+                    <td class="money-cell danger-text">
+                        {{ f.total_amount|add:"-"|add:f.paid_amount|default:"0" }}
+                    </td>
+
+                    <td>
+
+                        {% if f.status == 'completed' %}
+
+                            <span class="badge bs">
+                                <i class="fa-solid fa-check"></i>
+                                تکمیل
+                            </span>
+
+                        {% elif f.status == 'pending' %}
+
+                            <span class="badge bw">
+                                <i class="fa-regular fa-clock"></i>
+                                در انتظار
+                            </span>
+
+                        {% else %}
+
+                            <span class="badge bd">
+                                <i class="fa-solid fa-triangle-exclamation"></i>
+                                تاخیر
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="7">
+                        <div class="empty">
+                            <div class="empty-icon">
+                                <i class="fa-regular fa-folder-open"></i>
+                            </div>
+
+                            <strong>هنوز رکوردی وجود ندارد</strong>
+
+                            <p>
+                                سوابق فیس شما بعد از ثبت در این قسمت نمایش داده می‌شود.
+                            </p>
+                        </div>
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+{% endblock %}

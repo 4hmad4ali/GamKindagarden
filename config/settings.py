@@ -6,7 +6,7 @@ from pathlib import Path
 import os
 import pymysql
 
-pymysql.version_info = (2, 2, 1, "final", 0)
+pymysql.version_info = (2, 2, 1, 'final', 0)
 pymysql.install_as_MySQLdb()
 
 BASE_DIR = Path(__file__).resolve().parent.parent

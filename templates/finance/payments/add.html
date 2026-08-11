@@ -1,0 +1,198 @@
+{% extends 'finance/base.html' %}
+
+{% block title %}ثبت فیس - GAAM{% endblock %}
+{% block page_title %}ثبت فیس جدید{% endblock %}
+{% block nav_payment_add %}active{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div class="page-heading">
+
+        <span class="page-icon">
+            <i class="fa-solid fa-file-circle-plus"></i>
+        </span>
+
+        <div>
+            <h2>ثبت فیس جدید</h2>
+            <p>فیس ماهانه یا سالانه شاگرد را ثبت کنید</p>
+        </div>
+
+    </div>
+
+    <a class="btn btn-secondary" href="{% url 'finance_payments' %}">
+        <i class="fa-solid fa-arrow-right"></i>
+        بازگشت
+    </a>
+
+</div>
+
+
+<section class="form-card">
+
+    <form method="POST" action="{% url 'finance_payment_add' %}">
+
+        {% csrf_token %}
+
+
+        <div class="form-grid">
+
+            <div class="form-group full-width">
+
+                <label>
+                    <i class="fa-solid fa-user-graduate"></i>
+                    شاگرد *
+                </label>
+
+                <select name="student_id" required>
+
+                    <option value="">-- انتخاب شاگرد --</option>
+
+                    {% for s in all_students %}
+                        <option value="{{ s.id }}">
+                            {{ s.first_name }} {{ s.last_name }}
+                            ({{ s.student_id }})
+                        </option>
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    <i class="fa-solid fa-coins"></i>
+                    مبلغ کل (افغانی) *
+                </label>
+
+                <input
+                    type="text"
+                    name="total_amount"
+                    placeholder="مثال: 3000"
+                    required
+                    class="num-field"
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    <i class="fa-solid fa-money-bill-wave"></i>
+                    مبلغ پرداخت شده
+                </label>
+
+                <input
+                    type="text"
+                    name="paid_amount"
+                    placeholder="0"
+                    class="num-field"
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <div class="form-group full-width">
+
+                <label>
+                    <i class="fa-solid fa-list"></i>
+                    نوع پرداخت *
+                </label>
+
+                <input
+                    type="text"
+                    name="payment_type"
+                    placeholder="مثال: فیس ماهانه، ثبت نام، کتاب"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    <i class="fa-regular fa-calendar"></i>
+                    ماه *
+                </label>
+
+                <select name="month" required>
+                    <option value="1">ماه ۱ (جنوری)</option>
+                    <option value="2">ماه ۲ (فبروری)</option>
+                    <option value="3">ماه ۳ (مارچ)</option>
+                    <option value="4">ماه ۴ (اپریل)</option>
+                    <option value="5">ماه ۵ (می)</option>
+                    <option value="6">ماه ۶ (جون)</option>
+                    <option value="7">ماه ۷ (جولای)</option>
+                    <option value="8">ماه ۸ (اگست)</option>
+                    <option value="9">ماه ۹ (سپتمبر)</option>
+                    <option value="10">ماه ۱۰ (اکتوبر)</option>
+                    <option value="11">ماه ۱۱ (نومبر)</option>
+                    <option value="12">ماه ۱۲ (دسمبر)</option>
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    <i class="fa-solid fa-calendar-days"></i>
+                    سال *
+                </label>
+
+                <input
+                    type="text"
+                    name="year"
+                    value="1403"
+                    required
+                    class="num-field"
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <div class="form-group full-width">
+
+                <label>
+                    <i class="fa-solid fa-circle-info"></i>
+                    وضعیت
+                </label>
+
+                <select name="status">
+                    <option value="pending">در انتظار</option>
+                    <option value="completed">پرداخت شده</option>
+                    <option value="overdue">تاخیر</option>
+                </select>
+
+            </div>
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk"></i>
+                ذخیره فیس
+            </button>
+
+            <a class="btn btn-secondary" href="{% url 'finance_payments' %}">
+                <i class="fa-solid fa-xmark"></i>
+                لغو
+            </a>
+
+        </div>
+
+    </form>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'teacher/base.html' %}
+
+{% block title %}افزودن به جدول وقت - GAAM{% endblock %}
+{% block page_title %}افزودن به جدول وقت{% endblock %}
+{% block nav_timetable %}active{% endblock %}
+
+{% block content %}
+
+<div class="section-header">
+
+    <div class="section-heading">
+        <div class="section-icon">
+            <i class="fa-solid fa-calendar-plus"></i>
+        </div>
+
+        <div>
+            <h1>افزودن به جدول وقت</h1>
+            <p>درس جدید را در جدول هفتگی اضافه کنید</p>
+        </div>
+    </div>
+
+    <a class="back-btn" href="{% url 'teacher_timetable' %}">
+        <i class="fa-solid fa-arrow-right"></i>
+        بازگشت
+    </a>
+
+</div>
+
+
+<section class="card form-card">
+
+    <form method="POST" action="/core/teacher/timetable/add/">
+        {% csrf_token %}
+
+        <div class="fg2">
+
+            <div class="fg">
+                <label class="fl">روز</label>
+
+                <select class="fs" name="day">
+                    <option>شنبه</option>
+                    <option>یکشنبه</option>
+                    <option>دوشنبه</option>
+                    <option>سه‌شنبه</option>
+                    <option>چهارشنبه</option>
+                </select>
+            </div>
+
+
+            <div class="fg">
+                <label class="fl">وقت</label>
+
+                <select class="fs" name="time">
+                    <option>7:30 - 8:15</option>
+                    <option>8:15 - 9:00</option>
+                    <option>9:15 - 10:00</option>
+                    <option>10:00 - 10:45</option>
+                    <option>11:00 - 11:45</option>
+                    <option>11:45 - 12:30</option>
+                </select>
+            </div>
+
+
+            <div class="fg fg-full">
+                <label class="fl">موضوع درسی *</label>
+                <input class="fi" name="subject" required placeholder="مثال: ریاضی">
+            </div>
+
+
+            <div class="fg fg-full">
+                <label class="fl">یادداشت</label>
+                <input class="fi" name="note" placeholder="یادداشت...">
+            </div>
+
+        </div>
+
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit">
+                <i class="fa-solid fa-floppy-disk"></i>
+                ذخیره
+            </button>
+        </div>
+
+    </form>
+
+</section>
+
+{% endblock %}

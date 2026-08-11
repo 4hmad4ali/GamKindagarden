@@ -1,0 +1,337 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}مالی - GAAM{% endblock %}</title>
+
+    <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'vendor/fontawesome-free-6.7.2-web/css/all.min.css' %}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/finance.css' %}"
+    >
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+<div class="finance-shell">
+
+    <div
+        class="mobile-overlay"
+        id="mobileOverlay"
+        onclick="closeMobileSidebar()"
+    ></div>
+
+
+    <aside class="finance-sidebar" id="sidebar">
+
+        <div class="sidebar-brand">
+
+            <div class="sidebar-brand-icon">
+                <i class="fa-solid fa-coins"></i>
+            </div>
+
+            <div>
+                <strong>GAAM Kindergarten</strong>
+                <span>داشبورد مالی</span>
+            </div>
+
+        </div>
+
+
+        <div class="sidebar-profile">
+
+            <div class="sidebar-avatar">
+                {% if profile_picture %}
+                    <img src="{{ profile_picture }}" alt="{{ username }}">
+                {% else %}
+                    <i class="fa-solid fa-user-tie"></i>
+                {% endif %}
+            </div>
+
+            <div class="sidebar-profile-meta">
+                <strong>{{ username }}</strong>
+                <span>
+                    <i class="fa-solid fa-wallet"></i>
+                    مسئول مالی
+                </span>
+            </div>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <div class="sidebar-section">منوی اصلی</div>
+
+            <a
+                href="{% url 'finance_dashboard' %}"
+                class="sidebar-link {% block nav_dashboard %}{% endblock %}"
+            >
+                <span class="sidebar-link-icon">
+                    <i class="fa-solid fa-table-cells-large"></i>
+                </span>
+                داشبورد
+            </a>
+
+
+            <div class="sidebar-section">تراکنش‌ها</div>
+
+            <a
+                href="{% url 'finance_transactions' %}"
+                class="sidebar-link {% block nav_transactions %}{% endblock %}"
+            >
+                <span class="sidebar-link-icon">
+                    <i class="fa-solid fa-money-bill-transfer"></i>
+                </span>
+                لیست تراکنش‌ها
+            </a>
+
+            <a
+                href="{% url 'finance_transaction_add' %}"
+                class="sidebar-link {% block nav_transaction_add %}{% endblock %}"
+            >
+                <span class="sidebar-link-icon">
+                    <i class="fa-solid fa-circle-plus"></i>
+                </span>
+                ثبت تراکنش
+            </a>
+
+
+            <div class="sidebar-section">فیس شاگردان</div>
+
+            <a
+                href="{% url 'finance_payments' %}"
+                class="sidebar-link {% block nav_payments %}{% endblock %}"
+            >
+                <span class="sidebar-link-icon">
+                    <i class="fa-solid fa-receipt"></i>
+                </span>
+                لیست فیس‌ها
+            </a>
+
+            <a
+                href="{% url 'finance_payment_add' %}"
+                class="sidebar-link {% block nav_payment_add %}{% endblock %}"
+            >
+                <span class="sidebar-link-icon">
+                    <i class="fa-solid fa-file-circle-plus"></i>
+                </span>
+                ثبت فیس
+            </a>
+
+
+            <div class="sidebar-section">گزارشات</div>
+
+            <a
+                href="{% url 'finance_reports' %}"
+                class="sidebar-link {% block nav_reports %}{% endblock %}"
+            >
+                <span class="sidebar-link-icon">
+                    <i class="fa-solid fa-chart-column"></i>
+                </span>
+                گزارش مالی
+            </a>
+
+            <a
+                href="{% url 'finance_stats' %}"
+                class="sidebar-link {% block nav_stats %}{% endblock %}"
+            >
+                <span class="sidebar-link-icon">
+                    <i class="fa-solid fa-chart-line"></i>
+                </span>
+                آمار کلی
+            </a>
+
+
+            <div class="sidebar-section">حساب</div>
+
+            <a
+                href="{% url 'finance_profile' %}"
+                class="sidebar-link {% block nav_profile %}{% endblock %}"
+            >
+                <span class="sidebar-link-icon">
+                    <i class="fa-solid fa-user"></i>
+                </span>
+                پروفایل
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-footer">
+
+            <a href="{% url 'logout_chat' %}" class="logout-link">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                خروج از سیستم
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <header class="finance-topbar" id="topbar">
+
+        <div class="topbar-right">
+
+            <button
+                type="button"
+                class="topbar-btn"
+                onclick="toggleSidebar()"
+                aria-label="باز و بسته کردن منو"
+            >
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <div class="topbar-title-wrap">
+                <span>پنل مالی</span>
+                <h1>{% block page_title %}داشبورد مالی{% endblock %}</h1>
+            </div>
+
+        </div>
+
+
+        <div class="topbar-left">
+
+            <div class="topbar-clock">
+                <i class="fa-regular fa-clock"></i>
+                <span id="financeClock">--:--:--</span>
+                <small>کابل</small>
+            </div>
+
+            <button
+                type="button"
+                class="topbar-btn"
+                onclick="toggleDark()"
+                id="darkBtn"
+                aria-label="تغییر حالت نمایش"
+            >
+                <i class="fa-solid fa-moon"></i>
+            </button>
+
+            <a href="{% url 'chat_dashboard' %}" class="topbar-btn finance-chat-btn" title="پیام‌ها" aria-label="پیام‌ها">
+                <i class="fa-regular fa-message"></i>
+                <span class="finance-chat-badge" id="finance-chat-count"></span>
+            </a>
+
+            <a
+                href="{% url 'finance_profile' %}"
+                class="topbar-profile"
+                aria-label="پروفایل"
+            >
+                {% if profile_picture %}
+                    <img src="{{ profile_picture }}" alt="{{ username }}">
+                {% else %}
+                    <span>
+                        <i class="fa-solid fa-user-tie"></i>
+                    </span>
+                {% endif %}
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <main class="finance-main" id="mainArea">
+
+        {% if messages %}
+        <div class="message-stack">
+            {% for m in messages %}
+                <div class="message-item {% if '❌' in m.message or 'خطا' in m.message %}message-error{% else %}message-success{% endif %}">
+                    <i class="fa-solid {% if '❌' in m.message or 'خطا' in m.message %}fa-circle-exclamation{% else %}fa-circle-check{% endif %}"></i>
+                    <span>{{ m }}</span>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="content-shell">
+            {% block content %}{% endblock %}
+        </div>
+
+    </main>
+
+</div>
+
+
+<div class="modal-overlay" id="confirmModal">
+
+    <div class="confirm-card">
+
+        <div class="confirm-icon">
+            <i class="fa-solid fa-trash"></i>
+        </div>
+
+        <h3>تأیید حذف</h3>
+
+        <p>
+            آیا مطمئن هستید؟ این عملیات قابل بازگشت نیست.
+        </p>
+
+        <div class="confirm-actions">
+
+            <button
+                type="button"
+                class="btn btn-secondary"
+                onclick="closeConfirmModal()"
+            >
+                <i class="fa-solid fa-xmark"></i>
+                لغو
+            </button>
+
+            <button
+                type="button"
+                class="btn btn-danger"
+                onclick="confirmDeleteSubmit()"
+            >
+                <i class="fa-solid fa-trash"></i>
+                حذف
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script src="{% static 'js/finance.js' %}"></script>
+<script>
+  function updateFinanceChatBadge() {
+    const badge = document.getElementById('finance-chat-count');
+    if (!badge) return;
+
+    fetch('{% url "chat_unread" %}', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+      .then(response => response.ok ? response.json() : null)
+      .then(data => {
+        if (!data || !data.counts) return;
+        const total = Object.values(data.counts).reduce((sum, count) => sum + Number(count || 0), 0);
+        badge.textContent = total > 99 ? '99+' : total;
+        badge.style.display = total ? 'flex' : 'none';
+      })
+      .catch(() => {});
+  }
+
+  updateFinanceChatBadge();
+  setInterval(updateFinanceChatBadge, 30000);
+</script>
+
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,147 @@
+{% extends 'doctor/base.html' %}
+
+{% block title %}معلومات صحی شاگردان - GAAM{% endblock %}
+{% block page_title %}معلومات صحی شاگردان{% endblock %}
+{% block nav_health %}active{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div class="page-heading">
+        <span class="page-icon">
+            <i class="fa-solid fa-notes-medical"></i>
+        </span>
+
+        <div>
+            <h2>معلومات صحی تمام شاگردان</h2>
+            <p>مشاهده و مدیریت همه گزارش‌های صحی ثبت‌شده</p>
+        </div>
+    </div>
+
+    <a class="btn btn-primary" href="{% url 'doctor_health_add' %}">
+        <i class="fa-solid fa-plus"></i>
+        گزارش جدید
+    </a>
+
+</div>
+
+
+<section class="panel-card">
+
+    <div class="table-wrap">
+
+        <table class="wide-table">
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>شاگرد</th>
+                    <th>تاریخ</th>
+                    <th>قد</th>
+                    <th>وزن</th>
+                    <th>فشار خون</th>
+                    <th>دما</th>
+                    <th>تشخیص</th>
+                    <th>وضعیت</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for r in all_records %}
+
+                <tr>
+
+                    <td>{{ forloop.counter }}</td>
+
+                    <td>
+                        <strong>
+                            {{ r.student.first_name }}
+                            {{ r.student.last_name }}
+                        </strong>
+                    </td>
+
+                    <td>{{ r.checkup_date|date:"Y-m-d" }}</td>
+                    <td>{{ r.height|default:"—" }}</td>
+                    <td>{{ r.weight|default:"—" }}</td>
+                    <td>{{ r.blood_pressure|default:"—" }}</td>
+                    <td>{{ r.temperature|default:"—" }}</td>
+
+                    <td class="muted-cell">
+                        {{ r.diagnosis|truncatechars:30|default:"—" }}
+                    </td>
+
+                    <td>
+                        {% if r.health_status == 'excellent' %}
+                            <span class="badge badge-success">
+                                <i class="fa-solid fa-heart-circle-check"></i>
+                                عالی
+                            </span>
+                        {% elif r.health_status == 'good' %}
+                            <span class="badge badge-info">
+                                <i class="fa-solid fa-heart"></i>
+                                خوب
+                            </span>
+                        {% elif r.health_status == 'normal' %}
+                            <span class="badge badge-warning">
+                                <i class="fa-solid fa-circle-minus"></i>
+                                معمولی
+                            </span>
+                        {% else %}
+                            <span class="badge badge-danger">
+                                <i class="fa-solid fa-heart-circle-exclamation"></i>
+                                مراقبت
+                            </span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        <div class="action-group">
+
+                            <a
+                                class="icon-btn edit"
+                                href="{% url 'doctor_health_edit' r.id %}"
+                            >
+                                <i class="fa-solid fa-pen"></i>
+                            </a>
+
+                            <button
+                                type="button"
+                                class="icon-btn delete"
+                                onclick="confirmDelete({{ r.id }}, '{{ r.student.first_name|escapejs }}')"
+                            >
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+
+                        </div>
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="10">
+                        <div class="empty-state">
+                            <i class="fa-solid fa-notes-medical"></i>
+                            <strong>هنوز رکورد پزشکی ثبت نشده</strong>
+                        </div>
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+{% include 'doctor/partials/delete_record_modal.html' %}
+
+{% endblock %}

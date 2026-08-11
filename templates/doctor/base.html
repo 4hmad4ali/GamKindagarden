@@ -1,0 +1,265 @@
+{% load static %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}داکتر - GAAM{% endblock %}</title>
+
+    <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'vendor/fontawesome-free-6.7.2-web/css/all.min.css' %}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/doctor.css' %}"
+    >
+
+    {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+
+<div class="doc-shell">
+
+    <div class="mobile-overlay" id="mobileOverlay" onclick="closeMobileSidebar()"></div>
+
+    <aside class="doc-sidebar" id="sidebar">
+
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-icon">
+                <i class="fa-solid fa-stethoscope"></i>
+            </div>
+
+            <div>
+                <strong>GAAM Kindergarten</strong>
+                <span>سیستم مدیریت داکتر</span>
+            </div>
+        </div>
+
+
+        <div class="sidebar-profile">
+
+            <div class="sidebar-avatar">
+                {% if profile_picture %}
+                    <img src="{{ profile_picture }}" alt="{{ username }}">
+                {% else %}
+                    <i class="fa-solid fa-user-doctor"></i>
+                {% endif %}
+            </div>
+
+            <div class="sidebar-profile-meta">
+                <strong>{{ username }}</strong>
+                <span>
+                    <i class="fa-solid fa-user-doctor"></i>
+                    داکتر
+                </span>
+            </div>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <div class="sidebar-section">منوی اصلی</div>
+
+            <a
+                href="{% url 'doctor_dashboard' %}"
+                class="sidebar-link {% block nav_dashboard %}{% endblock %}"
+            >
+                <span class="sidebar-link-icon">
+                    <i class="fa-solid fa-table-cells-large"></i>
+                </span>
+                داشبورد
+            </a>
+
+
+            <div class="sidebar-section">پزشکی</div>
+
+            <a
+                href="{% url 'doctor_health_list' %}"
+                class="sidebar-link {% block nav_health %}{% endblock %}"
+            >
+                <span class="sidebar-link-icon">
+                    <i class="fa-solid fa-notes-medical"></i>
+                </span>
+                معلومات صحی شاگردان
+            </a>
+
+            <a
+                href="{% url 'doctor_health_add' %}"
+                class="sidebar-link {% block nav_health_add %}{% endblock %}"
+            >
+                <span class="sidebar-link-icon">
+                    <i class="fa-solid fa-file-circle-plus"></i>
+                </span>
+                اضافه کردن گزارش
+            </a>
+
+
+            <div class="sidebar-section">حضور</div>
+
+            <a
+                href="{% url 'doctor_attendance' %}"
+                class="sidebar-link {% block nav_attendance %}{% endblock %}"
+            >
+                <span class="sidebar-link-icon">
+                    <i class="fa-solid fa-calendar-check"></i>
+                </span>
+                حضور داکتر
+            </a>
+
+            <a
+                href="{% url 'doctor_attendance_add' %}"
+                class="sidebar-link {% block nav_attendance_add %}{% endblock %}"
+            >
+                <span class="sidebar-link-icon">
+                    <i class="fa-solid fa-calendar-plus"></i>
+                </span>
+                ثبت حضور
+            </a>
+
+
+            <div class="sidebar-section">تنظیمات</div>
+
+            <a
+                href="{% url 'doctor_profile' %}"
+                class="sidebar-link {% block nav_profile %}{% endblock %}"
+            >
+                <span class="sidebar-link-icon">
+                    <i class="fa-solid fa-user"></i>
+                </span>
+                پروفایل
+            </a>
+
+        </nav>
+
+
+        <div class="sidebar-footer">
+            <a href="{% url 'logout_chat' %}" class="logout-link">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                خروج از حساب
+            </a>
+        </div>
+
+    </aside>
+
+
+    <header class="doc-topbar" id="topbar">
+
+        <div class="topbar-right">
+
+            <button
+                type="button"
+                class="topbar-btn"
+                onclick="toggleSidebar()"
+                aria-label="باز و بسته کردن منو"
+            >
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+            <div class="topbar-title-wrap">
+                <span>پنل داکتر</span>
+                <h1>{% block page_title %}داشبورد داکتر{% endblock %}</h1>
+            </div>
+
+        </div>
+
+
+        <div class="topbar-left">
+
+            <div class="topbar-clock">
+                <i class="fa-regular fa-clock"></i>
+                <span id="afgClock">--:--:--</span>
+                <small>کابل</small>
+            </div>
+
+            <button
+                type="button"
+                class="topbar-btn"
+                id="darkBtn"
+                onclick="toggleDark()"
+                aria-label="تغییر حالت نمایش"
+            >
+                <i class="fa-solid fa-moon"></i>
+            </button>
+
+            <a href="{% url 'chat_dashboard' %}" class="topbar-btn doctor-chat-btn" title="پیام‌ها" aria-label="پیام‌ها">
+                <i class="fa-regular fa-message"></i>
+                <span class="doctor-chat-badge" id="doctor-chat-count"></span>
+            </a>
+
+            <a
+                href="{% url 'doctor_profile' %}"
+                class="topbar-profile"
+                aria-label="پروفایل"
+            >
+                {% if profile_picture %}
+                    <img src="{{ profile_picture }}" alt="{{ username }}">
+                {% else %}
+                    <span>
+                        <i class="fa-solid fa-user-doctor"></i>
+                    </span>
+                {% endif %}
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <main class="doc-main" id="mainArea">
+
+        {% if messages %}
+        <div class="message-stack">
+            {% for m in messages %}
+                <div class="message-item {% if '❌' in m.message or 'خطا' in m.message %}message-error{% else %}message-success{% endif %}">
+                    <i class="fa-solid {% if '❌' in m.message or 'خطا' in m.message %}fa-circle-exclamation{% else %}fa-circle-check{% endif %}"></i>
+                    <span>{{ m }}</span>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="content-shell">
+            {% block content %}{% endblock %}
+        </div>
+
+    </main>
+
+</div>
+
+
+<script src="{% static 'js/doctor.js' %}"></script>
+<script>
+  function updateDoctorChatBadge() {
+    const badge = document.getElementById('doctor-chat-count');
+    if (!badge) return;
+
+    fetch('{% url "chat_unread" %}', { headers: { 'X-Requested-With': 'XMLHttpRequest' } })
+      .then(response => response.ok ? response.json() : null)
+      .then(data => {
+        if (!data || !data.counts) return;
+        const total = Object.values(data.counts).reduce((sum, count) => sum + Number(count || 0), 0);
+        badge.textContent = total > 99 ? '99+' : total;
+        badge.style.display = total ? 'flex' : 'none';
+      })
+      .catch(() => {});
+  }
+
+  updateDoctorChatBadge();
+  setInterval(updateDoctorChatBadge, 30000);
+</script>
+
+{% block extra_js %}{% endblock %}
+
+</body>
+</html>

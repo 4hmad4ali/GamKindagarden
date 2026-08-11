@@ -1,0 +1,45 @@
+<div class="modal-overlay" id="deletePresenceModal">
+    <div class="modal-card">
+
+        <div class="modal-icon danger">
+            <i class="fa-solid fa-trash"></i>
+        </div>
+
+        <h3>تأیید حذف</h3>
+
+        <p id="deletePresenceText">
+            آیا مطمئن هستید؟
+        </p>
+
+        <form method="POST" id="deletePresenceForm" action="">
+
+            {% csrf_token %}
+
+            <input
+                type="hidden"
+                name="action"
+                value="delete_presence"
+            >
+
+            <div class="modal-actions">
+
+                <button type="submit" class="btn btn-danger">
+                    <i class="fa-solid fa-trash"></i>
+                    حذف
+                </button>
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    onclick="closePresenceModal()"
+                >
+                    <i class="fa-solid fa-xmark"></i>
+                    انصراف
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>

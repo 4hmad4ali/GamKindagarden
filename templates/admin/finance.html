@@ -1,9 +1,588 @@
 {% extends 'admin_base.html' %}
-{% block title %}مدیریت مالی - GAAM{% endblock %}
-{% block page_title %}مدیریت مالی{% endblock %}
+
+{% block title %}
+مدیریت مالی - GAAM
+{% endblock %}
+
+{% block page_title %}
+مدیریت مالی
+{% endblock %}
+
 {% block content %}
+
 <style>
-.finance-page{max-width:1400px;margin:auto}.finance-hero{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:25px}.finance-kicker{margin:0 0 7px;color:var(--pri);font-size:12px;font-weight:800}.finance-hero h1{margin:0;color:var(--text);font-size:25px}.finance-hero p{margin:8px 0 0;color:var(--text2);font-size:13px}.finance-actions{display:flex;gap:10px}.finance-actions a{display:inline-flex;align-items:center;gap:7px;padding:11px 15px;border-radius:10px;text-decoration:none;font-size:13px;font-weight:800}.finance-back{color:var(--text);background:var(--card);border:1px solid var(--border)}.finance-add{color:#fff;background:linear-gradient(135deg,#312e81,#4f46e5);box-shadow:0 8px 18px rgba(79,70,229,.24)}.finance-note{margin-bottom:15px;padding:10px 13px;border-radius:10px;background:#eff6ff;color:#1d4ed8;font-size:12px}.finance-stats{display:grid;grid-template-columns:repeat(5,1fr);gap:13px;margin-bottom:20px}.finance-stat{padding:17px;background:var(--card);border:1px solid var(--border);border-radius:14px}.finance-stat span{display:block;color:var(--text2);font-size:11px;font-weight:700}.finance-stat strong{display:block;margin-top:9px;color:var(--text);font-size:19px;direction:ltr;text-align:right}.finance-stat.income strong{color:#15803d}.finance-stat.expense strong{color:#b91c1c}.finance-stat.net strong{color:#3730a3}.finance-stat.pending strong{color:#b45309}.finance-panel{overflow:hidden;background:var(--card);border:1px solid var(--border);border-radius:15px}.finance-panel-head{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:17px 20px;border-bottom:1px solid var(--border)}.finance-panel-head h2{margin:0;color:var(--text);font-size:15px}.finance-search{width:min(310px,100%);padding:10px 12px;border:1px solid var(--border);border-radius:9px;background:var(--bg);color:var(--text);font:inherit;font-size:12px}.finance-search:focus{outline:none;border-color:var(--pri);box-shadow:0 0 0 3px rgba(79,70,229,.12)}.finance-table-wrap{overflow-x:auto}.finance-table{width:100%;min-width:1060px;border-collapse:collapse}.finance-table th{padding:13px 16px;background:rgba(79,70,229,.045);color:var(--text2);font-size:11px;text-align:right}.finance-table td{padding:15px 16px;border-top:1px solid var(--border);color:var(--text);font-size:12px}.finance-table tr:hover td{background:rgba(79,70,229,.025)}.transaction-id{color:var(--text2);font-size:10px;direction:ltr;text-align:right}.transaction-type,.transaction-status{display:inline-flex;padding:5px 9px;border-radius:99px;font-size:11px;font-weight:800}.transaction-type.income{color:#166534;background:#dcfce7}.transaction-type.expense{color:#991b1b;background:#fee2e2}.transaction-status.completed{color:#166534;background:#dcfce7}.transaction-status.pending{color:#92400e;background:#fef3c7}.transaction-amount{font-weight:900;white-space:nowrap;direction:ltr;text-align:right}.transaction-amount.income{color:#15803d}.transaction-amount.expense{color:#b91c1c}.transaction-desc strong,.transaction-desc small{display:block}.transaction-desc strong{font-size:12px}.transaction-desc small{margin-top:3px;color:var(--text2);font-size:10px}.finance-row-actions{display:flex;gap:7px}.finance-row-actions a,.finance-row-actions button{padding:7px 10px;border:0;border-radius:8px;font:inherit;font-size:11px;font-weight:800;text-decoration:none;cursor:pointer}.finance-edit{background:#e0e7ff;color:#3730a3}.finance-delete{background:#fee2e2;color:#b91c1c}.finance-empty{text-align:center;padding:52px 20px;color:var(--text2)}.finance-empty strong{display:block;margin-bottom:7px;color:var(--text);font-size:15px}@media(max-width:1050px){.finance-stats{grid-template-columns:repeat(3,1fr)}}@media(max-width:700px){.finance-hero{flex-direction:column}.finance-actions{width:100%}.finance-actions a{flex:1;justify-content:center}.finance-stats{grid-template-columns:repeat(2,1fr)}.finance-panel-head{flex-direction:column;align-items:stretch}.finance-search{width:100%}}
+.finance-page {
+    max-width: 1400px;
+    margin: auto;
+}
+
+.finance-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.finance-kicker {
+    margin: 0 0 7px;
+    color: var(--pri);
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.finance-hero h1 {
+    margin: 0;
+    color: var(--text);
+    font-size: 25px;
+}
+
+.finance-hero p {
+    margin: 8px 0 0;
+    color: var(--text2);
+    font-size: 13px;
+}
+
+.finance-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.finance-actions a {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 11px 15px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 800;
+}
+
+.finance-back {
+    color: var(--text);
+    background: var(--card);
+    border: 1px solid var(--border);
+}
+
+.finance-add {
+    color: #fff;
+    background: linear-gradient(135deg, #312e81, #4f46e5);
+    box-shadow: 0 8px 18px rgba(79, 70, 229, .24);
+}
+
+.finance-note {
+    margin-bottom: 15px;
+    padding: 10px 13px;
+    border-radius: 10px;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-size: 12px;
+}
+
+.finance-stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 13px;
+    margin-bottom: 20px;
+}
+
+.finance-stat {
+    padding: 17px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+}
+
+.finance-stat span {
+    display: block;
+    color: var(--text2);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.finance-stat strong {
+    display: block;
+    margin-top: 9px;
+    color: var(--text);
+    font-size: 19px;
+    direction: ltr;
+    text-align: right;
+}
+
+.finance-stat.income strong {
+    color: #15803d;
+}
+
+.finance-stat.expense strong {
+    color: #b91c1c;
+}
+
+.finance-stat.net strong {
+    color: #3730a3;
+}
+
+.finance-stat.pending strong {
+    color: #b45309;
+}
+
+.finance-panel {
+    overflow: hidden;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+}
+
+.finance-panel-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    padding: 17px 20px;
+    border-bottom: 1px solid var(--border);
+}
+
+.finance-panel-head h2 {
+    margin: 0;
+    color: var(--text);
+    font-size: 15px;
+}
+
+.finance-search {
+    width: min(310px, 100%);
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    background: var(--bg);
+    color: var(--text);
+    font: inherit;
+    font-size: 12px;
+}
+
+.finance-search:focus {
+    outline: none;
+    border-color: var(--pri);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, .12);
+}
+
+.finance-table-wrap {
+    overflow-x: auto;
+}
+
+.finance-table {
+    width: 100%;
+    min-width: 1060px;
+    border-collapse: collapse;
+}
+
+.finance-table th {
+    padding: 13px 16px;
+    background: rgba(79, 70, 229, .045);
+    color: var(--text2);
+    font-size: 11px;
+    text-align: right;
+}
+
+.finance-table td {
+    padding: 15px 16px;
+    border-top: 1px solid var(--border);
+    color: var(--text);
+    font-size: 12px;
+}
+
+.finance-table tr:hover td {
+    background: rgba(79, 70, 229, .025);
+}
+
+.transaction-id {
+    color: var(--text2);
+    font-size: 10px;
+    direction: ltr;
+    text-align: right;
+}
+
+.transaction-type,
+.transaction-status {
+    display: inline-flex;
+    padding: 5px 9px;
+    border-radius: 99px;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.transaction-type.income {
+    color: #166534;
+    background: #dcfce7;
+}
+
+.transaction-type.expense {
+    color: #991b1b;
+    background: #fee2e2;
+}
+
+.transaction-status.completed {
+    color: #166534;
+    background: #dcfce7;
+}
+
+.transaction-status.pending {
+    color: #92400e;
+    background: #fef3c7;
+}
+
+.transaction-amount {
+    font-weight: 900;
+    white-space: nowrap;
+    direction: ltr;
+    text-align: right;
+}
+
+.transaction-amount.income {
+    color: #15803d;
+}
+
+.transaction-amount.expense {
+    color: #b91c1c;
+}
+
+.transaction-desc strong,
+.transaction-desc small {
+    display: block;
+}
+
+.transaction-desc strong {
+    font-size: 12px;
+}
+
+.transaction-desc small {
+    margin-top: 3px;
+    color: var(--text2);
+    font-size: 10px;
+}
+
+.finance-row-actions {
+    display: flex;
+    gap: 7px;
+}
+
+.finance-row-actions a,
+.finance-row-actions button {
+    padding: 7px 10px;
+    border: 0;
+    border-radius: 8px;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 800;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.finance-edit {
+    background: #e0e7ff;
+    color: #3730a3;
+}
+
+.finance-delete {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.finance-empty {
+    text-align: center;
+    padding: 52px 20px;
+    color: var(--text2);
+}
+
+.finance-empty strong {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--text);
+    font-size: 15px;
+}
+
+@media (max-width: 1050px) {
+    .finance-stats {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 700px) {
+    .finance-hero {
+        flex-direction: column;
+    }
+
+    .finance-actions {
+        width: 100%;
+    }
+
+    .finance-actions a {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .finance-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .finance-panel-head {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .finance-search {
+        width: 100%;
+    }
+}
 </style>
-<main class="finance-page"><section class="finance-hero"><div><p class="finance-kicker">مدیریت مالی</p><h1>تراکنش‌ها</h1><p>درآمدها، هزینه‌ها و پرداخت‌های ثبت‌شده را با دیدی روشن مدیریت کنید.</p></div><div class="finance-actions"><a class="finance-back" href="{% url 'admin_dashboard' %}">← داشبورد</a><a class="finance-add" href="{% url 'transaction_add' %}">＋ ثبت تراکنش</a></div></section><p class="finance-note">آمار مالی فقط بر اساس تراکنش‌های «تکمیل‌شده» محاسبه می‌شود؛ تراکنش‌های در انتظار در مبالغ نهایی وارد نمی‌شوند.</p><section class="finance-stats"><article class="finance-stat income"><span>درآمد تکمیل‌شده</span><strong>{{ total_income|floatformat:0 }} AFN</strong></article><article class="finance-stat expense"><span>هزینه تکمیل‌شده</span><strong>{{ total_expense|floatformat:0 }} AFN</strong></article><article class="finance-stat net"><span>خالص درآمد</span><strong>{{ net_income|floatformat:0 }} AFN</strong></article><article class="finance-stat"><span>پرداخت شاگردان</span><strong>{{ total_payments|floatformat:0 }} AFN</strong></article><article class="finance-stat pending"><span>تراکنش‌های در انتظار</span><strong>{{ pending_transactions }}</strong></article></section><section class="finance-panel"><header class="finance-panel-head"><h2>همه تراکنش‌ها <span style="color:var(--text2);font-weight:500">({{ transactions|length }})</span></h2><input id="finance-search" class="finance-search" type="search" placeholder="جستجو بر اساس شناسه، دسته یا توضیحات" aria-label="جستجوی تراکنش‌ها"></header><div class="finance-table-wrap"><table class="finance-table"><thead><tr><th>نوع و شناسه</th><th>مبلغ</th><th>تاریخ</th><th>دسته و توضیحات</th><th>شاگرد مربوطه</th><th>وضعیت</th><th>عملیات</th></tr></thead><tbody id="finance-rows">{% for transaction in transactions %}<tr data-search="{{ transaction.transaction_id }} {{ transaction.category }} {{ transaction.description }} {{ transaction.student }}"><td><span class="transaction-type {{ transaction.transaction_type }}">{% if transaction.transaction_type == 'income' %}درآمد{% else %}هزینه{% endif %}</span><small class="transaction-id">{{ transaction.transaction_id }}</small></td><td class="transaction-amount {{ transaction.transaction_type }}">{% if transaction.transaction_type == 'income' %}+{% else %}−{% endif %} {{ transaction.amount|floatformat:2 }} AFN</td><td>{{ transaction.transaction_date|date:'Y-m-d' }}</td><td class="transaction-desc"><strong>{{ transaction.category }}</strong><small>{{ transaction.description }}</small></td><td>{% if transaction.student %}{{ transaction.student.first_name }} {{ transaction.student.last_name }}{% else %}<span style="color:var(--text2)">—</span>{% endif %}</td><td><span class="transaction-status {{ transaction.status }}">{% if transaction.status == 'completed' %}تکمیل‌شده{% else %}در انتظار{% endif %}</span></td><td><div class="finance-row-actions"><a class="finance-edit" href="{% url 'transaction_edit' transaction.id %}">ویرایش</a><form method="post" action="{% url 'transaction_delete' transaction.id %}" onsubmit="return confirm('آیا از حذف این تراکنش مطمئن هستید؟ این عمل قابل بازگشت نیست.');">{% csrf_token %}<button class="finance-delete" type="submit">حذف</button></form></div></td></tr>{% empty %}<tr><td colspan="7"><div class="finance-empty"><strong>هنوز تراکنشی ثبت نشده است.</strong>برای شروع، نخستین درآمد یا هزینه را ثبت کنید.</div></td></tr>{% endfor %}</tbody></table></div></section></main><script>document.getElementById('finance-search').addEventListener('input',function(){const q=this.value.toLocaleLowerCase();document.querySelectorAll('#finance-rows tr[data-search]').forEach(row=>row.hidden=!row.dataset.search.toLocaleLowerCase().includes(q));});</script>
+
+<main class="finance-page">
+
+    <section class="finance-hero">
+        <div>
+            <p class="finance-kicker">مدیریت مالی</p>
+
+            <h1>تراکنش‌ها</h1>
+
+            <p>
+                درآمدها، هزینه‌ها و پرداخت‌های ثبت‌شده را با دیدی روشن مدیریت کنید.
+            </p>
+        </div>
+
+        <div class="finance-actions">
+            <a
+                class="finance-back"
+                href="{% url 'admin_dashboard' %}"
+            >
+                ← داشبورد
+            </a>
+
+            <a
+                class="finance-add"
+                href="{% url 'transaction_add' %}"
+            >
+                ＋ ثبت تراکنش
+            </a>
+        </div>
+    </section>
+
+
+    <p class="finance-note">
+        آمار مالی فقط بر اساس تراکنش‌های «تکمیل‌شده» محاسبه می‌شود؛
+        تراکنش‌های در انتظار در مبالغ نهایی وارد نمی‌شوند.
+    </p>
+
+
+    <section class="finance-stats">
+
+        <article class="finance-stat income">
+            <span>درآمد تکمیل‌شده</span>
+            <strong>{{ total_income|floatformat:0 }} AFN</strong>
+        </article>
+
+        <article class="finance-stat expense">
+            <span>هزینه تکمیل‌شده</span>
+            <strong>{{ total_expense|floatformat:0 }} AFN</strong>
+        </article>
+
+        <article class="finance-stat net">
+            <span>خالص درآمد</span>
+            <strong>{{ net_income|floatformat:0 }} AFN</strong>
+        </article>
+
+        <article class="finance-stat">
+            <span>پرداخت شاگردان</span>
+            <strong>{{ total_payments|floatformat:0 }} AFN</strong>
+        </article>
+
+        <article class="finance-stat pending">
+            <span>تراکنش‌های در انتظار</span>
+            <strong>{{ pending_transactions }}</strong>
+        </article>
+
+    </section>
+
+
+    <section class="finance-panel">
+
+        <header class="finance-panel-head">
+
+            <h2>
+                همه تراکنش‌ها
+                <span style="color:var(--text2);font-weight:500">
+                    ({{ transactions|length }})
+                </span>
+            </h2>
+
+            <input
+                id="finance-search"
+                class="finance-search"
+                type="search"
+                placeholder="جستجو بر اساس شناسه، دسته یا توضیحات"
+                aria-label="جستجوی تراکنش‌ها"
+            >
+
+        </header>
+
+
+        <div class="finance-table-wrap">
+
+            <table class="finance-table">
+
+                <thead>
+                    <tr>
+                        <th>نوع و شناسه</th>
+                        <th>مبلغ</th>
+                        <th>تاریخ</th>
+                        <th>دسته و توضیحات</th>
+                        <th>شاگرد مربوطه</th>
+                        <th>وضعیت</th>
+                        <th>عملیات</th>
+                    </tr>
+                </thead>
+
+                <tbody id="finance-rows">
+
+                    {% for transaction in transactions %}
+
+                    <tr
+                        data-search="{{ transaction.transaction_id }} {{ transaction.category }} {{ transaction.description }} {{ transaction.student }}"
+                    >
+
+                        <td>
+                            <span class="transaction-type {{ transaction.transaction_type }}">
+                                {% if transaction.transaction_type == 'income' %}
+                                    درآمد
+                                {% else %}
+                                    هزینه
+                                {% endif %}
+                            </span>
+
+                            <small class="transaction-id">
+                                {{ transaction.transaction_id }}
+                            </small>
+                        </td>
+
+
+                        <td class="transaction-amount {{ transaction.transaction_type }}">
+                            {% if transaction.transaction_type == 'income' %}
+                                +
+                            {% else %}
+                                −
+                            {% endif %}
+
+                            {{ transaction.amount|floatformat:2 }} AFN
+                        </td>
+
+
+                        <td>
+                            {{ transaction.transaction_date|date:'Y-m-d' }}
+                        </td>
+
+
+                        <td class="transaction-desc">
+                            <strong>
+                                {{ transaction.category }}
+                            </strong>
+
+                            <small>
+                                {{ transaction.description }}
+                            </small>
+                        </td>
+
+
+                        <td>
+                            {% if transaction.student %}
+                                {{ transaction.student.first_name }}
+                                {{ transaction.student.last_name }}
+                            {% else %}
+                                <span style="color:var(--text2)">—</span>
+                            {% endif %}
+                        </td>
+
+
+                        <td>
+                            <span class="transaction-status {{ transaction.status }}">
+                                {% if transaction.status == 'completed' %}
+                                    تکمیل‌شده
+                                {% else %}
+                                    در انتظار
+                                {% endif %}
+                            </span>
+                        </td>
+
+
+                        <td>
+                            <div class="finance-row-actions">
+
+                                <a
+                                    class="finance-edit"
+                                    href="{% url 'transaction_edit' transaction.id %}"
+                                >
+                                    ویرایش
+                                </a>
+
+                                <form
+                                    method="post"
+                                    action="{% url 'transaction_delete' transaction.id %}"
+                                    onsubmit="return confirm('آیا از حذف این تراکنش مطمئن هستید؟ این عمل قابل بازگشت نیست.');"
+                                >
+                                    {% csrf_token %}
+
+                                    <button
+                                        class="finance-delete"
+                                        type="submit"
+                                    >
+                                        حذف
+                                    </button>
+                                </form>
+
+                            </div>
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+
+                    <tr>
+                        <td colspan="7">
+                            <div class="finance-empty">
+                                <strong>
+                                    هنوز تراکنشی ثبت نشده است.
+                                </strong>
+
+                                برای شروع، نخستین درآمد یا هزینه را ثبت کنید.
+                            </div>
+                        </td>
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<script>
+document
+    .getElementById('finance-search')
+    .addEventListener('input', function () {
+
+        const q = this.value.toLocaleLowerCase();
+
+        document
+            .querySelectorAll('#finance-rows tr[data-search]')
+            .forEach(row => {
+                row.hidden = !row.dataset.search
+                    .toLocaleLowerCase()
+                    .includes(q);
+            });
+    });
+</script>
+
 {% endblock %}

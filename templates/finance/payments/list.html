@@ -1,0 +1,184 @@
+{% extends 'finance/base.html' %}
+
+{% block title %}فیس شاگردان - GAAM{% endblock %}
+{% block page_title %}فیس شاگردان{% endblock %}
+{% block nav_payments %}active{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div class="page-heading">
+
+        <span class="page-icon">
+            <i class="fa-solid fa-receipt"></i>
+        </span>
+
+        <div>
+            <h2>فیس شاگردان</h2>
+            <p>وضعیت پرداخت فیس تمام شاگردان</p>
+        </div>
+
+    </div>
+
+    <a class="btn btn-primary" href="{% url 'finance_payment_add' %}">
+        <i class="fa-solid fa-plus"></i>
+        ثبت فیس
+    </a>
+
+</div>
+
+
+<section class="stats-grid stats-three">
+
+    <article class="stat-card">
+        <span class="stat-icon stat-green">
+            <i class="fa-solid fa-circle-check"></i>
+        </span>
+        <div>
+            <strong>{{ paid_count|default:0 }}</strong>
+            <span>پرداخت شده</span>
+        </div>
+    </article>
+
+    <article class="stat-card">
+        <span class="stat-icon stat-orange">
+            <i class="fa-regular fa-clock"></i>
+        </span>
+        <div>
+            <strong>{{ pending_count|default:0 }}</strong>
+            <span>در انتظار</span>
+        </div>
+    </article>
+
+    <article class="stat-card">
+        <span class="stat-icon stat-red">
+            <i class="fa-solid fa-circle-exclamation"></i>
+        </span>
+        <div>
+            <strong>{{ overdue_count|default:0 }}</strong>
+            <span>تاخیر</span>
+        </div>
+    </article>
+
+</section>
+
+
+<section class="panel-card">
+
+    <div class="table-wrap">
+
+        <table class="wide-table">
+
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>نام شاگرد</th>
+                    <th>مبلغ کل</th>
+                    <th>پرداخت شده</th>
+                    <th>نوع</th>
+                    <th>ماه/سال</th>
+                    <th>وضعیت</th>
+                    <th>عملیات</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for p in all_payments %}
+
+                <tr>
+
+                    <td>{{ forloop.counter }}</td>
+
+                    <td>
+                        <strong>
+                            {{ p.student.first_name }}
+                            {{ p.student.last_name }}
+                        </strong>
+
+                        <small class="sub-text">
+                            {{ p.student.student_id }}
+                        </small>
+                    </td>
+
+                    <td>{{ p.total_amount }} ؋</td>
+                    <td>{{ p.paid_amount }} ؋</td>
+                    <td>{{ p.payment_type }}</td>
+                    <td>{{ p.month }}/{{ p.year }}</td>
+
+                    <td>
+                        <span class="badge {% if p.status == 'completed' %}badge-success{% elif p.status == 'pending' %}badge-warning{% else %}badge-danger{% endif %}">
+                            {% if p.status == 'completed' %}
+                                پرداخت
+                            {% elif p.status == 'pending' %}
+                                معلق
+                            {% else %}
+                                تاخیر
+                            {% endif %}
+                        </span>
+                    </td>
+
+                    <td>
+
+                        <div class="action-group">
+
+                            <form
+                                method="POST"
+                                action="{% url 'finance_payment_mark' p.pk %}"
+                            >
+                                {% csrf_token %}
+
+                                <button
+                                    type="submit"
+                                    class="icon-btn success"
+                                    title="پرداخت شده"
+                                >
+                                    <i class="fa-solid fa-check"></i>
+                                </button>
+                            </form>
+
+
+                            <form
+                                method="POST"
+                                action="{% url 'finance_payment_delete' p.pk %}"
+                            >
+                                {% csrf_token %}
+
+                                <button
+                                    type="button"
+                                    class="icon-btn delete btn-delete"
+                                    title="حذف"
+                                >
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </form>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+                {% empty %}
+
+                <tr>
+                    <td colspan="8">
+                        <div class="empty-state">
+                            <i class="fa-solid fa-file-invoice-dollar"></i>
+                            <strong>هیچ پرداختی ثبت نشده</strong>
+                        </div>
+                    </td>
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+{% endblock %}

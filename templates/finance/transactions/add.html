@@ -1,0 +1,162 @@
+{% extends 'finance/base.html' %}
+
+{% block title %}ثبت تراکنش - GAAM{% endblock %}
+{% block page_title %}ثبت تراکنش جدید{% endblock %}
+{% block nav_transaction_add %}active{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div class="page-heading">
+        <span class="page-icon">
+            <i class="fa-solid fa-circle-plus"></i>
+        </span>
+
+        <div>
+            <h2>ثبت تراکنش جدید</h2>
+            <p>یک تراکنش درآمد یا هزینه ثبت کنید</p>
+        </div>
+    </div>
+
+    <a class="btn btn-secondary" href="{% url 'finance_transactions' %}">
+        <i class="fa-solid fa-arrow-right"></i>
+        بازگشت
+    </a>
+
+</div>
+
+
+<section class="form-card">
+
+    <form method="POST" action="{% if transaction %}{% url 'finance_transaction_edit' transaction.pk %}{% else %}{% url 'finance_transaction_add' %}{% endif %}">
+
+        {% csrf_token %}
+
+        <input type="hidden" name="transaction_id" value="">
+
+
+        <div class="form-grid">
+
+            <div class="form-group">
+
+                <label>
+                    <i class="fa-solid fa-right-left"></i>
+                    نوع تراکنش *
+                </label>
+
+                <select name="transaction_type" required>
+                    <option value="income" {% if transaction.transaction_type == 'income' %}selected{% endif %}>درآمد</option>
+                    <option value="expense" {% if transaction.transaction_type == 'expense' %}selected{% endif %}>هزینه</option>
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    <i class="fa-solid fa-coins"></i>
+                    مبلغ (افغانی) *
+                </label>
+
+                <input
+                    type="text"
+                    name="amount"
+                    placeholder="مثال: 5000"
+                    required
+                    class="num-field"
+                    autocomplete="off"
+                    value="{{ transaction.amount|default:'' }}"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    <i class="fa-regular fa-calendar"></i>
+                    تاریخ *
+                </label>
+
+                <input
+                    type="date"
+                    name="transaction_date"
+                    class="today-field"
+                    required
+                    value="{{ transaction.transaction_date|date:'Y-m-d' }}"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    <i class="fa-solid fa-tags"></i>
+                    دسته‌بندی *
+                </label>
+
+                <input
+                    type="text"
+                    name="category"
+                    placeholder="مثال: فیس شاگرد، معاش، تجهیزات"
+                    required
+                    value="{{ transaction.category|default:'' }}"
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    <i class="fa-solid fa-circle-info"></i>
+                    وضعیت
+                </label>
+
+                <select name="status">
+                    <option value="completed" {% if transaction.status == 'completed' %}selected{% endif %}>تکمیل شده</option>
+                    <option value="pending" {% if transaction.status == 'pending' %}selected{% endif %}>در انتظار</option>
+                </select>
+
+            </div>
+
+
+            <div class="form-group full-width">
+
+                <label>
+                    <i class="fa-regular fa-note-sticky"></i>
+                    توضیحات
+                </label>
+
+                <textarea
+                    name="description"
+                    placeholder="توضیح تراکنش (اختیاری)..."
+                >{{ transaction.description|default:'' }}</textarea>
+
+            </div>
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <button type="submit" class="btn btn-primary">
+                <i class="fa-solid fa-floppy-disk"></i>
+                ذخیره تراکنش
+            </button>
+
+            <a class="btn btn-secondary" href="{% url 'finance_transactions' %}">
+                <i class="fa-solid fa-xmark"></i>
+                لغو
+            </a>
+
+        </div>
+
+    </form>
+
+</section>
+
+{% endblock %}

@@ -1,0 +1,78 @@
+{% extends 'teacher/base.html' %}
+
+{% block title %}ثبت حضوری معلم - GAAM{% endblock %}
+{% block page_title %}ثبت حضوری معلم{% endblock %}
+{% block nav_teacher_attendance %}active{% endblock %}
+
+{% block content %}
+
+<div class="section-header">
+    <div class="section-heading">
+        <div class="section-icon">
+            <i class="fa-solid fa-clock"></i>
+        </div>
+
+        <div>
+            <h1>ثبت حضوری معلم</h1>
+            <p>حضور روزانه خود را ثبت کنید</p>
+        </div>
+    </div>
+
+    <a class="back-btn" href="{% url 'teacher_attendance' %}">
+        <i class="fa-solid fa-arrow-right"></i>
+        بازگشت
+    </a>
+</div>
+
+
+<section class="card form-card">
+
+    <form method="POST" action="/core/teacher/presence/add/">
+        {% csrf_token %}
+
+        <div class="fg2">
+
+            <div class="fg">
+                <label class="fl">تاریخ *</label>
+                <input class="fi" name="date" type="date" required value="{{ today }}">
+            </div>
+
+            <div class="fg">
+                <label class="fl">وضعیت</label>
+
+                <select class="fs" name="status">
+                    <option value="present">حاضر</option>
+                    <option value="absent">غایب</option>
+                    <option value="leave">مرخصی</option>
+                </select>
+            </div>
+
+            <div class="fg">
+                <label class="fl">وقت ورود</label>
+                <input class="fi" name="in_time" type="time">
+            </div>
+
+            <div class="fg">
+                <label class="fl">وقت خروج</label>
+                <input class="fi" name="out_time" type="time">
+            </div>
+
+            <div class="fg fg-full">
+                <label class="fl">یادداشت</label>
+                <textarea class="ft" name="note" placeholder="یادداشت..."></textarea>
+            </div>
+
+        </div>
+
+        <div class="form-actions">
+            <button class="btn btn-primary" type="submit">
+                <i class="fa-solid fa-floppy-disk"></i>
+                ذخیره
+            </button>
+        </div>
+
+    </form>
+
+</section>
+
+{% endblock %}
