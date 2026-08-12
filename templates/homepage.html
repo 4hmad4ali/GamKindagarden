@@ -4,704 +4,296 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta
-        name="description"
-        content="سیستم مدیریت هوشمند کودکستان گام"
-    >
-
-    <title>کودکستان گام | مدیریت هوشمند کودکستان</title>
+    <meta name="theme-color" content="#0c2430">
+    <meta name="description" content="سامانه مدیریت هوشمند کودکستان گام؛ مدیریت یکپارچه آموزش، حضور، سلامت، امور مالی و ارتباطات.">
+    <title>کودکستان گام | هر قدم، یک شروع روشن</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap"
-        rel="stylesheet"
-    >
-
-    <link
-        rel="stylesheet"
-        href="{% static 'vendor/fontawesome-free-6.7.2-web/css/all.min.css' %}"
-    >
-
-    <link
-        rel="stylesheet"
-        href="{% static 'css/homepage.css' %}"
-    >
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'vendor/fontawesome-free-6.7.2-web/css/all.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/homepage.css' %}?v=20260812-hero-console">
 </head>
 
 <body>
-
-<div class="page-progress" id="page-progress"></div>
-
+<!-- <a class="skip-link" href="#main-content">رفتن به محتوای اصلی</a> -->
+<div class="page-progress" id="page-progress" aria-hidden="true"></div>
 
 <header class="site-header" id="site-header">
-
     <nav class="container nav" aria-label="ناوبری اصلی">
-
-        <a
-            class="brand"
-            href="{% url 'homepage' %}"
-            aria-label="صفحه اصلی کودکستان گام"
-        >
-            <span class="brand-mark" aria-hidden="true">
-                <i class="fa-solid fa-school"></i>
-            </span>
-
+        <a class="brand" href="{% url 'homepage' %}" aria-label="صفحه اصلی کودکستان گام">
+            <span class="brand-mark" aria-hidden="true"><i class="fa-solid fa-shapes"></i></span>
             <span class="brand-copy">
                 <strong>کودکستان گام</strong>
-                <small>GAAM Kindergarten</small>
+                <small>GAAM KINDERGARTEN</small>
             </span>
         </a>
 
-
         <div class="desktop-nav">
-
             <a href="#features">امکانات</a>
-            <a href="#why-gaam">چرا گام؟</a>
-            <a href="#contact">تماس</a>
-
+            <a href="#experience">تجربه گام</a>
+            <a href="#roles">برای چه کسانی؟</a>
+            <a href="#contact">ارتباط با ما</a>
         </div>
-
 
         <div class="nav-actions">
-
-            <a
-                class="nav-login"
-                href="{% url 'login_chat' %}"
-            >
-                ورود
-            </a>
-
-            <a
-                class="nav-signup"
-                href="{% url 'signup' %}"
-            >
+            <a class="nav-login" href="{% url 'login_chat' %}">ورود به سیستم</a>
+            <a class="nav-signup" href="{% url 'signup' %}">
                 <span>ایجاد حساب</span>
-                <i class="fa-solid fa-arrow-left"></i>
+                <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
             </a>
-
+            <button class="menu-toggle" id="menu-toggle" type="button" aria-label="باز کردن فهرست" aria-expanded="false" aria-controls="mobile-menu">
+                <span></span><span></span><span></span>
+            </button>
         </div>
-
     </nav>
 
+   <div
+    class="mobile-menu"
+    id="mobile-menu"
+    aria-hidden="true"
+    hidden
+>
+        <div class="container mobile-menu-inner">
+            <a href="#features">امکانات</a>
+            <a href="#experience">تجربه گام</a>
+            <a href="#roles">برای چه کسانی؟</a>
+            <a href="#contact">ارتباط با ما</a>
+            <a class="mobile-login" href="{% url 'login_chat' %}">ورود به سیستم</a>
+        </div>
+    </div>
 </header>
 
+<main id="main-content">
+    <section class="hero" aria-labelledby="hero-title">
+        <div class="hero-pattern" aria-hidden="true"></div>
+        <div class="hero-shape hero-shape-one" aria-hidden="true"></div>
+        <div class="hero-shape hero-shape-two" aria-hidden="true"></div>
 
-<section class="hero" aria-labelledby="hero-title">
+        <div class="container hero-layout">
+            <div class="hero-content reveal">
+                <div class="eyebrow">
+                    <span class="eyebrow-icon"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i></span>
+                    سامانه یکپارچه کودکستان گام
+                </div>
 
-    <div class="hero-grid-bg"></div>
+                <h1 id="hero-title">
+                    هر قدم کوچک،
+                    <span class="hero-highlight">یک شروع روشن</span>
+                </h1>
 
-    <div class="hero-orb hero-orb-one"></div>
-    <div class="hero-orb hero-orb-two"></div>
+                <p class="hero-copy">
+                    آموزش، حضور و غیاب، سلامت، امور مالی و ارتباطات کودکستان را در یک فضای ساده و منظم مدیریت کنید؛ تا زمان بیشتری برای رشد کودکان بماند.
+                </p>
 
-    <div class="container hero-layout">
+                <div class="hero-actions">
+                    <a class="button button-primary" href="{% url 'signup' %}">
+                        <span>شروع با گام</span>
+                        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                    </a>
+                    <a class="button button-ghost" href="#features">
+                        <span class="play-icon"><i class="fa-solid fa-play" aria-hidden="true"></i></span>
+                        آشنایی با امکانات
+                    </a>
+                </div>
 
-        <div class="hero-content reveal">
-
-            <span class="eyebrow">
-                <span class="eyebrow-dot"></span>
-                مدیریت ساده، ارتباط نزدیک
-            </span>
-
-            <h1 id="hero-title">
-                کودکستان را
-                <span>هوشمندتر، منظم‌تر</span>
-                و حرفه‌ای‌تر مدیریت کنید
-            </h1>
-
-            <p class="hero-copy">
-                کودکستان گام، آموزش، حضور و غیاب، امور مالی، گزارش‌های صحی
-                و ارتباطات روزانه را در یک محیط منظم و قابل اعتماد گرد هم می‌آورد.
-            </p>
-
-
-            <div class="hero-actions">
-
-                <a
-                    class="button button-primary"
-                    href="{% url 'signup' %}"
-                >
-                    <span>همین حالا شروع کنید</span>
-                    <i class="fa-solid fa-arrow-left"></i>
-                </a>
-
-                <a
-                    class="button button-secondary"
-                    href="{% url 'login_chat' %}"
-                >
-                    <i class="fa-regular fa-circle-play"></i>
-                    ورود به سامانه
-                </a>
-
+                <div class="hero-proof" aria-label="مزایای کلیدی">
+                    <span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> کاربری آسان</span>
+                    <span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> دسترسی امن</span>
+                    <span><i class="fa-solid fa-circle-check" aria-hidden="true"></i> طراحی واکنش‌گرا</span>
+                </div>
             </div>
 
-
-            <div class="hero-trust">
-
-                <div class="trust-item">
-                    <i class="fa-solid fa-shield-halved"></i>
-                    <span>ساختار امن و متمرکز</span>
-                </div>
-
-                <div class="trust-item">
-                    <i class="fa-solid fa-mobile-screen-button"></i>
-                    <span>سازگار با موبایل</span>
-                </div>
-
-                <div class="trust-item">
-                    <i class="fa-solid fa-bolt"></i>
-                    <span>سریع و ساده</span>
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <div class="hero-visual reveal reveal-delay">
-
-            <div class="dashboard-window">
-
-                <div class="dashboard-window-top">
-
-                    <div class="window-dots">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </div>
-
-                    <div class="window-title">
-                        GAAM Management
-                    </div>
-
-                </div>
-
-
-                <div class="dashboard-preview">
-
-                    <aside class="preview-sidebar">
-
-                        <div class="preview-logo">
-                            <i class="fa-solid fa-school"></i>
+            <div class="hero-visual reveal reveal-delay" aria-label="نمای سامانه مدیریت گام">
+                <div class="visual-halo" aria-hidden="true"></div>
+                <div class="gaam-console" aria-label="پیش‌نمایش پنل مدیریت گام">
+                    <aside class="console-sidebar" aria-hidden="true">
+                        <div class="console-logo"><span><i class="fa-solid fa-shapes"></i></span><strong>گام</strong></div>
+                        <div class="console-nav">
+                            <span class="selected"><i class="fa-solid fa-table-cells-large"></i><b>داشبورد</b></span>
+                            <span><i class="fa-solid fa-users"></i><b>شاگردان</b></span>
+                            <span><i class="fa-solid fa-calendar-days"></i><b>برنامه‌ها</b></span>
+                            <span><i class="fa-solid fa-heart-pulse"></i><b>سلامت</b></span>
+                            <span><i class="fa-solid fa-wallet"></i><b>مالی</b></span>
                         </div>
-
-                        <span class="preview-nav active"></span>
-                        <span class="preview-nav"></span>
-                        <span class="preview-nav"></span>
-                        <span class="preview-nav"></span>
-                        <span class="preview-nav short"></span>
-
+                        <div class="console-support"><i class="fa-regular fa-circle-question"></i><span>راهنمای گام</span></div>
                     </aside>
 
-
-                    <div class="preview-main">
-
-                        <div class="preview-heading">
-                            <div>
-                                <span></span>
-                                <span></span>
-                            </div>
-
-                            <i class="fa-regular fa-bell"></i>
+                    <div class="console-workspace">
+                        <div class="console-header">
+                            <div class="console-title"><small>داشبورد مدیر</small><strong>صبح بخیر، مریم <span>👋</span></strong></div>
+                            <div class="console-account"><button type="button" aria-label="اعلان‌ها"><i class="fa-regular fa-bell"></i><em></em></button><span class="console-avatar">م</span><i class="fa-solid fa-chevron-down"></i></div>
                         </div>
 
-
-                        <div class="preview-stats">
-
-                            <div class="preview-stat">
-                                <span class="preview-stat-icon blue">
-                                    <i class="fa-solid fa-user-graduate"></i>
-                                </span>
-                                <div>
-                                    <strong>۲۴۸</strong>
-                                    <small>شاگرد</small>
-                                </div>
-                            </div>
-
-                            <div class="preview-stat">
-                                <span class="preview-stat-icon green">
-                                    <i class="fa-solid fa-user-check"></i>
-                                </span>
-                                <div>
-                                    <strong>۹۳٪</strong>
-                                    <small>حضور امروز</small>
-                                </div>
-                            </div>
-
-                            <div class="preview-stat">
-                                <span class="preview-stat-icon orange">
-                                    <i class="fa-solid fa-wallet"></i>
-                                </span>
-                                <div>
-                                    <strong>۸۷٪</strong>
-                                    <small>فیس تکمیل</small>
-                                </div>
-                            </div>
-
+                        <div class="console-overview">
+                            <article class="overview-card students"><span class="overview-icon"><i class="fa-solid fa-child-reaching"></i></span><div><small>کل شاگردان</small><strong>۲۴۸</strong></div><em>۱۲+ این ماه</em></article>
+                            <article class="overview-card attendance"><span class="overview-icon"><i class="fa-solid fa-user-check"></i></span><div><small>حضور امروز</small><strong>۹۳٪</strong></div><em>عالی</em></article>
+                            <article class="overview-card tasks"><span class="overview-icon"><i class="fa-solid fa-list-check"></i></span><div><small>کارهای امروز</small><strong>۰۶</strong></div><em>۲ مورد جدید</em></article>
                         </div>
 
-
-                        <div class="preview-chart">
-
-                            <div class="chart-head">
-                                <div>
-                                    <span></span>
-                                    <span></span>
-                                </div>
-
-                                <small>هفته جاری</small>
-                            </div>
-
-                            <div class="bars">
-                                <span style="height:42%"></span>
-                                <span style="height:66%"></span>
-                                <span style="height:54%"></span>
-                                <span style="height:80%"></span>
-                                <span style="height:72%"></span>
-                                <span style="height:92%"></span>
-                            </div>
-
+                        <div class="console-panels">
+                            <article class="console-card attendance-panel">
+                                <div class="console-card-head"><div><strong>نمای حضور هفتگی</strong><small>شاگردان حاضر در این هفته</small></div><span>این هفته <i class="fa-solid fa-chevron-down"></i></span></div>
+                                <div class="attendance-graph" aria-hidden="true"><div class="graph-scale"><span>۱۰۰٪</span><span>۵۰٪</span><span>۰٪</span></div><div class="graph-bars"><span style="--bar: 72%"><b>ش</b></span><span style="--bar: 86%"><b>ی</b></span><span style="--bar: 68%"><b>د</b></span><span class="today" style="--bar: 93%"><b>س</b></span><span style="--bar: 80%"><b>چ</b></span><span style="--bar: 89%"><b>پ</b></span></div></div>
+                            </article>
+                            <article class="console-card schedule-panel">
+                                <div class="console-card-head"><div><strong>برنامه امروز</strong><small>چهارشنبه، ۲۱ اسد</small></div><i class="fa-solid fa-ellipsis"></i></div>
+                                <div class="schedule-item"><span class="schedule-time">۰۹:۰۰</span><i class="schedule-dot purple"></i><div><strong>نقاشی خلاق</strong><small>صنف رنگین‌کمان</small></div></div>
+                                <div class="schedule-item"><span class="schedule-time">۱۰:۳۰</span><i class="schedule-dot orange"></i><div><strong>بازی گروهی</strong><small>محوطه کودکستان</small></div></div>
+                                <div class="schedule-item"><span class="schedule-time">۱۲:۰۰</span><i class="schedule-dot green"></i><div><strong>قصه‌خوانی</strong><small>صنف ستاره</small></div></div>
+                            </article>
                         </div>
-
-
-                        <div class="preview-table">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-
                     </div>
-
                 </div>
 
-            </div>
+                <div class="floating-note note-health">
+                    <span><i class="fa-solid fa-heart" aria-hidden="true"></i></span>
+                    <div><small>گزارش سلامت</small><strong>همه‌چیز خوب است</strong></div>
+                    <i class="fa-solid fa-check" aria-hidden="true"></i>
+                </div>
 
-
-            <div class="floating-card floating-card-one">
-                <span class="floating-icon success">
-                    <i class="fa-solid fa-circle-check"></i>
-                </span>
-                <div>
-                    <strong>حضور ثبت شد</strong>
-                    <small>چند لحظه پیش</small>
+                <div class="floating-note note-message">
+                    <div class="note-avatars"><span>س</span><span>ن</span><span>م</span></div>
+                    <div><strong>ارتباط نزدیک‌تر</strong><small>مدیر، آموزگار و خانواده</small></div>
                 </div>
             </div>
-
-
-            <div class="floating-card floating-card-two">
-                <span class="floating-icon info">
-                    <i class="fa-solid fa-message"></i>
-                </span>
-                <div>
-                    <strong>پیام جدید</strong>
-                    <small>ارتباط سریع داخلی</small>
-                </div>
-            </div>
-
         </div>
 
-    </div>
-
-</section>
-
-
-<section class="details container reveal" aria-label="اطلاعات تماس کودکستان">
-
-    <div class="details-grid">
-
-        <div class="detail">
-
-            <span class="detail-icon">
-                <i class="fa-solid fa-location-dot"></i>
-            </span>
-
-            <div>
-                <span class="detail-label">آدرس</span>
-                <strong class="detail-value">
-                    مکروریان سوم، کابل
-                </strong>
-            </div>
-
+        <div class="container quick-facts reveal">
+            <div class="fact"><span><i class="fa-solid fa-location-dot"></i></span><div><small>آدرس ما</small><strong>مکروریان سوم، کابل</strong></div></div>
+            <div class="fact"><span><i class="fa-solid fa-phone"></i></span><div><small>تماس مستقیم</small><strong dir="ltr">0788919112</strong></div></div>
+            <div class="fact"><span><i class="fa-solid fa-layer-group"></i></span><div><small>مدیریت یکپارچه</small><strong>همه‌چیز در یک‌جا</strong></div></div>
         </div>
-
-
-        <div class="detail">
-
-            <span class="detail-icon">
-                <i class="fa-solid fa-phone"></i>
-            </span>
-
-            <div>
-                <span class="detail-label">تماس</span>
-                <strong class="detail-value" dir="ltr">
-                    0788919112
-                </strong>
-            </div>
-
-        </div>
-
-
-        <div class="detail">
-
-            <span class="detail-icon">
-                <i class="fa-solid fa-globe"></i>
-            </span>
-
-            <div>
-                <span class="detail-label">وب‌سایت</span>
-                <strong class="detail-value" dir="ltr">
-                    gaam-kindergarten.com
-                </strong>
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<main>
-
-    <section
-        class="section container"
-        id="features"
-    >
-
-        <div class="section-heading reveal">
-
-            <p class="section-kicker">
-                همه‌چیز در یک‌جا
-            </p>
-
-            <h2>
-                یک سیستم کامل برای مدیریت روزانه کودکستان
-            </h2>
-
-            <p class="section-copy">
-                تمام ابزارهایی که مدیر، معلم، شاگرد و بخش‌های اجرایی نیاز دارند،
-                در یک تجربه ساده و هماهنگ.
-            </p>
-
-        </div>
-
-
-        <div class="features-grid">
-
-            <article class="feature-card reveal">
-
-                <div class="feature-top">
-
-                    <span class="feature-icon feature-blue">
-                        <i class="fa-solid fa-table-cells-large"></i>
-                    </span>
-
-                    <span class="feature-number">01</span>
-
-                </div>
-
-                <h3>داشبوردهای نقش‌محور</h3>
-
-                <p>
-                    هر کاربر فقط اطلاعات و ابزارهای مرتبط با نقش خود را
-                    سریع و واضح مشاهده می‌کند.
-                </p>
-
-                <div class="feature-link">
-                    <span>تجربه ساده‌تر</span>
-                    <i class="fa-solid fa-arrow-left"></i>
-                </div>
-
-            </article>
-
-
-            <article class="feature-card reveal">
-
-                <div class="feature-top">
-
-                    <span class="feature-icon feature-purple">
-                        <i class="fa-regular fa-comments"></i>
-                    </span>
-
-                    <span class="feature-number">02</span>
-
-                </div>
-
-                <h3>ارتباطات داخلی</h3>
-
-                <p>
-                    پیام‌رسان داخلی برای ارتباط سریع‌تر میان اعضای
-                    کودکستان و پیگیری بهتر امور روزانه.
-                </p>
-
-                <div class="feature-link">
-                    <span>ارتباط متمرکز</span>
-                    <i class="fa-solid fa-arrow-left"></i>
-                </div>
-
-            </article>
-
-
-            <article class="feature-card reveal">
-
-                <div class="feature-top">
-
-                    <span class="feature-icon feature-green">
-                        <i class="fa-solid fa-database"></i>
-                    </span>
-
-                    <span class="feature-number">03</span>
-
-                </div>
-
-                <h3>داده‌های منظم و مطمئن</h3>
-
-                <p>
-                    معلومات شاگردان، حضور، پرداخت‌ها و گزارش‌ها با
-                    ساختاری روشن و قابل پیگیری نگهداری می‌شوند.
-                </p>
-
-                <div class="feature-link">
-                    <span>مدیریت بهتر اطلاعات</span>
-                    <i class="fa-solid fa-arrow-left"></i>
-                </div>
-
-            </article>
-
-
-            <article class="feature-card reveal">
-
-                <div class="feature-top">
-
-                    <span class="feature-icon feature-orange">
-                        <i class="fa-solid fa-mobile-screen-button"></i>
-                    </span>
-
-                    <span class="feature-number">04</span>
-
-                </div>
-
-                <h3>طراحی واکنش‌گرا</h3>
-
-                <p>
-                    تجربه‌ای خوانا و سریع روی موبایل، تبلت و کامپیوتر
-                    برای استفاده روزانه در هر محیط.
-                </p>
-
-                <div class="feature-link">
-                    <span>همیشه در دسترس</span>
-                    <i class="fa-solid fa-arrow-left"></i>
-                </div>
-
-            </article>
-
-        </div>
-
     </section>
 
-
-    <section
-        class="why-section"
-        id="why-gaam"
-    >
-
-        <div class="container why-layout">
-
-            <div class="why-copy reveal">
-
-                <p class="section-kicker">
-                    چرا کودکستان گام؟
-                </p>
-
-                <h2>
-                    کمتر وقت صرف کارهای تکراری کنید،
-                    بیشتر روی رشد کودکان تمرکز کنید
-                </h2>
-
-                <p>
-                    هدف سیستم گام این است که اطلاعات پراکنده، ثبت‌های دستی
-                    و پیگیری‌های دشوار را به یک جریان کاری ساده و قابل اعتماد تبدیل کند.
-                </p>
-
-
-                <div class="why-points">
-
-                    <div class="why-point">
-                        <span>
-                            <i class="fa-solid fa-check"></i>
-                        </span>
-                        ثبت و دسترسی سریع به معلومات شاگردان
-                    </div>
-
-                    <div class="why-point">
-                        <span>
-                            <i class="fa-solid fa-check"></i>
-                        پیگیری حضور، فیس و وضعیت صحی
-                        </span>
-                    </div>
-
-                    <div class="why-point">
-                        <span>
-                            <i class="fa-solid fa-check"></i>
-                        رابط کاربری ساده برای نقش‌های مختلف
-                        </span>
-                    </div>
-
-                </div>
-
+    <section class="section features-section" id="features">
+        <div class="container">
+            <div class="section-heading centered reveal">
+                <span class="section-tag">امکانات گام</span>
+                <h2>یک روز آرام‌تر برای تیم شما،<br><span>یک تجربه بهتر برای کودکان</span></h2>
+                <p>ابزارهای ضروری کودکستان در یک محیط روشن، سریع و قابل اعتماد کنار هم قرار گرفته‌اند.</p>
             </div>
 
-
-            <div class="why-metrics reveal reveal-delay">
-
-                <article class="metric-card metric-main">
-
-                    <span class="metric-icon">
-                        <i class="fa-solid fa-chart-line"></i>
-                    </span>
-
-                    <strong data-counter="93">0</strong>
-
-                    <span class="metric-unit">%</span>
-
-                    <p>
-                        نمونه نمایش نرخ حضور در داشبورد
-                    </p>
-
+            <div class="feature-bento">
+                <article class="feature-card feature-large reveal">
+                    <div class="feature-copy">
+                        <span class="feature-icon mint"><i class="fa-solid fa-calendar-check"></i></span>
+                        <span class="feature-label">حضور و برنامه‌ریزی</span>
+                        <h3>هر روز، منظم و قابل پیگیری</h3>
+                        <p>حضور شاگردان و آموزگاران، برنامه‌های درسی و فعالیت‌های روزانه را سریع ثبت و مرور کنید.</p>
+                        <span class="feature-meta"><i class="fa-solid fa-check"></i> ثبت سریع و گزارش روشن</span>
+                    </div>
+                    <div class="mini-attendance" aria-hidden="true">
+                        <div class="mini-header"><span>امروز، ۲۱ اسد</span><strong>۹۳٪ حاضر</strong></div>
+                        <div class="student-row"><span class="student-avatar a1">آ</span><div><strong>آرین</strong><small>صنف ستاره</small></div><em class="present">حاضر</em></div>
+                        <div class="student-row"><span class="student-avatar a2">ر</span><div><strong>رها</strong><small>صنف رنگین‌کمان</small></div><em class="present">حاضر</em></div>
+                        <div class="student-row"><span class="student-avatar a3">ن</span><div><strong>نیما</strong><small>صنف آفتاب</small></div><em class="pending">در انتظار</em></div>
+                    </div>
                 </article>
 
-
-                <article class="metric-card">
-
-                    <span class="metric-icon">
-                        <i class="fa-solid fa-users"></i>
-                    </span>
-
-                    <strong>چند نقش</strong>
-
-                    <p>
-                        مدیر، معلم، شاگرد و بخش‌های اجرایی
-                    </p>
-
+                <article class="feature-card feature-dark reveal">
+                    <span class="feature-icon coral"><i class="fa-solid fa-heart-pulse"></i></span>
+                    <span class="feature-label">سلامت</span>
+                    <h3>مراقبت دقیق‌تر، خیال آسوده‌تر</h3>
+                    <p>سوابق صحی و بررسی‌های روزانه را منظم، امن و همیشه در دسترس نگه دارید.</p>
+                    <div class="health-pulse" aria-hidden="true"><i class="fa-solid fa-heart"></i><span></span></div>
                 </article>
 
-
-                <article class="metric-card">
-
-                    <span class="metric-icon">
-                        <i class="fa-solid fa-layer-group"></i>
-                    </span>
-
-                    <strong>یک سیستم</strong>
-
-                    <p>
-                        اطلاعات، ارتباطات و عملیات روزانه
-                    </p>
-
+                <article class="feature-card reveal">
+                    <span class="feature-icon yellow"><i class="fa-solid fa-comments"></i></span>
+                    <span class="feature-label">ارتباطات</span>
+                    <h3>همه در یک مسیر</h3>
+                    <p>پیام‌رسانی داخلی برای هماهنگی سریع‌تر میان اعضای کودکستان.</p>
+                    <div class="message-preview" aria-hidden="true"><span>س</span><div><i></i><i></i></div><em>همین حالا</em></div>
                 </article>
 
+                <article class="feature-card reveal">
+                    <span class="feature-icon blue"><i class="fa-solid fa-chart-pie"></i></span>
+                    <span class="feature-label">امور مالی</span>
+                    <h3>شفاف و بدون پیچیدگی</h3>
+                    <p>پرداخت‌ها، فیس‌ها و گزارش‌های مالی را دقیق و یکپارچه دنبال کنید.</p>
+                    <div class="finance-bars" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></div>
+                </article>
             </div>
-
         </div>
-
     </section>
 
+    <section class="experience-section" id="experience">
+        <div class="container experience-layout">
+            <div class="experience-visual reveal">
+                <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+                <div class="experience-card card-main">
+                    <span class="experience-number">۰۱</span>
+                    <div><small>شروع ساده</small><strong>اطلاعات را یک‌بار، درست ثبت کنید</strong></div>
+                </div>
+                <div class="experience-card card-second">
+                    <span class="experience-number">۰۲</span>
+                    <div><small>همکاری روان</small><strong>هر نقش، ابزار مناسب خودش را دارد</strong></div>
+                </div>
+                <div class="experience-card card-third">
+                    <span class="experience-number">۰۳</span>
+                    <div><small>تصمیم بهتر</small><strong>گزارش‌ها همیشه روشن و آماده‌اند</strong></div>
+                </div>
+                <span class="decor-star"><i class="fa-solid fa-star"></i></span>
+            </div>
 
-    <section class="container">
+            <div class="experience-copy reveal reveal-delay">
+                <span class="section-tag light">تجربه متفاوت</span>
+                <h2>فناوری باید کار را آسان کند، نه پیچیده</h2>
+                <p>گام برای کار واقعی یک کودکستان طراحی شده است؛ از اولین ثبت صبحگاهی تا آخرین گزارش روز.</p>
+                <div class="experience-points">
+                    <div><span><i class="fa-solid fa-wand-magic-sparkles"></i></span><div><strong>ساده از همان نگاه اول</strong><small>رابط روشن برای استفاده روزمره همه اعضای تیم</small></div></div>
+                    <div><span><i class="fa-solid fa-shield-halved"></i></span><div><strong>اطلاعات منظم و مطمئن</strong><small>دسترسی نقش‌محور و ساختار قابل پیگیری</small></div></div>
+                    <div><span><i class="fa-solid fa-mobile-screen-button"></i></span><div><strong>همراه شما در هر دستگاه</strong><small>تجربه روان روی موبایل، تبلت و کامپیوتر</small></div></div>
+                </div>
+            </div>
+        </div>
+    </section>
 
+    <section class="section roles-section" id="roles">
+        <div class="container">
+            <div class="roles-heading reveal">
+                <div><span class="section-tag">یک سامانه، برای همه</span><h2>هرکس، دقیقاً آنچه نیاز دارد</h2></div>
+                <p>فضای کاری هر نقش متناسب با مسئولیت‌های اوست؛ ساده، مشخص و بدون شلوغی.</p>
+            </div>
+
+            <div class="roles-grid">
+                <article class="role-card reveal"><span class="role-icon"><i class="fa-solid fa-user-tie"></i></span><strong>مدیر</strong><small>دید کامل و تصمیم‌گیری سریع</small><i class="fa-solid fa-arrow-left role-arrow"></i></article>
+                <article class="role-card reveal"><span class="role-icon"><i class="fa-solid fa-person-chalkboard"></i></span><strong>آموزگار</strong><small>صنف، حضور و برنامه‌های روزانه</small><i class="fa-solid fa-arrow-left role-arrow"></i></article>
+                <article class="role-card reveal"><span class="role-icon"><i class="fa-solid fa-child-reaching"></i></span><strong>شاگرد</strong><small>برنامه و اطلاعات شخصی</small><i class="fa-solid fa-arrow-left role-arrow"></i></article>
+                <article class="role-card reveal"><span class="role-icon"><i class="fa-solid fa-user-doctor"></i></span><strong>بخش صحی</strong><small>بررسی و پیگیری سلامت</small><i class="fa-solid fa-arrow-left role-arrow"></i></article>
+                <article class="role-card reveal"><span class="role-icon"><i class="fa-solid fa-coins"></i></span><strong>بخش مالی</strong><small>فیس‌ها، پرداخت‌ها و گزارش‌ها</small><i class="fa-solid fa-arrow-left role-arrow"></i></article>
+            </div>
+        </div>
+    </section>
+
+    <section class="container cta-wrap">
         <div class="cta reveal">
-
-            <div class="cta-glow"></div>
-
-            <div class="cta-inner">
-
-                <div>
-
-                    <span class="cta-kicker">
-                        شروع یک تجربه بهتر
-                    </span>
-
-                    <h2 id="cta-title">
-                        آماده‌اید کارهای کودکستان را ساده‌تر کنید؟
-                    </h2>
-
-                    <p>
-                        حساب خود را ایجاد کنید و وارد محیط مدیریت کودکستان گام شوید.
-                    </p>
-
-                </div>
-
-
-                <div class="cta-actions">
-
-                    <a
-                        class="button button-primary"
-                        href="{% url 'signup' %}"
-                    >
-                        ایجاد حساب کاربری
-                        <i class="fa-solid fa-arrow-left"></i>
-                    </a>
-
-                    <a
-                        class="cta-login"
-                        href="{% url 'login_chat' %}"
-                    >
-                        قبلاً حساب دارید؟ ورود
-                    </a>
-
-                </div>
-
+            <div class="cta-shape" aria-hidden="true"></div>
+            <div class="cta-copy">
+                <span class="cta-mark"><i class="fa-solid fa-shapes"></i></span>
+                <div><span>آماده یک شروع بهتر هستید؟</span><h2>قدم بعدی را با اطمینان بردارید.</h2><p>حساب خود را بسازید و وارد محیط هوشمند کودکستان گام شوید.</p></div>
             </div>
-
+            <div class="cta-actions">
+                <a class="button button-primary" href="{% url 'signup' %}">ایجاد حساب کاربری <i class="fa-solid fa-arrow-left"></i></a>
+                <a href="{% url 'login_chat' %}">قبلاً حساب دارید؟ ورود به سیستم</a>
+            </div>
         </div>
-
     </section>
-
 </main>
 
-
 <footer id="contact">
-
-    <div class="container footer-inner">
-
-        <div class="footer-brand">
-
-            <span>
-                <i class="fa-solid fa-school"></i>
-            </span>
-
-            <div>
-                <strong>کودکستان گام</strong>
-                <small>مدیریت هوشمند کودکستان</small>
-            </div>
-
+    <div class="container footer-main">
+        <div class="footer-about">
+            <a class="brand footer-logo" href="{% url 'homepage' %}"><span class="brand-mark"><i class="fa-solid fa-shapes"></i></span><span class="brand-copy"><strong>کودکستان گام</strong><small>هر قدم، یک شروع روشن</small></span></a>
+            <p>سامانه‌ای برای مدیریت بهتر امروز و ساختن فردایی روشن‌تر برای کودکان.</p>
         </div>
-
-
-        <div class="footer-info">
-            <span>
-                <i class="fa-solid fa-location-dot"></i>
-                مکروریان سوم، کابل
-            </span>
-
-            <span dir="ltr">
-                <i class="fa-solid fa-phone"></i>
-                0788919112
-            </span>
-        </div>
-
-
-        <p class="copyright">
-            © ۲۰۲۶ کودکستان گام. تمامی حقوق محفوظ است.
-        </p>
-
+        <div class="footer-links"><strong>دسترسی سریع</strong><a href="#features">امکانات</a><a href="#experience">تجربه گام</a><a href="#roles">نقش‌ها</a></div>
+        <div class="footer-contact"><strong>ارتباط با ما</strong><a href="tel:+93788919112" dir="ltr"><i class="fa-solid fa-phone"></i> 0788919112</a><span><i class="fa-solid fa-location-dot"></i> مکروریان سوم، کابل</span></div>
     </div>
-
+    <div class="container footer-bottom"><p>© ۲۰۲۶ کودکستان گام. تمامی حقوق محفوظ است.</p><span>ساخته‌شده برای قدم‌های بزرگِ کوچک</span></div>
 </footer>
 
-
-<script src="{% static 'js/homepage.js' %}"></script>
-
+<script src="{% static 'js/homepage.js' %}?v=20260812-hero-console"></script>
 </body>
 </html>
