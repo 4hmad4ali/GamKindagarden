@@ -288,9 +288,9 @@ input[type=number]{-moz-appearance:textfield}
   <nav class="sb-nav">
     <div class="sb-cat">منوی اصلی</div>
     <button class="sb-a on" id="nav-home" onclick="showPage('home','داشبورد مالی')"><span class="ic">🏠</span> داشبورد</button>
-    <div class="sb-cat">تراکنش‌ها</div>
-    <button class="sb-a" id="nav-transactions" onclick="showPage('transactions','تراکنش‌ها')"><span class="ic">💳</span> لیست تراکنش‌ها</button>
-    <button class="sb-a" id="nav-add-trans" onclick="showPage('add-trans','ثبت تراکنش جدید')"><span class="ic">➕</span> ثبت تراکنش</button>
+    <div class="sb-cat">ترانسکشن‌ها</div>
+    <button class="sb-a" id="nav-transactions" onclick="showPage('transactions','ترانسکشن‌ها')"><span class="ic">💳</span> لیست ترانسکشن‌ها</button>
+    <button class="sb-a" id="nav-add-trans" onclick="showPage('add-trans','ثبت ترانسکشن جدید')"><span class="ic">➕</span> ثبت ترانسکشن</button>
     <div class="sb-cat">فیس شاگردان</div>
     <button class="sb-a" id="nav-payments" onclick="showPage('payments','فیس شاگردان')"><span class="ic">📋</span> لیست فیس‌ها</button>
     <button class="sb-a" id="nav-add-payment" onclick="showPage('add-payment','ثبت فیس جدید')"><span class="ic">➕</span> ثبت فیس</button>
@@ -357,7 +357,7 @@ input[type=number]{-moz-appearance:textfield}
     <div class="sc orange">
       <div class="si">💳</div>
       <div class="sn">{{ total_transactions|default:"0" }}</div>
-      <div class="sl">تعداد تراکنش</div>
+      <div class="sl">تعداد ترانسکشن</div>
     </div>
   </div>
 
@@ -380,11 +380,11 @@ input[type=number]{-moz-appearance:textfield}
     </div>
   </div>
 
-  <div class="sec-t">آخرین تراکنش‌ها</div>
+  <div class="sec-t">آخرین ترانسکشن‌ها</div>
   <div class="card">
     <div class="card-head">
-      <h3>💳 تراکنش‌های اخیر</h3>
-      <button class="btn btn-pri btn-sm" onclick="showPage('transactions','تراکنش‌ها')">مشاهده همه ←</button>
+      <h3>💳 ترانسکشن‌های اخیر</h3>
+      <button class="btn btn-pri btn-sm" onclick="showPage('transactions','ترانسکشن‌ها')">مشاهده همه ←</button>
     </div>
     <div class="tbl-wrap">
     <table>
@@ -400,7 +400,7 @@ input[type=number]{-moz-appearance:textfield}
         <td><span class="badge b-b">{{ t.get_status_display|default:t.status }}</span></td>
       </tr>
       {% empty %}
-      <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text2)">📭 هیچ تراکنشی ثبت نشده</td></tr>
+      <tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text2)">📭 هیچ ترانسکشنی ثبت نشده</td></tr>
       {% endfor %}
       </tbody>
     </table>
@@ -419,10 +419,10 @@ input[type=number]{-moz-appearance:textfield}
 <!-- ══════════════════════ TRANSACTIONS LIST ══════════════════════ -->
 <div class="page" id="page-transactions">
   <div class="ph">
-    <div><h2>💳 لیست تراکنش‌ها</h2><p>تمام عملیات مالی ثبت شده</p></div>
+    <div><h2>💳 لیست ترانسکشن‌ها</h2><p>تمام عملیات مالی ثبت شده</p></div>
     <div class="ph-btns">
       <button class="btn btn-sec btn-sm" onclick="showPage('home','داشبورد مالی')">← بازگشت</button>
-      <button class="btn btn-pri btn-sm" onclick="showPage('add-trans','ثبت تراکنش جدید')">➕ تراکنش جدید</button>
+      <button class="btn btn-pri btn-sm" onclick="showPage('add-trans','ثبت ترانسکشن جدید')">➕ ترانسکشن جدید</button>
     </div>
   </div>
   <div class="stats">
@@ -457,7 +457,7 @@ input[type=number]{-moz-appearance:textfield}
         </td>
       </tr>
       {% empty %}
-      <tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text2)">📭 هیچ تراکنشی ثبت نشده</td></tr>
+      <tr><td colspan="9" style="text-align:center;padding:24px;color:var(--text2)">📭 هیچ ترانسکشنی ثبت نشده</td></tr>
       {% endfor %}
       </tbody>
     </table>
@@ -468,8 +468,8 @@ input[type=number]{-moz-appearance:textfield}
 <!-- ══════════════════════ ADD TRANSACTION ══════════════════════ -->
 <div class="page" id="page-add-trans">
   <div class="ph">
-    <div><h2>➕ ثبت تراکنش جدید</h2><p>یک تراکنش درآمد یا هزینه ثبت کنید</p></div>
-    <button class="btn btn-sec btn-sm" onclick="showPage('transactions','تراکنش‌ها')">← بازگشت</button>
+    <div><h2>➕ ثبت ترانسکشن جدید</h2><p>یک ترانسکشن درآمد یا هزینه ثبت کنید</p></div>
+    <button class="btn btn-sec btn-sm" onclick="showPage('transactions','ترانسکشن‌ها')">← بازگشت</button>
   </div>
   <div class="form-box">
     <form method="POST" action="{% url 'transaction_add' %}">{% csrf_token %}
@@ -478,7 +478,7 @@ input[type=number]{-moz-appearance:textfield}
           <input type="hidden" name="transaction_id" value="">
         </div>
         <div class="fg">
-          <label>نوع تراکنش *</label>
+          <label>نوع ترانسکشن *</label>
           <select name="transaction_type" required>
             <option value="income">💵 درآمد</option>
             <option value="expense">💸 هزینه</option>
@@ -519,11 +519,11 @@ input[type=number]{-moz-appearance:textfield}
       </div>
       <div class="fg">
         <label>📝 توضیحات</label>
-        <textarea name="description" placeholder="توضیح تراکنش..."></textarea>
+        <textarea name="description" placeholder="توضیح ترانسکشن..."></textarea>
       </div>
       <div style="display:flex;gap:9px;margin-top:6px">
-        <button type="submit" class="btn btn-pri">💾 ذخیره تراکنش</button>
-        <button type="button" class="btn btn-sec" onclick="showPage('transactions','تراکنش‌ها')">لغو</button>
+        <button type="submit" class="btn btn-pri">💾 ذخیره ترانسکشن</button>
+        <button type="button" class="btn btn-sec" onclick="showPage('transactions','ترانسکشن‌ها')">لغو</button>
       </div>
     </form>
   </div>
@@ -661,10 +661,10 @@ input[type=number]{-moz-appearance:textfield}
     <div class="sc green"><div class="si">📈</div><div class="sn">{{ total_income|default:0 }}</div><div class="sl">مجموع درآمد ؋</div></div>
     <div class="sc red"><div class="si">📉</div><div class="sn">{{ total_expense|default:0 }}</div><div class="sl">مجموع هزینه ؋</div></div>
     <div class="sc blue"><div class="si">💹</div><div class="sn">{{ net_balance|default:0 }}</div><div class="sl">سود خالص ؋</div></div>
-    <div class="sc orange"><div class="si">📋</div><div class="sn">{{ total_transactions|default:0 }}</div><div class="sl">تعداد تراکنش</div></div>
+    <div class="sc orange"><div class="si">📋</div><div class="sn">{{ total_transactions|default:0 }}</div><div class="sl">تعداد ترانسکشن</div></div>
   </div>
   <div class="card">
-    <div class="card-head"><h3>📊 جزئیات تمام تراکنش‌ها</h3></div>
+    <div class="card-head"><h3>📊 جزئیات تمام ترانسکشن‌ها</h3></div>
     {% for t in all_transactions %}
     <div style="display:flex;justify-content:space-between;align-items:center;
       padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;flex-wrap:wrap;gap:8px">
@@ -703,7 +703,7 @@ input[type=number]{-moz-appearance:textfield}
     <div class="sc green"><div class="si">📈</div><div class="sn">{{ total_income|default:0 }}</div><div class="sl">درآمد کل ؋</div></div>
     <div class="sc red"><div class="si">📉</div><div class="sn">{{ total_expense|default:0 }}</div><div class="sl">هزینه کل ؋</div></div>
     <div class="sc blue"><div class="si">💹</div><div class="sn">{{ net_balance|default:0 }}</div><div class="sl">سود خالص ؋</div></div>
-    <div class="sc orange"><div class="si">💳</div><div class="sn">{{ total_transactions|default:0 }}</div><div class="sl">تراکنش‌ها</div></div>
+    <div class="sc orange"><div class="si">💳</div><div class="sn">{{ total_transactions|default:0 }}</div><div class="sl">ترانسکشن‌ها</div></div>
   </div>
   <div class="sec-t">وضعیت فیس</div>
   <div class="stats stats-3">

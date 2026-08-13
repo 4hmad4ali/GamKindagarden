@@ -145,8 +145,8 @@ class Migration(migrations.Migration):
                 ('student', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='transactions', to='core.student')),
             ],
             options={
-                'verbose_name': 'تراکنش',
-                'verbose_name_plural': 'تراکنش\u200cها',
+                'verbose_name': 'ترانسکشن',
+                'verbose_name_plural': 'ترانسکشن\u200cها',
                 'ordering': ['-transaction_date'],
             },
         ),

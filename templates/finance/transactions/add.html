@@ -1,7 +1,7 @@
 {% extends 'finance/base.html' %}
 
-{% block title %}ثبت تراکنش - GAAM{% endblock %}
-{% block page_title %}ثبت تراکنش جدید{% endblock %}
+{% block title %}ثبت ترانسکشن - GAAM{% endblock %}
+{% block page_title %}ثبت ترانسکشن جدید{% endblock %}
 {% block nav_transaction_add %}active{% endblock %}
 
 {% block content %}
@@ -14,8 +14,8 @@
         </span>
 
         <div>
-            <h2>ثبت تراکنش جدید</h2>
-            <p>یک تراکنش درآمد یا هزینه ثبت کنید</p>
+            <h2>ثبت ترانسکشن جدید</h2>
+            <p>یک ترانسکشن درآمد یا هزینه ثبت کنید</p>
         </div>
     </div>
 
@@ -42,7 +42,7 @@
 
                 <label>
                     <i class="fa-solid fa-right-left"></i>
-                    نوع تراکنش *
+                    نوع ترانسکشن *
                 </label>
 
                 <select name="transaction_type" required>
@@ -133,7 +133,7 @@
 
                 <textarea
                     name="description"
-                    placeholder="توضیح تراکنش (اختیاری)..."
+                    placeholder="توضیح ترانسکشن (اختیاری)..."
                 >{{ transaction.description|default:'' }}</textarea>
 
             </div>

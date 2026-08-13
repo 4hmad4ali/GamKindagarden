@@ -37,9 +37,9 @@
         </div>
 
         <div class="nav-actions">
-            <a class="nav-login" href="{% url 'login_chat' %}">ورود به سیستم</a>
-            <a class="nav-signup" href="{% url 'signup' %}">
-                <span>ایجاد حساب</span>
+           
+            <a class="nav-signup" href="{% url  'login_chat' %}">
+                <span>ورود به حساب</span>
                 <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
             </a>
             <button class="menu-toggle" id="menu-toggle" type="button" aria-label="باز کردن فهرست" aria-expanded="false" aria-controls="mobile-menu">
@@ -87,7 +87,7 @@
                 </p>
 
                 <div class="hero-actions">
-                    <a class="button button-primary" href="{% url 'signup' %}">
+                    <a class="button button-primary" href="{% url  'login_chat' %}">
                         <span>شروع با گام</span>
                         <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
                     </a>
@@ -275,8 +275,8 @@
                 <div><span>آماده یک شروع بهتر هستید؟</span><h2>قدم بعدی را با اطمینان بردارید.</h2><p>حساب خود را بسازید و وارد محیط هوشمند کودکستان گام شوید.</p></div>
             </div>
             <div class="cta-actions">
-                <a class="button button-primary" href="{% url 'signup' %}">ایجاد حساب کاربری <i class="fa-solid fa-arrow-left"></i></a>
-                <a href="{% url 'login_chat' %}">قبلاً حساب دارید؟ ورود به سیستم</a>
+                <a class="button button-primary" href="{% url  'login_chat' %}">,ورود به حساب کاربری <i class="fa-solid fa-arrow-left"></i></a>
+               
             </div>
         </div>
     </section>

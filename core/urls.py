@@ -163,9 +163,9 @@ urlpatterns = [
     path('student/profile/update/', views.student_profile_update, name='student_profile_update'),
     path('student/profile/picture/', views.student_profile_picture, name='student_profile_picture'),
 
-    # ════════════════════════════════════════════════════════════════
+    #  
     # Doctor Dashboard - داشبورد داکتر
-    # ════════════════════════════════════════════════════════════════
+    #  
     path('doctor/', views.doctor_dashboard, name='doctor_dashboard'),
     path('doctor/health/', views.doctor_health_list, name='doctor_health_list'),
     path('doctor/health/add/', views.doctor_health_add, name='doctor_health_add'),
@@ -179,9 +179,9 @@ urlpatterns = [
     path('doctor/profile/picture/',       views.doctor_profile_picture,  name='doctor_profile_picture'),  
     
 
-    # ════════════════════════════════════════════════════════════════
+    #  
     # Finance Dashboard - داشبورد مالی
-    # ════════════════════════════════════════════════════════════════
+    #  
     path('finance/', views.finance_dashboard, name='finance_dashboard'),
     path('finance/transactions/', views.finance_transactions, name='finance_transactions'),
     path('finance/transactions/add/', views.transaction_add, name='finance_transaction_add'),

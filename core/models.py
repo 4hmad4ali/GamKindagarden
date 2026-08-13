@@ -206,8 +206,8 @@ class Transaction(models.Model):
         return f"{self.transaction_type} - {self.amount}"
 
     class Meta:
-        verbose_name = 'تراکنش'
-        verbose_name_plural = 'تراکنش‌ها'
+        verbose_name = 'ترانسکشن'
+        verbose_name_plural = 'ترانسکشن‌ها'
         ordering = ['-transaction_date']
 
 

@@ -77,9 +77,9 @@ def _payment_payload(request, payment=None):
         'status': status,
     }
 
-# ════════════════════════════════════════════════════════════════
+#  
 #  PROFILE CONTEXT HELPER
-# ════════════════════════════════════════════════════════════════
+#  
 def _get_profile_context(user):
     """عکس پروفایل، نام، تلفن و بایو را برای همه view ها برمی‌گرداند"""
     ctx = {
@@ -100,9 +100,9 @@ def _get_profile_context(user):
     return ctx
 
 
-# ════════════════════════════════════════════════════════════════
-# 🏠 HOMEPAGE
-# ════════════════════════════════════════════════════════════════
+#  
+#  HOMEPAGE
+#  
 
 def homepage(request):
     """صفحه اصلی"""
@@ -113,9 +113,9 @@ def homepage(request):
     }
     return render(request, 'homepage.html', context)
 
-# ════════════════════════════════════════════════════════════════
-# 1️⃣ ADMIN DASHBOARD
-# ════════════════════════════════════════════════════════════════
+#  
+#  ADMIN DASHBOARD
+#  
 
 @login_required(login_url='login_chat')
 def admin_dashboard(request):
@@ -167,7 +167,7 @@ def privileged_accounts(request):
                 _set_managed_account_role(account, role)
                 account.save(update_fields=['is_staff'])
                 UserProfile.objects.get_or_create(user=account)
-            messages.success(request, 'Account created.')
+            messages.success(request, 'حساب  با موفقیت اضافه شد.')
             return redirect('privileged_accounts')
         except ValidationError as error:
             messages.error(request, error.messages[0])
@@ -182,7 +182,7 @@ def privileged_accounts(request):
 def privileged_account_edit(request, pk):
     account = get_object_or_404(User, pk=pk)
     if account == request.user or account.is_superuser:
-        messages.error(request, 'This protected account cannot be changed here.')
+        messages.error(request, 'این حساب محافظت‌شده قابل ویرایش نیست.')
         return redirect('privileged_accounts')
     if request.method == 'POST':
         try:
@@ -200,7 +200,7 @@ def privileged_account_edit(request, pk):
                 if password:
                     account.set_password(password)
                 account.save()
-            messages.success(request, 'Account updated.')
+            messages.success(request, 'حساب با موفقیت بروزرسانی شد.')
             return redirect('privileged_accounts')
         except ValidationError as error:
             messages.error(request, error.messages[0])
@@ -216,15 +216,15 @@ def privileged_account_delete(request, pk):
     account = get_object_or_404(User, pk=pk)
     if request.method == 'POST':
         if account == request.user or account.is_superuser:
-            messages.error(request, 'This protected account cannot be deleted.')
+            messages.error(request, 'این حساب محافظت‌شده قابل حذف نیست.')
         else:
             account.delete()
-            messages.success(request, 'Account deleted.')
+            messages.success(request, 'حساب با موفقیت حذف شد.')
     return redirect('privileged_accounts')
 
-# ════════════════════════════════════════════════════════════════
-# 2️⃣ ATTENDANCE
-# ════════════════════════════════════════════════════════════════
+#  
+# ATTENDANCE
+#  
 
 @login_required(login_url='login_chat')
 def attendance_list(request):
@@ -282,7 +282,7 @@ def attendance_add(request):
                         attendance.status = status
                         attendance.save()
                 
-                messages.success(request, '✅ حضوری روزانه با موفقیت ثبت شد')
+                messages.success(request, ' حضوری روزانه با موفقیت ثبت شد')
             else:
                 # رکورد منفرد
                 employee = Employee.objects.get(id=request.POST.get('employee'))
@@ -353,9 +353,9 @@ def attendance_delete(request, pk):
     
     return redirect('attendance_list')
 
-# ════════════════════════════════════════════════════════════════
-# 3️⃣ TEACHERS
-# ════════════════════════════════════════════════════════════════
+#  
+#  TEACHERS
+#  
 
 @login_required(login_url='login_chat')
 def teachers_list(request):
@@ -494,9 +494,9 @@ def teacher_delete(request, pk):
     
     return redirect('teachers_list')
 
-# ════════════════════════════════════════════════════════════════
-# 4️⃣ STUDENTS
-# ════════════════════════════════════════════════════════════════
+#  
+#  STUDENTS
+#  
 
 @login_required(login_url='login_chat')
 def students_list(request):
@@ -633,16 +633,16 @@ def student_delete(request, pk):
     
     return redirect('students_list')
 
-# ════════════════════════════════════════════════════════════════
-# 5️⃣ FINANCE
-# ════════════════════════════════════════════════════════════════
+#  
+#  FINANCE
+#  
 
 @login_required(login_url='login_chat')
 def finance_list(request):
     """
-    لیست تمام تراکنش‌های مالی
+    لیست تمام ترانسکشن‌های مالی
     - نمایش درآمد، هزینه، درآمد خالص
-    - جدول تمام تراکنش‌ها
+    - جدول تمام ترانسکشن‌ها
     - دکمه‌های Edit و Delete
     """
     transactions = Transaction.objects.select_related('student').all().order_by('-transaction_date', '-id')
@@ -679,11 +679,11 @@ def _transaction_payload(request, transaction=None):
     payload['description'] = request.POST.get('description', '').strip() or '—'
 
     if any(not payload[field] for field in fields):
-        raise ValidationError('لطفاً تمام فیلدهای الزامی تراکنش را تکمیل کنید.')
+        raise ValidationError('لطفاً تمام فیلدهای الزامی ترانسکشن را تکمیل کنید.')
     if payload['transaction_type'] not in {'income', 'expense'}:
-        raise ValidationError({'transaction_type': 'نوع تراکنش معتبر نیست.'})
+        raise ValidationError({'transaction_type': 'نوع ترانسکشن معتبر نیست.'})
     if payload['status'] not in {'completed', 'pending'}:
-        raise ValidationError({'status': 'وضعیت تراکنش معتبر نیست.'})
+        raise ValidationError({'status': 'وضعیت ترانسکشن معتبر نیست.'})
 
     payload['student_id'] = None
 
@@ -702,7 +702,7 @@ def _transaction_payload(request, transaction=None):
 @login_required(login_url='login_chat')
 def transaction_add(request):
     """
-    افزودن تراکنش جدید - با auto-generate transaction_id
+    افزودن ترانسکشن جدید - با auto-generate transaction_id
     """
     is_finance = request.resolver_match.url_name.startswith('finance_')
     if request.method == 'POST':
@@ -714,7 +714,7 @@ def transaction_add(request):
                 # Use a generated immutable ID, avoiding user-supplied collisions.
                 trx_id = f"TRX-{_date.today().strftime('%Y%m%d')}-{uuid.uuid4().hex[:6].upper()}"
                 Transaction.objects.create(transaction_id=trx_id, **_transaction_payload(request))
-            messages.success(request, '✅ تراکنش با موفقیت اضافه شد')
+            messages.success(request, 'ترانسکشن با موفقیت اضافه شد')
             if is_finance:
                 return redirect('finance_transactions')
             return redirect('finance_list')
@@ -744,7 +744,7 @@ def transaction_edit(request, pk):
                 setattr(transaction, field, value)
             transaction.save()
             
-            messages.success(request, '✅ تراکنش با موفقیت بروزرسانی شد')
+            messages.success(request, '✅ ترانسکشن با موفقیت بروزرسانی شد')
             if is_finance:
                 return redirect('finance_transactions')
             return redirect('finance_list')
@@ -772,7 +772,7 @@ def transaction_delete(request, pk):
     if request.method == 'POST':
         try:
             transaction.delete()
-            messages.success(request, '✅ تراکنش با موفقیت حذف شد')
+            messages.success(request, '✅ ترانسکشن با موفقیت حذف شد')
         except Exception as e:
             messages.error(request, f'❌ خطا: {str(e)}')
     
@@ -780,9 +780,9 @@ def transaction_delete(request, pk):
         return redirect('finance_transactions')
     return redirect('finance_list')
 
-# ════════════════════════════════════════════════════════════════
-# 6️⃣ EMPLOYEES
-# ════════════════════════════════════════════════════════════════
+#  
+#  EMPLOYEES
+#  
 
 @login_required(login_url='login_chat')
 def employees_list(request):
@@ -895,9 +895,9 @@ def employee_delete(request, pk):
     
     return redirect('employees_list')
 
-# ════════════════════════════════════════════════════════════════
-# 7️⃣ MEDICAL (DOCTOR)
-# ════════════════════════════════════════════════════════════════
+#  
+#  MEDICAL (DOCTOR)
+#  
 
 @login_required(login_url='login_chat')
 def medical_list(request):
@@ -1036,9 +1036,9 @@ def medical_delete(request, pk):
     
     return redirect('medical_list')
 
-# ════════════════════════════════════════════════════════════════
-# 8️⃣ REPORTS
-# ════════════════════════════════════════════════════════════════
+#  
+#  REPORTS
+#  
 
 _REPORT_MONTHS_FA = ('جنوری', 'فبروری', 'مارچ', 'اپریل', 'می', 'جون', 'جولای', 'اگست', 'سپتمبر', 'اکتوبر', 'نومبر', 'دسمبر')
 
@@ -1210,7 +1210,7 @@ def _admin_pdf_document(context):
         ]),
         ('وضعیت مالی ماهانه', [
             ('درآمد تکمیل‌شده', f"AFN {context['total_income']}"), ('هزینه تکمیل‌شده', f"AFN {context['total_expenses']}"),
-            ('تراز خالص', f"AFN {context['net_balance']}"), ('تعداد تراکنش‌ها', context['total_income_count'] + context['total_expense_count']),
+            ('تراز خالص', f"AFN {context['net_balance']}"), ('تعداد ترانسکشن‌ها', context['total_income_count'] + context['total_expense_count']),
         ]),
     ]
     for section_index, (section, rows) in enumerate(sections):
@@ -1247,9 +1247,9 @@ def admin_report_pdf(request):
     response['Content-Disposition'] = f'attachment; filename="gaam-admin-report-{context["selected_year"]}-{context["selected_month"]:02d}.pdf"'
     return response
 
-# ════════════════════════════════════════════════════════════════
-# 9️⃣ CLASSES
-# ════════════════════════════════════════════════════════════════
+#  
+# CLASSES
+#  
 
 @login_required(login_url='login_chat')
 def _class_payload(request):
@@ -1363,9 +1363,9 @@ def class_delete(request, pk):
             messages.error(request, f'❌ خطا: {str(e)}')
     return redirect('classes_list')
 
-# ════════════════════════════════════════════════════════════════
+#  
 # 🔟 PROFILE
-# ════════════════════════════════════════════════════════════════
+#  
 
 def _get_or_create_profile(user):
     """Helper: get or create UserProfile safely"""
@@ -1471,9 +1471,9 @@ def profile_upload_picture(request):
     return redirect('profile')
 
 
-# ════════════════════════════════════════════════════════════════
+#  
 # teacher_dashboard
-# ════════════════════════════════════════════════════════════════
+#  
 
 def _linked_teacher_for_user(user):
     """Return the teacher owned by this account, repairing only safe legacy links."""
@@ -2099,9 +2099,9 @@ def teacher_profile_picture(request):
             messages.error(request, f'❌ خطا: {str(e)}')
     return redirect('teacher_dashboard')
 
-# ════════════════════════════════════════════════════════════════
+#  
 # سایر Dashboards
-# ════════════════════════════════════════════════════════════════
+#  
 
 @login_required(login_url='login_chat')
 def student_dashboard(request, template_name='student/dashboard.html'):
@@ -2423,10 +2423,10 @@ def student_profile_picture(request):
     from django.urls import reverse
     return redirect('student_profile')
 
-# ════════════════════════════════════════════════════════════════
+#  
 # doctor DASHBOARD -داشبورد داکتر
 # 
-# ════════════════════════════════════════════════════════════════
+#  
 
 @login_required(login_url='login_chat')
 @login_required(login_url='login_chat')
@@ -2643,10 +2643,10 @@ def doctor_profile_picture(request):
     from django.urls import reverse
     return redirect('doctor_profile')
 
-# ════════════════════════════════════════════════════════════════
+#  
 # 💰 FINANCE DASHBOARD - داشبورد مالی
 # 
-# ════════════════════════════════════════════════════════════════
+#  
 
 def _finance_page_context(request):
     """Shared data for every page in the split finance dashboard."""
@@ -2654,7 +2654,7 @@ def _finance_page_context(request):
     total_expense = Transaction.objects.filter(transaction_type='expense').aggregate(Sum('amount'))['amount__sum'] or 0
     net_balance   = total_income - total_expense
 
-    # تراکنش‌ها
+    # ترانسکشن‌ها
     all_transactions   = Transaction.objects.all().order_by('-transaction_date')
     recent_transactions = all_transactions[:8]
     total_transactions = all_transactions.count()
@@ -2844,9 +2844,9 @@ def finance_profile(request):
     return render(request, 'finance/profile.html', _finance_page_context(request))
 
 
-# ════════════════════════════════════════════════════════════════
+#  
 # 💰 PAYMENT ADD - ثبت فیس جدید
-# ════════════════════════════════════════════════════════════════
+#  
 
 @login_required(login_url='login_chat')
 def _legacy_finance_payment_add(request):
@@ -2879,9 +2879,9 @@ def _legacy_finance_payment_add(request):
     return redirect('finance_dashboard')
 
 
-# ════════════════════════════════════════════════════════════════
+#  
 # 💰 PAYMENT MARK PAID - علامت‌گذاری پرداخت شده
-# ════════════════════════════════════════════════════════════════
+#  
 
 @login_required(login_url='login_chat')
 def _legacy_finance_payment_mark(request, pk):
@@ -2900,9 +2900,9 @@ def _legacy_finance_payment_mark(request, pk):
 
 
 
-# ════════════════════════════════════════════════════════════════
+#  
 # 💰 PAYMENT EDIT - ویرایش فیس
-# ════════════════════════════════════════════════════════════════
+#  
 
 @login_required(login_url='login_chat')
 def _legacy_finance_payment_edit(request, pk):
@@ -2930,9 +2930,9 @@ def _legacy_finance_payment_edit(request, pk):
             messages.error(request, f'❌ خطا: {str(e)}')
     return redirect('finance_dashboard')
 
-# ════════════════════════════════════════════════════════════════
+#  
 # 💰 PAYMENT DELETE - حذف فیس
-# ════════════════════════════════════════════════════════════════
+#  
 
 @login_required(login_url='login_chat')
 def _legacy_finance_payment_delete(request, pk):
@@ -2948,9 +2948,9 @@ def _legacy_finance_payment_delete(request, pk):
     return redirect('finance_dashboard')
 
 
-# ════════════════════════════════════════════════════════════════
+#  
 # 💰 FINANCE PROFILE UPDATE - ویرایش پروفایل مسئول مالی
-# ════════════════════════════════════════════════════════════════
+#  
 
 @login_required(login_url='login_chat')
 def finance_payment_add(request):
@@ -2959,11 +2959,11 @@ def finance_payment_add(request):
             with transaction.atomic():
                 payment = StudentPayment.objects.create(**_payment_payload(request))
                 _sync_payment_transaction(payment)
-            messages.success(request, 'Student fee saved successfully.')
+            messages.success(request, 'فیس شاگرد با موفقیت ثبت شد و با سیستم مالی همگام‌سازی شد.')
         except ValidationError as error:
             messages.error(request, error.messages[0])
         except Exception as error:
-            messages.error(request, f'Unable to save the student fee: {error}')
+            messages.error(request, f'خطا: {error}')
         return redirect('finance_payments')
     return render(request, 'finance/payments/add.html', _finance_page_context(request))
 
@@ -2978,7 +2978,7 @@ def finance_payment_edit(request, pk):
                     setattr(payment, field, value)
                 payment.save()
                 _sync_payment_transaction(payment)
-            messages.success(request, 'Student fee updated successfully.')
+            messages.success(request, 'فیس شاگرد با موفقیت به‌روزرسانی شد.')
         except ValidationError as error:
             messages.error(request, error.messages[0])
     return redirect('finance_payments')
@@ -2993,7 +2993,7 @@ def finance_payment_mark(request, pk):
             payment.paid_amount = payment.total_amount
             payment.save(update_fields=['status', 'paid_amount'])
             _sync_payment_transaction(payment)
-        messages.success(request, 'Student fee marked as paid.')
+        messages.success(request, 'فیس شاگردبه  پرداخت‌شده  شد.')
     return redirect('finance_payments')
 
 
@@ -3005,7 +3005,7 @@ def finance_payment_delete(request, pk):
             if payment.transaction_id:
                 payment.transaction.delete()
             payment.delete()
-        messages.success(request, 'Student fee deleted.')
+        messages.success(request, 'فیس شاگرد با موفقیت حذف شد.')
     return redirect('finance_payments')
 
 
@@ -3032,11 +3032,11 @@ def admin_student_payment_add(request):
             with transaction.atomic():
                 payment = StudentPayment.objects.create(**_payment_payload(request))
                 _sync_payment_transaction(payment)
-            messages.success(request, 'Student fee saved and synchronized with finance.')
+            messages.success(request, 'فیس شاگرد با موفقیت ثبت شد و با سیستم مالی همگام‌سازی شد.')
         except ValidationError as error:
             messages.error(request, error.messages[0])
         except Exception as error:
-            messages.error(request, f'Unable to save the student fee: {error}')
+            messages.error(request, f'خطا: {error}')
     return redirect('admin_student_payments')
 
 
@@ -3049,7 +3049,7 @@ def admin_student_payment_mark(request, pk):
             payment.paid_amount = payment.total_amount
             payment.save(update_fields=['status', 'paid_amount'])
             _sync_payment_transaction(payment)
-        messages.success(request, 'Payment marked as paid and added to finance.')
+        messages.success(request, 'فیس شاگرد به عنوان پرداخت‌شده علامت‌گذاری شد و با سیستم مالی همگام‌سازی شد.')
     return redirect('admin_student_payments')
 
 
@@ -3097,9 +3097,9 @@ def finance_profile_update(request):
     return redirect('finance_profile')
 
 
-# ════════════════════════════════════════════════════════════════
+#  
 # 💰 FINANCE PROFILE PICTURE - تغییر عکس پروفایل
-# ════════════════════════════════════════════════════════════════
+#  
 
 @login_required(login_url='login_chat')
 def finance_profile_picture(request):

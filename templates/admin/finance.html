@@ -341,7 +341,7 @@
         <div>
             <p class="finance-kicker">مدیریت مالی</p>
 
-            <h1>تراکنش‌ها</h1>
+            <h1>ترانسکشن‌ها</h1>
 
             <p>
                 درآمدها، هزینه‌ها و پرداخت‌های ثبت‌شده را با دیدی روشن مدیریت کنید.
@@ -366,8 +366,8 @@
 
 
     <p class="finance-note">
-        آمار مالی فقط بر اساس تراکنش‌های «تکمیل‌شده» محاسبه می‌شود؛
-        تراکنش‌های در انتظار در مبالغ نهایی وارد نمی‌شوند.
+        آمار مالی فقط بر اساس ترانسکشن‌های «تکمیل‌شده» محاسبه می‌شود؛
+        ترانسکشن‌های در انتظار در مبالغ نهایی وارد نمی‌شوند.
     </p>
 
 
@@ -394,7 +394,7 @@
         </article>
 
         <article class="finance-stat pending">
-            <span>تراکنش‌های در انتظار</span>
+            <span>ترانسکشن‌های در انتظار</span>
             <strong>{{ pending_transactions }}</strong>
         </article>
 
@@ -406,7 +406,7 @@
         <header class="finance-panel-head">
 
             <h2>
-                همه تراکنش‌ها
+                همه ترانسکشن‌ها
                 <span style="color:var(--text2);font-weight:500">
                     ({{ transactions|length }})
                 </span>
@@ -417,7 +417,7 @@
                 class="finance-search"
                 type="search"
                 placeholder="جستجو بر اساس شناسه، دسته یا توضیحات"
-                aria-label="جستجوی تراکنش‌ها"
+                aria-label="جستجوی ترانسکشن‌ها"
             >
 
         </header>
@@ -523,7 +523,7 @@
                                 <form
                                     method="post"
                                     action="{% url 'transaction_delete' transaction.id %}"
-                                    onsubmit="return confirm('آیا از حذف این تراکنش مطمئن هستید؟ این عمل قابل بازگشت نیست.');"
+                                    onsubmit="return confirm('آیا از حذف این ترانسکشن مطمئن هستید؟ این عمل قابل بازگشت نیست.');"
                                 >
                                     {% csrf_token %}
 
@@ -546,7 +546,7 @@
                         <td colspan="7">
                             <div class="finance-empty">
                                 <strong>
-                                    هنوز تراکنشی ثبت نشده است.
+                                    هنوز ترانسکشنی ثبت نشده است.
                                 </strong>
 
                                 برای شروع، نخستین درآمد یا هزینه را ثبت کنید.

@@ -1,7 +1,7 @@
 {% extends 'finance/base.html' %}
 
-{% block title %}تراکنش‌ها - GAAM{% endblock %}
-{% block page_title %}تراکنش‌ها{% endblock %}
+{% block title %}ترانسکشن‌ها - GAAM{% endblock %}
+{% block page_title %}ترانسکشن‌ها{% endblock %}
 {% block nav_transactions %}active{% endblock %}
 
 {% block content %}
@@ -14,14 +14,14 @@
         </span>
 
         <div>
-            <h2>لیست تراکنش‌ها</h2>
+            <h2>لیست ترانسکشن‌ها</h2>
             <p>تمام عملیات مالی ثبت‌شده</p>
         </div>
     </div>
 
     <a class="btn btn-primary" href="{% url 'finance_transaction_add' %}">
         <i class="fa-solid fa-plus"></i>
-        تراکنش جدید
+        ترانسکشن جدید
     </a>
 
 </div>
@@ -167,7 +167,7 @@
                     <td colspan="9">
                         <div class="empty-state">
                             <i class="fa-solid fa-receipt"></i>
-                            <strong>هیچ تراکنشی ثبت نشده</strong>
+                            <strong>هیچ ترانسکشنی ثبت نشده</strong>
                         </div>
                     </td>
                 </tr>

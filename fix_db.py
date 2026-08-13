@@ -1,8 +1,8 @@
 """
-╔══════════════════════════════════════════════════════════════════╗
+╔ ══╗
 ║    GAAM Kindergarten — Fix Database — نسخه کامل نهایی v4       ║
 ║  اجرا: python fix_db.py                                          ║
-╚══════════════════════════════════════════════════════════════════╝
+╚ ══╝
 """
 import os, sys, django
 
@@ -547,7 +547,7 @@ checks = [
     ('core_studenthealthreport','گزارش صحی (معلم)'),
     ('core_medical',            'معاینه داکتر'),
     ('core_studentpayment',     'فیس شاگردان'),
-    ('core_transaction',        'تراکنش‌های مالی'),
+    ('core_transaction',        'ترانسکشن‌های مالی'),
     ('core_userprofile',        'پروفایل کاربران'),
     ('core_doctorpresence',     'حضور داکتر'),
 ]
