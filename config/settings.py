@@ -5,11 +5,13 @@ Django settings for GAAM Kindergarten Management System.
 from pathlib import Path
 import os
 import pymysql
+from dotenv import load_dotenv
 
 pymysql.version_info = (2, 2, 1, 'final', 0)
 pymysql.install_as_MySQLdb()
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(BASE_DIR / '.env')
 
 SECRET_KEY = 'gaam-kindergarten-secret-key-change-in-production-2026'
 
@@ -61,14 +63,16 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
+# Railway MySQL runs in a separate service, so its host is never localhost.
+# Locally, DATABASE_* values from .env continue to be used as fallbacks.
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'gaam_kindergarten_db',
-        'USER': 'root',
-        'PASSWORD': 'password123',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'NAME': os.getenv('MYSQLDATABASE') or os.getenv('DATABASE_NAME', 'gaam_kindergarten_db'),
+        'USER': os.getenv('MYSQLUSER') or os.getenv('DATABASE_USER', 'root'),
+        'PASSWORD': os.getenv('MYSQLPASSWORD') or os.getenv('DATABASE_PASSWORD', 'password123'),
+        'HOST': os.getenv('MYSQLHOST') or os.getenv('DATABASE_HOST', 'localhost'),
+        'PORT': os.getenv('MYSQLPORT') or os.getenv('DATABASE_PORT', '3306'),
         'OPTIONS': {
             'charset': 'utf8mb4',
             # ✅ init_command حذف شد - strict mode خاموش است
