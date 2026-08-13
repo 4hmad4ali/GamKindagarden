@@ -7,14 +7,73 @@
   .employee-form-page{max-width:920px;margin:auto}.form-top{display:flex;justify-content:space-between;gap:18px;align-items:center;margin-bottom:22px}.form-top h1{font-size:23px;color:var(--text);margin:0}.form-top p{margin:6px 0 0;color:var(--text2);font-size:12px}.back-button{padding:10px 13px;border:1px solid var(--border);border-radius:9px;color:var(--text);background:var(--card);text-decoration:none;font-size:12px;font-weight:800;white-space:nowrap}.employee-form-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:25px}.form-section+.form-section{margin-top:25px;padding-top:24px;border-top:1px solid var(--border)}.section-title{display:flex;align-items:center;gap:9px;margin:0 0 17px;color:var(--text);font-size:14px}.section-icon{width:28px;height:28px;border-radius:8px;background:#e0e7ff;color:#3730a3;display:grid;place-items:center}.fields{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}.field.full{grid-column:1/-1}.field label{display:block;margin-bottom:7px;font-size:12px;font-weight:800;color:var(--text2)}.field input{box-sizing:border-box;width:100%;padding:11px 12px;border:1px solid var(--border);border-radius:9px;background:var(--bg);color:var(--text);font-family:inherit;font-size:13px}.field input:focus{outline:none;border-color:var(--pri);box-shadow:0 0 0 3px rgba(79,70,229,.12)}.field input[type="email"],.field input[type="tel"],.field input[type="number"]{direction:ltr;text-align:right}.help{display:block;margin-top:5px;color:var(--text2);font-size:10px}.active-control{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border:1px solid var(--border);border-radius:10px;background:var(--bg)}.active-control strong{display:block;color:var(--text);font-size:12px}.active-control span{display:block;margin-top:3px;color:var(--text2);font-size:11px}.active-control input{width:19px;height:19px;accent-color:var(--pri)}.form-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:25px}.form-actions a,.form-actions button{padding:12px 18px;border-radius:9px;font-family:inherit;font-size:13px;font-weight:800;text-decoration:none;cursor:pointer}.cancel{border:1px solid var(--border);background:var(--card);color:var(--text)}.save{border:0;background:linear-gradient(135deg,#312e81,#4f46e5);color:#fff;box-shadow:0 8px 18px rgba(79,70,229,.22)}@media(max-width:650px){.form-top{align-items:flex-start;flex-direction:column}.fields{grid-template-columns:1fr}.field.full{grid-column:auto}.form-actions{flex-direction:column-reverse}.form-actions>*{text-align:center}}
 </style>
 <main class="employee-form-page">
-  <header class="form-top"><div><h1>{% if edit_mode %}ویرایش اطلاعات کارمند{% else %}افزودن کارمند جدید{% endif %}</h1><p>اطلاعات ضروری را با دقت وارد کنید. موارد ستاره‌دار الزامی هستند.</p></div><a class="back-button" href="{% url 'employees_list' %}">← بازگشت به فهرست</a></header>
+  <header class="form-top"><div>
+    <h1>{% if edit_mode %}ویرایش اطلاعات کارمند{% else %}افزودن کارمند جدید{% endif %}</h1>
+    <p>اطلاعات ضروری را با دقت وارد کنید. موارد ستاره‌دار الزامی هستند.</p>
+  </div><a class="back-button" href="{% url 'employees_list' %}">← بازگشت به فهرست</a>
+  </header>
   <form method="post" class="employee-form-card" novalidate>{% csrf_token %}
-    <section class="form-section"><h2 class="section-title"><span class="section-icon">۱</span>مشخصات فردی</h2>
+    <section class="form-section">
+      <h2 class="section-title"><span class="section-icon">۱</span>مشخصات فردی</h2>
       <div class="fields">
-        <div class="field"><label for="first_name">نام *</label><input id="first_name" name="first_name" value="{{ employee.first_name|default:'' }}" required maxlength="100" autocomplete="given-name"></div><div class="field"><label for="last_name">نام خانوادگی *</label><input id="last_name" name="last_name" value="{{ employee.last_name|default:'' }}" required maxlength="100" autocomplete="family-name"></div><div class="field"><label for="phone">شماره تماس *</label><input id="phone" type="tel" name="phone" value="{{ employee.phone|default:'' }}" required maxlength="10" autocomplete="tel"></div><div class="field"><label for="email">ایمیل *</label><input id="email" type="email" name="email" value="{{ employee.email|default:'' }}" required maxlength="254" autocomplete="email"></div>
-    </div></section>
-    <section class="form-section"><h2 class="section-title"><span class="section-icon">۲</span>اطلاعات استخدامی</h2><div class="fields"><div class="field"><label for="employee_id">کد کارمندی *</label><input id="employee_id" name="employee_id" value="{{ employee.employee_id|default:'' }}" required maxlength="20" autocomplete="off"><small class="help">این کد باید برای هر کارمند یکتا باشد.</small></div><div class="field"><label for="position">سمت شغلی *</label><input id="position" name="position" value="{{ employee.position|default:'' }}" required maxlength="100" placeholder="مثلاً: مسئول اداری"></div><div class="field"><label for="salary">حقوق ماهانه (AFN) *</label><input id="salary" type="number" name="salary" value="{{ employee.salary|default:'' }}" required min="0.01" step="0.01" inputmode="decimal"><small class="help">مقدار باید بزرگ‌تر از صفر باشد.</small></div><div class="field"><label for="hire_date">تاریخ استخدام *</label><input id="hire_date" type="date" name="hire_date" value="{{ employee.hire_date|date:'Y-m-d' }}" required></div><div class="field full"><label>وضعیت همکاری</label><label class="active-control" for="is_active"><span><strong>کارمند فعال است</strong><span>کارمند فعال در فهرست و آمار جاری نمایش داده می‌شود.</span></span><input id="is_active" type="checkbox" name="is_active" {% if not employee or employee.is_active %}checked{% endif %}></label></div></div></section>
-    <footer class="form-actions"><a class="cancel" href="{% url 'employees_list' %}">انصراف</a><button class="save" type="submit">{% if edit_mode %}ذخیره تغییرات{% else %}ثبت کارمند{% endif %}</button></footer>
+        <div class="field">
+          <label for="first_name">نام *</label>
+          <input id="first_name"
+           name="first_name" value="{{ employee.first_name|default:'' }}"
+            required maxlength="100" autocomplete="given-name">
+          </div>
+          <div class="field">
+            <label for="last_name">نام خانوادگی *</label><input id="last_name" 
+            name="last_name" value="{{ employee.last_name|default:'' }}"
+             required maxlength="100" autocomplete="family-name">
+            </div>
+            <div class="field"><label for="phone">شماره تماس *</label><input id="phone" 
+              type="tel" name="phone" value="{{ employee.phone|default:'' }}"
+               required maxlength="10" autocomplete="tel">
+              </div>
+              <div class="field"><label for="email">ایمیل *</label><input id="email" 
+                type="email" name="email" value="{{ employee.email|default:'' }}"
+                 required maxlength="254" autocomplete="email">
+              </div>
+    </div>
+  </section>
+    <section class="form-section">
+      <h2 class="section-title">
+        <span class="section-icon">۲</span>اطلاعات استخدامی</h2>
+        <div class="fields">
+          <div class="field"><label for="employee_id">کد کارمندی *</label>
+            <input id="employee_id" name="employee_id"
+             value="{{ employee.employee_id|default:'' }}" required maxlength="20"
+              autocomplete="off">
+              <small class="help">این کد باید برای هر کارمند یکتا باشد.</small>
+            </div>
+            <div class="field">
+              <label for="position">سمت شغلی *</label><input id="position" 
+              name="position" value="{{ employee.position|default:'' }}"
+               required maxlength="100" placeholder="مثلاً: مسئول اداری">
+              </div>
+              <div class="field"><label for="salary">حقوق ماهانه (AFN) *</label><input id="salary"
+                 type="number" name="salary" value="{{ employee.salary|default:'' }}" 
+                 required min="0.01" step="0.01" inputmode="decimal">
+                 <small class="help">مقدار باید بزرگ‌تر از صفر باشد.</small>
+                </div>
+                <div class="field">
+                  <label for="hire_date">تاریخ استخدام *</label>
+                  <input id="hire_date" type="date" name="hire_date" 
+                  value="{{ employee.hire_date|date:'Y-m-d' }}" required>
+                </div>
+                <div class="field full"><label>وضعیت همکاری</label>
+                  <label class="active-control" for="is_active">
+                    <span><strong>کارمند فعال است</strong><span>کارمند فعال در فهرست و آمار جاری نمایش داده می‌شود.</span>
+                  </span>
+                  <input id="is_active" type="checkbox" name="is_active" {% if not employee or employee.is_active %}checked{% endif %}></label>
+                </div>
+              </div>
+            </section>
+    <footer class="form-actions">
+      <a class="cancel" href="{% url 'employees_list' %}">انصراف</a>
+      <button class="save" type="submit">{% if edit_mode %}ذخیره تغییرات{% else %}ثبت کارمند{% endif %}</button>
+    </footer>
   </form>
 </main>
 {% endblock %}

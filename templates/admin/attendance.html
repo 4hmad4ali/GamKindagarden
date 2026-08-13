@@ -34,9 +34,42 @@
 
   <section class="records-card" aria-labelledby="records-title">
     <div class="records-head"><h2 id="records-title">رکوردهای ثبت‌شده</h2><span>{{ attendances|length }} رکورد</span></div>
-    <div class="table-scroll"><table class="records-table"><thead><tr><th>کارمند</th><th>تاریخ</th><th>ورود</th><th>خروج</th><th>وضعیت</th><th>عملیات</th></tr></thead><tbody>
-      {% for a in attendances %}<tr><td class="record-person">{{ a.employee }}</td><td>{{ a.date|date:"Y-m-d" }}</td><td>{% if a.check_in_time %}{{ a.check_in_time|time:"H:i" }}{% else %}<span class="muted">—</span>{% endif %}</td><td>{% if a.check_out_time %}{{ a.check_out_time|time:"H:i" }}{% else %}<span class="muted">—</span>{% endif %}</td><td>{% if a.status == "present" %}<span class="status-badge status-present">حاضر</span>{% elif a.status == "absent" %}<span class="status-badge status-absent">غایب</span>{% else %}<span class="status-badge status-leave">مرخصی</span>{% endif %}</td><td><div class="record-actions"><a href="{% url 'attendance_edit' a.id %}" class="icon-button" aria-label="ویرایش حضور {{ a.employee }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m14 5 5 5L9 20l-5 1 1-5L14 5Z"/></svg></a><form method="POST" action="{% url 'attendance_delete' a.id %}">{% csrf_token %}<button type="submit" class="icon-button delete btn-delete" aria-label="حذف حضور {{ a.employee }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M10 11v5M14 11v5M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></form></div></td></tr>
-      {% empty %}<tr><td colspan="6"><div class="empty-state"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M8 12h8"/></svg><p>هنوز هیچ رکورد حضوری ثبت نشده است.</p></div></td></tr>{% endfor %}
+    <div class="table-scroll">
+      <table class="records-table">
+        <thead>
+          <tr><th>کارمند</th>
+            <th>تاریخ</th>
+            <th>ورود</th>
+            <th>خروج</th>
+            <th>وضعیت</th>
+            <th>عملیات</th>
+          </tr>
+        </thead>
+        <tbody>
+      {% for a in attendances %}<tr>
+        <td class="record-person">{{ a.employee }}</td>
+        <td>{{ a.date|date:"Y-m-d" }}</td>
+        <td>{% if a.check_in_time %}{{ a.check_in_time|time:"H:i" }}{% else %}<span class="muted">—</span>{% endif %}</td>
+        <td>{% if a.check_out_time %}{{ a.check_out_time|time:"H:i" }}{% else %}<span class="muted">—</span>{% endif %}</td>
+        <td>{% if a.status == "present" %}<span class="status-badge status-present">حاضر</span>{% elif a.status == "absent" %}<span class="status-badge status-absent">غایب</span>{% else %}<span class="status-badge status-leave">مرخصی</span>{% endif %}</td>
+        <td>
+          <div class="record-actions">
+            <a href="{% url 'attendance_edit' a.id %}" class="icon-button" aria-label="ویرایش حضور {{ a.employee }}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m14 5 5 5L9 20l-5 1 1-5L14 5Z"/></svg>
+            </a><form method="POST" action="{% url 'attendance_delete' a.id %}">{% csrf_token %}
+              <button type="submit" class="icon-button delete btn-delete" aria-label="حذف حضور {{ a.employee }}">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M10 11v5M14 11v5M6 7l1 13h10l1-13M9 7V4h6v3"/>
+      </svg>
+    </button>
+  </form>
+      </div>
+      </td>
+      </tr>
+      {% empty %}<tr><td colspan="6">
+        <div class="empty-state">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7">
+            <rect x="4" y="5" width="16" height="15" rx="2"/><path d="M8 3v4M16 3v4M8 12h8"/>
+          </svg><p>هنوز هیچ رکورد حضوری ثبت نشده است.</p></div></td></tr>{% endfor %}
     </tbody></table></div>
   </section>
 </div>

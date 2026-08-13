@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 
 class ChatUserProfile(models.Model):
-    """پروفایل کاربر چت — عکس پروفایل و وضعیت آنلاین"""
+    """ chat profile"""
     user            = models.OneToOneField(User, on_delete=models.CASCADE, related_name='chat_profile')
     profile_picture = models.ImageField(upload_to='chat_profiles/', null=True, blank=True)
     is_online       = models.BooleanField(default=False)
@@ -24,7 +24,7 @@ class ChatUserProfile(models.Model):
 
 
 class DirectMessage(models.Model):
-    """پیام مستقیم بین دو کارمند"""
+    """Direct message between two users"""
     sender     = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chat_sent')
     receiver   = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chat_received')
     content    = models.TextField()

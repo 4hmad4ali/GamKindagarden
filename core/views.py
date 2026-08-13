@@ -392,6 +392,9 @@ def _teacher_payload(request, teacher=None):
     if teacher:
         candidate.pk = teacher.pk
         candidate.user = teacher.user
+        # This represents an existing row. Without this Django's uniqueness
+        # validation checks the teacher's own employee ID as a duplicate.
+        candidate._state.adding = False
     candidate.full_clean()
     return payload
 
@@ -533,6 +536,9 @@ def _student_payload(request, student=None):
     if student:
         candidate.pk = student.pk
         candidate.user = student.user
+        # This represents an existing row. Without this Django's uniqueness
+        # validation checks the student's own ID as a duplicate.
+        candidate._state.adding = False
     candidate.full_clean()
     return {field: getattr(candidate, field) for field in (*fields, 'is_active')}
 
@@ -728,8 +734,7 @@ def transaction_add(request):
 @login_required(login_url='login_chat')
 def transaction_edit(request, pk):
     """
-    ویرایش تراکنش
-    """
+    ویرایش ترانسکشن    """
     is_finance = request.resolver_match.url_name.startswith('finance_')
     transaction = get_object_or_404(Transaction, pk=pk)
     
@@ -761,8 +766,7 @@ def transaction_edit(request, pk):
 @login_required(login_url='login_chat')
 def transaction_delete(request, pk):
     """
-    حذف تراکنش
-    """
+    حذف ترانسکشن    """
     transaction = get_object_or_404(Transaction, pk=pk)
     
     if request.method == 'POST':

@@ -1,7 +1,7 @@
 """SQLite-only settings for local testing.
 
 This module intentionally does not import ``config.settings`` so local tests
-do not need the MySQL driver.  The normal MySQL configuration is unchanged.
+This is for test.
 """
 
 from pathlib import Path

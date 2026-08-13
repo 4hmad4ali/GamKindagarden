@@ -2,9 +2,9 @@ import datetime
 from django.db import models
 from django.contrib.auth.models import User
 
-# ════════════════════════════════════════════════════════════════
-# 0️⃣ UserProfile - پروفایل کاربر
-# ════════════════════════════════════════════════════════════════
+
+#  UserProfile 
+
 
 class UserProfile(models.Model):
     """پروفایل کاربر - عکس، تلفون، بخش، بایو"""
@@ -22,9 +22,9 @@ class UserProfile(models.Model):
         verbose_name_plural = 'پروفایل‌ها'
 
 
-# ════════════════════════════════════════════════════════════════
-# 1️⃣ Employee
-# ════════════════════════════════════════════════════════════════
+
+# 1️ Employee
+
 
 class Employee(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
@@ -47,9 +47,9 @@ class Employee(models.Model):
         verbose_name_plural = 'کارمندان'
 
 
-# ════════════════════════════════════════════════════════════════
-# 2️⃣ Teacher
-# ════════════════════════════════════════════════════════════════
+
+#  Teacher
+
 
 class Teacher(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
@@ -71,9 +71,9 @@ class Teacher(models.Model):
         verbose_name_plural = 'معلمان'
 
 
-# ════════════════════════════════════════════════════════════════
-# 3️⃣ Student
-# ════════════════════════════════════════════════════════════════
+
+# Student
+
 
 class Student(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
@@ -97,9 +97,9 @@ class Student(models.Model):
         verbose_name_plural = 'شاگردان'
 
 
-# ════════════════════════════════════════════════════════════════
-# 4️⃣ Attendance
-# ════════════════════════════════════════════════════════════════
+
+# Attendance
+
 
 class Attendance(models.Model):
     CHOICES = [
@@ -124,9 +124,9 @@ class Attendance(models.Model):
         ordering = ['-date']
 
 
-# ════════════════════════════════════════════════════════════════
-# 5️⃣ Class
-# ════════════════════════════════════════════════════════════════
+
+# Class
+
 
 class Class(models.Model):
     class_name = models.CharField(max_length=100)
@@ -145,9 +145,9 @@ class Class(models.Model):
         verbose_name_plural = 'کلاس‌ها'
 
 
-# ════════════════════════════════════════════════════════════════
-# 6️⃣ Medical
-# ════════════════════════════════════════════════════════════════
+
+#  Medical
+
 
 class Medical(models.Model):
     HEALTH_STATUS_CHOICES = [
@@ -175,12 +175,12 @@ class Medical(models.Model):
         verbose_name_plural = 'معاینات پزشکی'
 
 
-# ════════════════════════════════════════════════════════════════
-# 7️⃣ Transaction   ✅ FIXED: TRANSACTION_TYPE داخل کلاس
-# ════════════════════════════════════════════════════════════════
+
+#  Transaction   TRANSACTION_TYPE داخل کلاس
+
 
 class Transaction(models.Model):
-    # ✅ این لیست باید داخل کلاس باشد نه بیرون
+    #  این لیست باید داخل کلاس باشد نه بیرون
     TRANSACTION_TYPE = [
         ('income', 'درآمد'),
         ('expense', 'هزینه'),
@@ -211,9 +211,9 @@ class Transaction(models.Model):
         ordering = ['-transaction_date']
 
 
-# ════════════════════════════════════════════════════════════════
-# 8️⃣ StudentPayment
-# ════════════════════════════════════════════════════════════════
+
+# StudentPayment
+
 
 class StudentPayment(models.Model):
     PAYMENT_STATUS = [
@@ -245,9 +245,9 @@ class StudentPayment(models.Model):
         verbose_name_plural = 'پرداخت‌های شاگردان'
         ordering = ['-year', '-month']
         unique_together = ('student', 'month', 'year')
-# ════════════════════════════════════════════════════════════════
-# 9️⃣ TeacherPlan - پلان درسی معلم  ✅ NEW
-# ════════════════════════════════════════════════════════════════
+
+#  TeacherPlan 
+
 
 class TeacherPlan(models.Model):
     """پلان درسی معلم"""
@@ -271,9 +271,9 @@ class TeacherPlan(models.Model):
         ordering = ['-date']
 
 
-# ════════════════════════════════════════════════════════════════
-# 🔟 TeacherPresence - حضوری معلم  ✅ NEW
-# ════════════════════════════════════════════════════════════════
+
+#  TeacherPresence - 
+
 
 class TeacherPresence(models.Model):
     """حضوری معلم"""
@@ -299,9 +299,8 @@ class TeacherPresence(models.Model):
         ordering = ['-date']
 
 
-# ════════════════════════════════════════════════════════════════
-# 1️⃣1️⃣ StudentPresence - حضوری شاگرد  ✅ NEW
-# ════════════════════════════════════════════════════════════════
+
+#  StudentPresence 
 
 class StudentPresence(models.Model):
     """حضوری شاگرد توسط معلم"""
@@ -325,9 +324,8 @@ class StudentPresence(models.Model):
         ordering = ['-date']
 
 
-# ════════════════════════════════════════════════════════════════
-# 1️⃣2️⃣ StudentHealthReport - گزارش صحی شاگرد  ✅ NEW
-# ════════════════════════════════════════════════════════════════
+# StudentHealthReport - گزارش صحی 
+
 
 class StudentHealthReport(models.Model):
     """گزارش صحی شاگرد توسط معلم"""
@@ -354,9 +352,9 @@ class StudentHealthReport(models.Model):
         ordering = ['-date']
 
 
-# ════════════════════════════════════════════════════════════════
-# 1️⃣3️⃣ TeacherTimetable - جدول وقت  ✅ NEW
-# ════════════════════════════════════════════════════════════════
+
+#  TeacherTimetable - جدول وقت  
+
 
 class TeacherTimetable(models.Model):
     """جدول وقت معلم"""
