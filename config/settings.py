@@ -25,6 +25,9 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-local-development-key-chan
 DEBUG = _env_flag('DEBUG', default=True)
 
 ALLOWED_HOSTS = _env_list('DJANGO_ALLOWED_HOSTS', 'localhost,127.0.0.1')
+# Railway sends deployment health checks with this Host header.
+if 'healthcheck.railway.app' not in ALLOWED_HOSTS:
+    ALLOWED_HOSTS.append('healthcheck.railway.app')
 railway_public_domain = os.getenv('RAILWAY_PUBLIC_DOMAIN', '').strip()
 if railway_public_domain and railway_public_domain not in ALLOWED_HOSTS:
     ALLOWED_HOSTS.append(railway_public_domain)
