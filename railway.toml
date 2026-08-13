@@ -3,7 +3,7 @@ builder = "RAILPACK"
 buildCommand = "python manage.py collectstatic --noinput"
 
 [deploy]
-preDeployCommand = ["python manage.py migrate --noinput", "python manage.py ensure_initial_admin"]
+preDeployCommand = "python manage.py migrate --noinput && python manage.py ensure_initial_admin"
 startCommand = "gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --access-logfile - --error-logfile -"
 healthcheckPath = "/healthz/"
 healthcheckTimeout = 100
